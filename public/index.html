@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>互動牆｜簽到＆留言</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif; margin: 0; padding: 16px; }
+    .wrap { max-width: 960px; margin: 0 auto; }
+    h1 { margin: 8px 0 12px; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    input, button { font-size: 16px; padding: 10px 12px; }
+    button { cursor: pointer; }
+    .wall { margin-top: 16px; border-top: 1px solid #ddd; padding-top: 12px; }
+    .item { padding: 10px 0; border-bottom: 1px dashed #e0e0e0; }
+    .meta { color: #666; font-size: 13px; margin-bottom: 4px; }
+    .msg { font-size: 18px; }
+    .hint { color: #666; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>活動互動牆</h1>
+    <div class="hint">手機輸入名字＋留言（例如：我已簽到），送出後會即時顯示在大螢幕。</div>
+ 
+    <div class="grid" style="margin-top:12px;">
+      <input id="name" placeholder="請輸入你的名字（必填）" />
+      <input id="message" placeholder="請輸入留言或簽到內容（例如：我已簽到）" />
+      <button id="send">送出</button>
+    </div>
+ 
+    <div class="wall" id="wall"></div>
+  </div>
+ 
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const wall = document.getElementById("wall");
+    const nameEl = document.getElementById("name");
+    const msgEl = document.getElementById("message");
+    const btn = document.getElementById("send");
+ 
+    function now() {
+      const d = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+ 
+    btn.addEventListener("click", () => {
+      const name = nameEl.value.trim();
+      const message = (msgEl.value.trim() || "我已簽到");
+      if (!name) {
+        alert("請先輸入名字");
+        return;
+      }
+      socket.emit("checkin", { name, message, time: now() });
+      msgEl.value = "";
+      msgEl.focus();
+    });
+ 
+    socket.on("wall", (p) => {
+      const div = document.createElement("div");
+      div.className = "item";
+      div.innerHTML = `
+        <div class="meta">${p.time}｜${escapeHtml(p.name)}</div>
+        <div class="msg">${escapeHtml(p.message)}</div>
+      `;
+      wall.prepend(div);
+ 
+      while (wall.children.length > 50) wall.removeChild(wall.lastChild);
+    });
+ 
+    function escapeHtml(str){
+      return str.replace(/[&<>"']/g, s => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[s]));
+    }
+  </script>
+</body>
+</html>
