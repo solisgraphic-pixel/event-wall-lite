@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>互動牆｜簽到＆留言</title>
   <style>
+    /* 大螢幕模式隱藏輸入區 */
+.wall-only .input-area {
+  display: none;
+}
     body { font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif; margin: 0; padding: 16px; }
     .wrap { max-width: 960px; margin: 0 auto; }
     h1 { margin: 8px 0 12px; }
@@ -23,7 +27,7 @@
     <h1>活動互動牆</h1>
     <div class="hint">手機輸入名字＋留言（例如：我已簽到），送出後會即時顯示在大螢幕。</div>
  
-    <div class="grid" style="margin-top:12px;">
+    <div class="grid input-area" style="margin-top:12px;">
       <input id="name" placeholder="請輸入你的名字（必填）" />
       <input id="message" placeholder="請輸入留言或簽到內容（例如：我已簽到）" />
       <button id="send">送出</button>
@@ -34,6 +38,11 @@
  
   <script src="/socket.io/socket.io.js"></script>
   <script>
+    // 判斷是否為大螢幕模式
+const params = new URLSearchParams(window.location.search);
+if (params.get("wall") === "1") {
+  document.body.classList.add("wall-only");
+}
     const socket = io();
     const wall = document.getElementById("wall");
     const nameEl = document.getElementById("name");
