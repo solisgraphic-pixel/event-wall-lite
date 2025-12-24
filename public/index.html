@@ -45,6 +45,25 @@ button:hover {
 .brand img {
   max-height: 80px;
 }
+    /* QR Code 區塊 */
+.qr-box {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  text-align: center;
+  z-index: 999;
+}
+ 
+.qr-box p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #333;
+}
+ 
   </style>
 </head>
 <body>
@@ -114,6 +133,25 @@ if (params.get("wall") === "1") {
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
       }[s]));
     }
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+    <script>
+  // 只在大螢幕模式顯示 QR Code
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("wall") === "1") {
+    const qrBox = document.getElementById("qrBox");
+    qrBox.style.display = "block";
+ 
+    new QRious({
+      element: document.getElementById("qr"),
+      value: window.location.origin, // 手機簽到用網址
+      size: 140
+    });
+  }
+</script>
   </script>
+    <div class="qr-box" id="qrBox" style="display:none;">
+  <canvas id="qr"></canvas>
+  <p>掃描簽到</p>
+</div>
 </body>
 </html>
