@@ -135,23 +135,29 @@ if (params.get("wall") === "1") {
     }
     <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
     <script>
-  // 只在大螢幕模式顯示 QR Code
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("wall") === "1") {
-    const qrBox = document.getElementById("qrBox");
-    qrBox.style.display = "block";
+ // === 大螢幕模式顯示 QR Code ===
+//（如果你前面已經有 params，就不要再宣告一次）
+const _params = new URLSearchParams(window.location.search);
+if (_params.get("wall") === "1") {
+  const qrBox = document.getElementById("qrBox");
+  if (qrBox) qrBox.style.display = "block";
  
+  // QRious 需要已經載入（上面那個 script src）
+  if (window.QRious) {
     new QRious({
       element: document.getElementById("qr"),
-      value: window.location.origin, // 手機簽到用網址
-      size: 140
+      value: window.location.origin, // 手機簽到網址
+      size: 160
     });
   }
+}
 </script>
   </script>
-    <div class="qr-box" id="qrBox" style="display:none;">
+  <div class="qr-box" id="qrBox" style="display:none;">
   <canvas id="qr"></canvas>
   <p>掃描簽到</p>
 </div>
+ 
+<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 </body>
 </html>
