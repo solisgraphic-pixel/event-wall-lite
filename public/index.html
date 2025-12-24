@@ -3,78 +3,71 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>互動牆｜簽到＆留言</title>
+  <title>SOLIS 活動互動牆</title>
+ 
   <style>
-    /* 大螢幕模式隱藏輸入區 */
-.wall-only .input-area {
-  display: none;
-}
     body {
-  background: #f7f7f7;
-}
- 
-h1 {
-  color: #111;
-}
- 
-button {
-  background: #111;
-  color: #fff;
-  border: none;
-}
- 
-button:hover {
-  opacity: 0.9;
-}
-    body { font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif; margin: 0; padding: 16px; }
+      font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f7f7f7;
+    }
     .wrap { max-width: 960px; margin: 0 auto; }
-    h1 { margin: 8px 0 12px; }
+ 
+    .brand { text-align: center; margin-bottom: 12px; }
+    .brand img { max-height: 80px; }
+ 
+    h1 { margin: 8px 0 12px; color: #111; }
+    .hint { color: #666; font-size: 14px; margin-bottom: 12px; }
+ 
     .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
     input, button { font-size: 16px; padding: 10px 12px; }
-    button { cursor: pointer; }
+    button {
+      cursor: pointer;
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+    }
+    button:hover { opacity: 0.9; }
+ 
     .wall { margin-top: 16px; border-top: 1px solid #ddd; padding-top: 12px; }
     .item { padding: 10px 0; border-bottom: 1px dashed #e0e0e0; }
     .meta { color: #666; font-size: 13px; margin-bottom: 4px; }
     .msg { font-size: 18px; }
-    .hint { color: #666; font-size: 14px; }
-    .brand {
-  text-align: center;
-  margin-bottom: 12px;
-}
  
-.brand img {
-  max-height: 80px;
-}
+    /* 大螢幕模式隱藏輸入區 */
+    .wall-only .input-area { display: none; }
+ 
     /* QR Code 區塊 */
-.qr-box {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  background: #ffffff;
-  padding: 12px;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
-  text-align: center;
-  z-index: 999;
-}
- 
-.qr-box p {
-  margin: 6px 0 0;
-  font-size: 14px;
-  color: #333;
-}
- 
+    .qr-box {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+      text-align: center;
+      z-index: 999;
+      display: none; /* 預設不顯示 */
+    }
+    .qr-box p {
+      margin: 6px 0 0;
+      font-size: 14px;
+      color: #333;
+    }
   </style>
 </head>
+ 
 <body>
   <div class="brand">
-  <img src="/logo.png" alt="SOLIS" />
-</div>
+    <img src="logo.png" alt="SOLIS" />
+  </div>
+ 
   <div class="wrap">
-    <h1>SOLIS活動互動牆</h1>
-    <div class="hint"><div class="hint">
-歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到
-</div>
+    <h1>SOLIS 活動互動牆</h1>
+    <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到</div>
  
     <div class="grid input-area" style="margin-top:12px;">
       <input id="name" placeholder="請輸入你的名字（必填）" />
@@ -85,13 +78,22 @@ button:hover {
     <div class="wall" id="wall"></div>
   </div>
  
+  <!-- 右下角 QR（只在大螢幕模式顯示） -->
+  <div class="qr-box" id="qrBox">
+    <canvas id="qr"></canvas>
+    <p>掃描簽到</p>
+  </div>
+ 
   <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+ 
   <script>
     // 判斷是否為大螢幕模式
-const params = new URLSearchParams(window.location.search);
-if (params.get("wall") === "1") {
-  document.body.classList.add("wall-only");
-}
+    const params = new URLSearchParams(window.location.search);
+    const isWall = params.get("wall") === "1";
+    if (isWall) document.body.classList.add("wall-only");
+ 
+    // Socket.IO 即時牆
     const socket = io();
     const wall = document.getElementById("wall");
     const nameEl = document.getElementById("name");
@@ -107,10 +109,7 @@ if (params.get("wall") === "1") {
     btn.addEventListener("click", () => {
       const name = nameEl.value.trim();
       const message = (msgEl.value.trim() || "我已簽到");
-      if (!name) {
-        alert("請先輸入名字");
-        return;
-      }
+      if (!name) { alert("請先輸入名字"); return; }
       socket.emit("checkin", { name, message, time: now() });
       msgEl.value = "";
       msgEl.focus();
@@ -120,44 +119,31 @@ if (params.get("wall") === "1") {
       const div = document.createElement("div");
       div.className = "item";
       div.innerHTML = `
-        <div class="meta">${p.time}｜${escapeHtml(p.name)}</div>
+        <div class="meta">${escapeHtml(p.time)}｜${escapeHtml(p.name)}</div>
         <div class="msg">${escapeHtml(p.message)}</div>
       `;
       wall.prepend(div);
- 
       while (wall.children.length > 50) wall.removeChild(wall.lastChild);
     });
  
     function escapeHtml(str){
-      return str.replace(/[&<>"']/g, s => ({
+      return String(str).replace(/[&<>"']/g, s => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
       }[s]));
     }
-    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
-    <script>
- // === 大螢幕模式顯示 QR Code ===
-//（如果你前面已經有 params，就不要再宣告一次）
-const _params = new URLSearchParams(window.location.search);
-if (_params.get("wall") === "1") {
-  const qrBox = document.getElementById("qrBox");
-  if (qrBox) qrBox.style.display = "block";
  
-  // QRious 需要已經載入（上面那個 script src）
-  if (window.QRious) {
-    new QRious({
-      element: document.getElementById("qr"),
-      value: window.location.origin, // 手機簽到網址
-      size: 160
-    });
-  }
-}
-</script>
+    // 只在大螢幕模式顯示 QR
+    if (isWall) {
+      const qrBox = document.getElementById("qrBox");
+      qrBox.style.display = "block";
+ 
+      new QRious({
+        element: document.getElementById("qr"),
+        value: window.location.origin, // 給手機掃的簽到網址
+        size: 160
+      });
+    }
   </script>
-  <div class="qr-box" id="qrBox" style="display:none;">
-  <canvas id="qr"></canvas>
-  <p>掃描簽到</p>
-</div>
- 
-<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 </body>
 </html>
+ 
