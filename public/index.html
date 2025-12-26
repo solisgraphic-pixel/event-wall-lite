@@ -159,7 +159,11 @@
   gap: 10px;
   justify-content: center; /* ✅ 置中，左右留白一致 */
 }
+.host-card{
+  align-items: center;  /* ✅ 讓按鈕與文字共用中線 */
+}
 
+    
     .btn-draw{
       background: linear-gradient(135deg, #ff7a00, #ff9a3c);
       color: #fff;
@@ -176,11 +180,12 @@
       box-shadow: 0 10px 22px rgba(255,122,0,0.45);
     }
 
-    .host-info{
-      font-size: 14px;
-      color: #555;
-      text-align: right;
-    }
+.host-info{
+  font-size: 14px;
+  color: #555;
+  text-align: center;   /* ✅ 置中 */
+}
+
 
     /* 抽獎 overlay */
     .draw-overlay{
