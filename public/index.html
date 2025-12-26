@@ -33,11 +33,39 @@
  
     .wall { margin-top: 16px; border-top: 1px solid #ddd; padding-top: 12px; }
     .item { padding: 10px 0; border-bottom: 1px dashed #e0e0e0; }
-   .meta { color: #666; font-size: 16px; margin-bottom: 6px; display:flex; gap:10px; align-items: baseline; }
-.meta .name { font-size: 20px; font-weight: 700; color:#111; }
-.meta .time { font-size: 16px; color:#666; }
+.item { padding: 14px 0; border-bottom: 1px dashed #e6e6e6; }
  
-.msg { font-size: 26px; font-weight: 600; line-height: 1.35; }
+.line{
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+ 
+.line .name{
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+}
+ 
+.line .time{
+  font-size: 16px;
+  color: #666;
+  font-variant-numeric: tabular-nums;
+}
+ 
+.line .colon{
+  font-size: 22px;
+  color: #999;
+}
+ 
+.line .msg{
+  font-size: 26px;
+  font-weight: 650;
+  line-height: 1.35;
+  color: #111;
+  word-break: break-word;
+}
  
     /* 大螢幕模式隱藏輸入區 */
     .wall-only .input-area { display: none; }
@@ -140,12 +168,13 @@ btn.addEventListener("click", () => {
     socket.on("wall", (p) => {
       const div = document.createElement("div");
       div.className = "item";
-      div.innerHTML = `
-  <div class="meta">
+     div.innerHTML = `
+  <div class="line">
     <span class="name">${escapeHtml(p.name)}</span>
     <span class="time">${escapeHtml(p.time)}</span>
+    <span class="colon">：</span>
+    <span class="msg">${escapeHtml(p.message)}</span>
   </div>
-  <div class="msg">${escapeHtml(p.message)}</div>
 `;
       wall.prepend(div);
       while (wall.children.length > 50) wall.removeChild(wall.lastChild);
