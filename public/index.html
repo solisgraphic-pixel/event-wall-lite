@@ -268,10 +268,11 @@ body.is-host #hostActions{ display: flex; }
 
   <!-- 主持人控制卡（右上角） -->
   <div class="host-card" id="hostCard">
-    <div class="host-actions" id="hostActions">
-      <button class="btn-draw" id="drawBtn">🎉 立即抽獎</button>
-      <button class="btn-clear" id="clearBtn">清空名單</button>
-    </div>
+<div class="host-actions" id="hostActions">
+  <button class="btn-draw" id="drawBtn">🎉 抽 1 名</button>
+  <button class="btn-draw" id="draw3Btn">🎉 抽 3 名</button>
+  <button class="btn-clear" id="clearBtn">清空名單</button>
+</div>
     <div class="host-info" id="playerCount">參與者：0 人（一人一票）</div>
   </div>
 
@@ -389,56 +390,120 @@ if (isHost) document.body.classList.add("is-host");
     }
 
     // ===== 主持人：抽獎/清空（目前先做前端示意，不會真的清 server）=====
-    const drawBtn = document.getElementById("drawBtn");
-    const clearBtn = document.getElementById("clearBtn");
-
-    const drawOverlay = document.getElementById("drawOverlay");
-    const drawBox = document.getElementById("drawBox");
-    const drawName = document.getElementById("drawName");
-    const drawSub = document.getElementById("drawSub");
-    const drawClose = document.getElementById("drawClose");
-
-    function openDrawOverlay(){
-      drawOverlay.style.display = "flex";
-      drawName.textContent = "抽獎中…";
+   // ===== 主持人：抽獎/清空（目前先做前端示意，之後再接 server 真抽獎）=====
+const drawBtn = document.getElementById("drawBtn");
+const draw3Btn = document.getElementById("draw3Btn");
+const clearBtn = document.getElementById("clearBtn");
+ 
+const drawOverlay = document.getElementById("drawOverlay");
+const drawBox = document.getElementById("drawBox");
+const drawName = document.getElementById("drawName");
+const drawSub = document.getElementById("drawSub");
+const drawClose = document.getElementById("drawClose");
+ 
+function openDrawOverlay(){
+  drawOverlay.style.display = "flex";
+  drawName.textContent = "抽獎中…";
+  drawSub.textContent = "";
+  drawBox.classList.remove("win");
+}
+function closeDrawOverlay(){
+  drawOverlay.style.display = "none";
+}
+function sleep(ms){ return new Promise(res => setTimeout(res, ms)); }
+ 
+drawClose.addEventListener("click", closeDrawOverlay);
+drawOverlay.addEventListener("click", (e) => { if (e.target === drawOverlay) closeDrawOverlay(); });
+ 
+function rollingText(durationMs = 1200){
+  const frames = ["抽獎中", "抽獎中.", "抽獎中..", "抽獎中..."];
+  let i = 0;
+  const t = setInterval(() => {
+    if (drawOverlay.style.display !== "flex") { clearInterval(t); return; }
+    drawName.textContent = frames[i % frames.length];
+    i++;
+  }, 140);
+  setTimeout(() => clearInterval(t), durationMs);
+}
+ 
+// ⚠️ 先用前端「示意抽獎」：從當前牆上的名字抓出唯一名單
+function getUniqueNamesFromWall(){
+  const nodes = document.querySelectorAll(".line .name");
+  const names = [];
+  nodes.forEach(n => names.push(n.textContent.trim()));
+  return Array.from(new Set(names)).filter(Boolean);
+}
+ 
+function pickRandomUnique(list, count){
+  const arr = list.slice();
+  // 洗牌
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, Math.min(count, arr.length));
+}
+ 
+async function showWinners(winners){
+  for (let i = 0; i < winners.length; i++){
+    drawName.textContent = winners[i];
+    drawSub.textContent = `第 ${i+1} 位得獎者（共抽 ${winners.length} 名）`;
+    drawBox.classList.remove("win"); void drawBox.offsetWidth; drawBox.classList.add("win");
+    await sleep(1100);
+  }
+  drawName.textContent = `🎉 恭喜：${winners.join("、")}`;
+  drawSub.textContent = `本輪抽出 ${winners.length} 名`;
+  drawBox.classList.remove("win"); void drawBox.offsetWidth; drawBox.classList.add("win");
+}
+ 
+if (isHost) {
+  drawBtn.addEventListener("click", async () => {
+    openDrawOverlay();
+    rollingText(900);
+ 
+    // ✅ 示意：抽 1 名
+    const list = getUniqueNamesFromWall();
+    if (list.length === 0) {
+      drawName.textContent = "目前尚無參與者";
       drawSub.textContent = "";
-      drawBox.classList.remove("win");
+      return;
     }
-    function closeDrawOverlay(){
-      drawOverlay.style.display = "none";
+    const winners = pickRandomUnique(list, 1);
+    await sleep(950);
+    await showWinners(winners);
+ 
+    // ✅ 之後你會改成：socket.emit("host_draw", {count:1});
+  });
+ 
+  draw3Btn.addEventListener("click", async () => {
+    openDrawOverlay();
+    rollingText(1200);
+ 
+    // ✅ 示意：抽 3 名（不重複）
+    const list = getUniqueNamesFromWall();
+    if (list.length === 0) {
+      drawName.textContent = "目前尚無參與者";
+      drawSub.textContent = "";
+      return;
     }
-    drawClose.addEventListener("click", closeDrawOverlay);
-    drawOverlay.addEventListener("click", (e) => { if (e.target === drawOverlay) closeDrawOverlay(); });
-
-    if (isHost) {
-      drawBtn.addEventListener("click", () => {
-        openDrawOverlay();
-        // 你之後會接後端真正抽獎，現在先做嗨一下的假動畫
-        const frames = ["抽獎中", "抽獎中.", "抽獎中..", "抽獎中..."];
-        let i = 0;
-        const t = setInterval(() => {
-          if (drawOverlay.style.display !== "flex") { clearInterval(t); return; }
-          drawName.textContent = frames[i % frames.length];
-          i++;
-        }, 140);
-        setTimeout(() => {
-          clearInterval(t);
-          drawName.textContent = "（下一步接真正抽獎）";
-          drawSub.textContent = "等你確認 server.js 那邊抽獎邏輯後，我幫你接起來";
-          drawBox.classList.remove("win"); void drawBox.offsetWidth; drawBox.classList.add("win");
-        }, 1600);
-      });
-
-      clearBtn.addEventListener("click", () => {
-        if (confirm("確定要清空名單嗎？（下一步會接 server 真正清空）")) {
-          alert("已觸發清空（示意）");
-        }
-      });
-    } else {
-      // 來賓就算看得到 DOM，也不綁事件
-      drawBtn.disabled = true;
-      clearBtn.disabled = true;
+    const winners = pickRandomUnique(list, 3);
+    await sleep(1250);
+    await showWinners(winners);
+ 
+    // ✅ 之後你會改成：socket.emit("host_draw", {count:3});
+  });
+ 
+  clearBtn.addEventListener("click", () => {
+    if (confirm("確定要清空名單嗎？（下一步會接 server 真正清空）")) {
+      alert("已觸發清空（示意）");
     }
+  });
+} else {
+  // 來賓就算看得到 DOM，也不綁事件
+  drawBtn.disabled = true;
+  if (draw3Btn) draw3Btn.disabled = true;
+  clearBtn.disabled = true;
+}
   </script>
 </body>
 </html>
