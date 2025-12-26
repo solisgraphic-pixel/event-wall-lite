@@ -370,8 +370,7 @@
     const playerCountEl = document.getElementById("playerCount");
 
     const draw3Btn = document.getElementById("draw3Btn");
-    const clearBtn = document.getElementById("clearBtn");
-
+  
     const drawOverlay = document.getElementById("drawOverlay");
     const drawBox = document.getElementById("drawBox");
     const drawName = document.getElementById("drawName");
@@ -457,7 +456,7 @@
     // ===== 參與者人數 =====
     socket.on("participants_count", (d) => {
       const c = Number(d?.count ?? 0);
-      if (playerCountEl) playerCountEl.textContent = `參與者：${c} 人（一人一票）`;
+      if (playerCountEl) playerCountEl.textContent = ``參與者：${count} 人`;
     });
 
     // ===== QR：wall 或 host 顯示（掃到首頁，不帶 host）=====
@@ -506,15 +505,8 @@
         socket.emit("host_draw", { n: 3 });
       });
 
-      clearBtn.addEventListener("click", () => {
-        if (!confirm("確定要清空名單嗎？")) return;
-        socket.emit("host_reset");
-      });
-    } else {
-      // 來賓不綁事件（也避免有人硬點）
-      if (draw3Btn) draw3Btn.disabled = true;
-      if (clearBtn) clearBtn.disabled = true;
-    }
+
+   
 
     // ===== 抽獎結果：逐一揭曉 3 位 =====
     socket.on("draw_result", (r) => {
