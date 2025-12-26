@@ -4,85 +4,151 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SOLIS 活動互動牆</title>
- 
+
   <style>
     body {
       font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif;
       margin: 0;
-      padding: 16px;
+      padding: 20px;
       background: #f7f7f7;
     }
-    .wrap { max-width: 960px; margin: 0 auto; }
- 
-    .brand { text-align: center; margin-bottom: 12px; }
-    .brand img { max-height: 140px; }
- 
-    h1 { margin: 8px 0 12px; color: #111; }
-    .hint { color: #666; font-size: 14px; margin-bottom: 12px; }
- 
-    .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-    input, button { font-size: 16px; padding: 10px 12px; }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* 品牌 */
+    .brand {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .brand img {
+      max-height: 140px;
+    }
+
+    h1 {
+      margin: 10px 0 6px;
+      color: #111;
+      text-align: center;
+    }
+
+    .hint {
+      color: #666;
+      font-size: 15px;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    /* 輸入區 */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    input, button {
+      font-size: 18px;
+      padding: 14px 16px;
+      border-radius: 10px;
+    }
+
+    input {
+      border: 1px solid #ccc;
+    }
+
     button {
-      cursor: pointer;
       background: #111;
       color: #fff;
       border: none;
-      border-radius: 10px;
+      cursor: pointer;
     }
-    button:hover { opacity: 0.9; }
- 
-    .wall { margin-top: 16px; border-top: 1px solid #ddd; padding-top: 12px; }
-    .item { padding: 10px 0; border-bottom: 1px dashed #e0e0e0; }
-.item { padding: 14px 0; border-bottom: 1px dashed #e6e6e6; }
- 
-.line{
-  display: flex;
-  gap: 8px;
-  align-items: baseline;
-  flex-wrap: wrap;
-}
- 
-.line .name{
-  font-size: 16px;
-  font-weight: 800;
-  color: #777;
-}
- 
-.line .time{
-  font-size: 16px;
-  color: #666;
-  font-variant-numeric: tabular-nums;
-}
- 
-.line .colon{
-  font-size: 20px;
-  color: #999;
-}
- 
-.line .msg{
-  font-size: 26px;
-  font-weight: 700;
-  line-height: 1.35;
-  color: #111;
-  word-break: break-word;
-}
- 
-    /* 大螢幕模式隱藏輸入區 */
-    .wall-only .input-area { display: none; }
- 
-    /* QR Code 區塊 */
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    /* 大螢幕隱藏輸入 */
+    .wall-only .input-area {
+      display: none;
+    }
+
+    /* 留言牆 */
+    .wall {
+      margin-top: 24px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+    }
+
+    .item {
+      margin-bottom: 18px;
+    }
+
+    .line {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 18px 22px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+      flex-wrap: wrap;
+    }
+
+    .line .name {
+      font-size: 22px;
+      font-weight: 900;
+      color: #111;
+    }
+
+    .line .time {
+      font-size: 16px;
+      color: #777;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .line .msg {
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: #111;
+      word-break: break-word;
+    }
+
+    /* 新留言動畫 */
+    @keyframes popIn {
+      0%   { transform: translateY(12px) scale(0.96); opacity: 0; }
+      60%  { transform: translateY(0) scale(1.03); opacity: 1; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    @keyframes glow {
+      0%   { box-shadow: 0 10px 24px rgba(0,0,0,0.06); }
+      40%  { box-shadow: 0 18px 42px rgba(255,106,0,0.25); }
+      100% { box-shadow: 0 10px 24px rgba(0,0,0,0.06); }
+    }
+
+    .item.is-new .line {
+      animation: popIn 420ms ease-out, glow 1200ms ease-out;
+      outline: 3px solid rgba(255, 106, 0, 0.25);
+    }
+
+    /* QR Code */
     .qr-box {
       position: fixed;
       left: 24px;
       top: 24px;
-      background: #ffffff;
-      padding: 12px;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+      background: #fff;
+      padding: 14px;
+      border-radius: 16px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
       text-align: center;
       z-index: 999;
-      display: none; /* 預設不顯示 */
+      display: none;
     }
+
     .qr-box p {
       margin: 6px 0 0;
       font-size: 14px;
@@ -90,115 +156,113 @@
     }
   </style>
 </head>
- 
+
 <body>
+
   <div class="brand">
-    <img src="logo.png" alt="SOLIS" />
+    <img src="logo.png" alt="SOLIS">
   </div>
- 
+
   <div class="wrap">
     <h1>SOLIS 活動互動牆</h1>
     <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到</div>
- 
-    <div class="grid input-area" style="margin-top:12px;">
-      <input id="name" placeholder="請輸入你的名字（必填）" />
-      <input id="message" placeholder="請輸入留言或簽到內容（例如：我已簽到）" />
+
+    <div class="grid input-area">
+      <input id="name" placeholder="請輸入你的名字（必填）">
+      <input id="message" placeholder="請輸入留言或簽到內容（例如：我已簽到）">
       <button id="send">送出</button>
     </div>
- 
+
     <div class="wall" id="wall"></div>
   </div>
- 
-  <!-- 右下角 QR（只在大螢幕模式顯示） -->
+
+  <!-- QR Code -->
   <div class="qr-box" id="qrBox">
     <canvas id="qr"></canvas>
     <p>掃描簽到</p>
   </div>
- 
+
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
- 
+
   <script>
-    // 判斷是否為大螢幕模式
     const params = new URLSearchParams(window.location.search);
     const isWall = params.get("wall") === "1";
     if (isWall) document.body.classList.add("wall-only");
- 
-    // Socket.IO 即時牆
+
     const socket = io();
     const wall = document.getElementById("wall");
     const nameEl = document.getElementById("name");
     const msgEl = document.getElementById("message");
     const btn = document.getElementById("send");
- 
+
     function now() {
       const d = new Date();
-      const pad = (n) => String(n).padStart(2, "0");
+      const pad = n => String(n).padStart(2,"0");
       return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
- 
-   // 讀取已鎖定的名字（如果有）
-const lockedName = localStorage.getItem("event_name");
-if (lockedName) {
-  nameEl.value = lockedName;
-  nameEl.disabled = true;
-}
- 
-btn.addEventListener("click", () => {
-  let name = nameEl.value.trim();
-  const message = (msgEl.value.trim() || "我已簽到");
- 
-  if (!name) {
-    alert("請先輸入名字");
-    return;
-  }
- 
-  // 第一次送出就鎖名字
-  if (!localStorage.getItem("event_name")) {
-    localStorage.setItem("event_name", name);
-    nameEl.disabled = true;
-  }
- 
-  socket.emit("checkin", { name, message, time: now() });
-  msgEl.value = "";
-  msgEl.focus();
-});
- 
- 
-    socket.on("wall", (p) => {
+
+    // 鎖名字
+    const lockedName = localStorage.getItem("event_name");
+    if (lockedName) {
+      nameEl.value = lockedName;
+      nameEl.disabled = true;
+    }
+
+    btn.addEventListener("click", () => {
+      const name = nameEl.value.trim();
+      const message = msgEl.value.trim() || "我已簽到";
+
+      if (!name) {
+        alert("請先輸入名字");
+        return;
+      }
+
+      if (!localStorage.getItem("event_name")) {
+        localStorage.setItem("event_name", name);
+        nameEl.disabled = true;
+      }
+
+      socket.emit("checkin", { name, message, time: now() });
+      msgEl.value = "";
+      msgEl.focus();
+    });
+
+    socket.on("wall", p => {
       const div = document.createElement("div");
-      div.className = "item";
-     div.innerHTML = `
-  <div class="line">
-    <span class="name">${escapeHtml(p.name)}</span>
-<span class="time">${escapeHtml(p.time)}：</span>
-<span class="msg">${escapeHtml(p.message)}</span>
-  </div>
-`;
+      div.className = "item is-new";
+      div.innerHTML = `
+        <div class="line">
+          <span class="name">${escapeHtml(p.name)}</span>
+          <span class="time">${escapeHtml(p.time)}：</span>
+          <span class="msg">${escapeHtml(p.message)}</span>
+        </div>
+      `;
       wall.prepend(div);
+
+      setTimeout(() => div.classList.remove("is-new"), 2000);
       while (wall.children.length > 50) wall.removeChild(wall.lastChild);
     });
- 
-    function escapeHtml(str){
+
+    function escapeHtml(str) {
       return String(str).replace(/[&<>"']/g, s => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
       }[s]));
     }
- 
-    // 只在大螢幕模式顯示 QR
+
     if (isWall) {
       const qrBox = document.getElementById("qrBox");
       qrBox.style.display = "block";
- 
+
       new QRious({
         element: document.getElementById("qr"),
-        value: window.location.origin, // 給手機掃的簽到網址
+        value: window.location.origin,
         size: 160
       });
     }
-    <span class="time">${escapeHtml(p.time)}：</span>
-<span class="msg">${escapeHtml(p.message)}</span>
   </script>
+
 </body>
 </html>
+
  
