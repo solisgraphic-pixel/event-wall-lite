@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SOLIS 活動互動牆</title>
+  <title>SOLIS 許願牆</title>
 
   <style>
 .host-badge {
@@ -80,7 +80,10 @@
       z-index: 999;
       display:none;
     }
-    .qr-box p{ margin:6px 0 0; font-size:14px; color:#333; }
+    .qr-box p{ margin:6px 0 0; font-size:18
+      px;font-weight: 700; 
+  color: #111;
+}
 
     /* ===== 主持人控制台（host）===== */
     .host-panel{
@@ -210,7 +213,7 @@
   <div class="host-panel" id="hostPanel">
     <div class="host-card">
       <span class="host-badge">主持人模式</span>
-      <span class="host-stat">參與者：<b id="pCount">0</b> 人（公平：一人一票）</span>
+      <span class="host-stat">參與者：<b id="pCount">0</b> 人（一人一票）</span>
     </div>
     <div class="host-actions host-card">
       <button class="btn-orange" id="btnDraw">🎉 立即抽獎</button>
@@ -219,12 +222,12 @@
   </div>
 
   <div class="wrap">
-    <h1>SOLIS 活動互動牆</h1>
-    <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到</div>
+    <h1>SOLIS 許願牆</h1>
+    <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到｜有機會抽精美小禮一份喔</div>
 
     <div class="grid input-area">
       <input id="name" placeholder="請輸入你的名字（必填）">
-      <input id="message" placeholder="請輸入留言或簽到內容（例如：我已簽到）">
+      <input id="message" placeholder="請輸入你想對SOLIS說的話~（例如：我要中頭獎）">
       <button id="send">送出</button>
     </div>
 
