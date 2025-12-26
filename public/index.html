@@ -296,6 +296,28 @@
     .draw-pill.show{
       animation: revealIn 520ms ease-out forwards;
     }
+
+    /* 人數增加閃爍動畫 */
+@keyframes countFlash {
+  0% {
+    color: #ff6a00;
+    transform: scale(1);
+  }
+  40% {
+    color: #ff6a00;
+    transform: scale(1.15);
+  }
+  100% {
+    color: #555;
+    transform: scale(1);
+  }
+}
+
+/* 套用動畫用的 class */
+.host-info.flash {
+  animation: countFlash 600ms ease-out;
+}
+
   </style>
 </head>
 
@@ -447,10 +469,24 @@
     });
 
     // ===== 參與者人數 =====
-    socket.on("participants_count", (d) => {
-      const c = Number(d?.count ?? 0);
-      if (playerCountEl) playerCountEl.textContent = `參與者：${c} 人`;
-    });
+let lastCount = 0;
+
+socket.on("participants_count", (d) => {
+  const c = Number(d?.count ?? 0);
+  if (!playerCountEl) return;
+
+  playerCountEl.textContent = `參與者：${c} 人`;
+
+  // ✅ 只有「人數變多」才閃
+  if (c > lastCount) {
+    playerCountEl.classList.remove("flash"); // 重置
+    void playerCountEl.offsetWidth;          // 強制重算，確保動畫會重播
+    playerCountEl.classList.add("flash");
+  }
+
+  lastCount = c;
+});
+
 
     // ===== QR：wall 或 host 顯示（掃到首頁，不帶 host）=====
     if (isWall || isHost) {
