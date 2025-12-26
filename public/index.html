@@ -6,50 +6,96 @@
   <title>SOLIS 許願牆</title>
 
   <style>
-.host-badge {
-  display: none;
-}
+    :root{
+      --bg:#f7f7f7;
+      --text:#111;
+      --muted:#666;
+      --card:#fff;
+      --orange:#ff6a00;
+      --shadow: 0 10px 24px rgba(0,0,0,0.06);
+    }
+
     body{
       font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif;
       margin: 0;
       padding: 20px;
-      background: #f7f7f7;
+      background: var(--bg);
+      color: var(--text);
     }
     .wrap{ max-width: 1100px; margin: 0 auto; }
 
     .brand{ text-align:center; margin-bottom:10px; }
     .brand img{ max-height: 140px; }
 
-    h1{ margin: 10px 0 6px; color:#111; text-align:center; font-size: 40px; letter-spacing: .5px;}
-    .hint{ color:#666; font-size:15px; text-align:center; margin-bottom:18px; }
+    h1{
+      margin: 10px 0 6px;
+      text-align:center;
+      font-size: 44px;
+      letter-spacing: .5px;
+    }
+    .hint{
+      color: var(--muted);
+      font-size: 15px;
+      text-align:center;
+      margin-bottom: 18px;
+    }
 
     /* 輸入區 */
-    .grid{ display:grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 18px; }
-    input, button{ font-size:18px; padding:14px 16px; border-radius: 10px; }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    input, button{
+      font-size: 18px;
+      padding: 14px 16px;
+      border-radius: 12px;
+    }
     input{ border:1px solid #ccc; }
-    button{ background:#111; color:#fff; border:none; cursor:pointer; }
-    button:hover{ opacity:.9; }
+    button{
+      background:#111;
+      color:#fff;
+      border:none;
+      cursor:pointer;
+    }
+    button:hover{ opacity:.92; }
 
+    /* 模式：大螢幕隱藏輸入 */
     .wall-only .input-area{ display:none; }
-    .host-only .input-area{ display:none; } /* 主持人頁預設也不顯示輸入區（你要也可開） */
 
     /* 留言牆 */
     .wall{ margin-top: 24px; padding-top: 10px; border-top: 1px solid #ddd; }
     .item{ margin-bottom: 18px; }
+
     .line{
-      background:#fff;
-      border-radius: 16px;
+      background: var(--card);
+      border-radius: 18px;
       padding: 18px 22px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+      box-shadow: var(--shadow);
       display:flex;
       gap: 12px;
       align-items: baseline;
       flex-wrap: wrap;
-      justify-content: flex-start;
     }
-    .line .name{ font-size: 22px; font-weight: 900; color:#111; }
-    .line .time{ font-size: 16px; color:#777; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .line .msg{ font-size: 30px; font-weight: 800; line-height: 1.25; color:#111; word-break: break-word; }
+    .line .name{
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+    }
+    .line .time{
+      font-size: 16px;
+      color: #777;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .line .msg{
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1.25;
+      color: var(--text);
+      word-break: break-word;
+    }
 
     /* 新留言動畫 */
     @keyframes popIn{
@@ -58,80 +104,93 @@
       100%{ transform: translateY(0) scale(1); opacity:1; }
     }
     @keyframes glow{
-      0%{ box-shadow: 0 10px 24px rgba(0,0,0,0.06); }
+      0%{ box-shadow: var(--shadow); }
       40%{ box-shadow: 0 18px 42px rgba(255,106,0,0.25); }
-      100%{ box-shadow: 0 10px 24px rgba(0,0,0,0.06); }
+      100%{ box-shadow: var(--shadow); }
     }
     .item.is-new .line{
       animation: popIn 420ms ease-out, glow 1200ms ease-out;
-      outline: 3px solid rgba(255,106,0,0.25);
+      outline: 3px solid rgba(255,106,0,0.22);
     }
 
-    /* QR */
+    /* QR（只在 wall=1 顯示） */
     .qr-box{
       position: fixed;
       left: 24px;
       top: 24px;
       background:#fff;
       padding: 14px;
-      border-radius: 16px;
+      border-radius: 18px;
       box-shadow: 0 8px 28px rgba(0,0,0,0.18);
       text-align:center;
       z-index: 999;
       display:none;
     }
-    .qr-box p{ margin:6px 0 0; font-size:18
-      px;font-weight: 700; 
-  color: #111;
-}
-
-    /* ===== 主持人控制台（host）===== */
-    .host-panel{
-      max-width: 1100px;
-      margin: 0 auto 18px;
-      display: none;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
+    .qr-box p{
+      margin: 10px 0 0;
+      font-size: 18px;
+      font-weight: 800;
+      color: #111;
     }
+
+    /* 主持人懸浮控制卡（預設顯示框架，但按鈕會被藏） */
     .host-card{
-      background:#fff;
-      border-radius: 16px;
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      border-radius: 18px;
       padding: 14px 16px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.06);
-      display:flex;
-      align-items:center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .host-badge{
-      font-weight: 900;
-      font-size: 16px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(255,106,0,0.12);
-      color: #c14a00;
-    }
-    .host-stat{
-      font-size: 16px;
-      color: #333;
-    }
-    .host-actions button{
-      padding: 12px 14px;
-      font-size: 16px;
-      border-radius: 12px;
-    }
-    .btn-orange{
-      background: #ff6a00;
-      color:#fff;
-    }
-    .btn-ghost{
-      background: #fff;
-      color:#111;
-      border: 1px solid #ddd;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 998;
+      min-width: 260px;
     }
 
-    /* ===== 抽獎全螢幕動畫 ===== */
+    /* ✅ 重要：所有人預設看不到按鈕（只有 host=1 才顯示） */
+    #hostActions{ display: none !important; }
+
+    .host-actions{
+      display:flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .btn-draw{
+      background: linear-gradient(135deg, #ff7a00, #ff9a3c);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(255,122,0,0.35);
+    }
+    .btn-draw:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(255,122,0,0.45);
+    }
+    .btn-clear{
+      background: #fff;
+      color: #333;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+    .btn-clear:hover{ background:#f3f3f3; }
+
+    .host-info{
+      font-size: 14px;
+      color: #555;
+      text-align: right;
+    }
+
+    /* 抽獎全螢幕 overlay */
     .draw-overlay{
       position: fixed;
       inset: 0;
@@ -152,29 +211,11 @@
       position: relative;
       overflow: hidden;
     }
-    .draw-title{
-      font-size: 18px;
-      color: #666;
-      margin-bottom: 12px;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-    .draw-name{
-      font-size: clamp(42px, 6vw, 84px);
-      font-weight: 1000;
-      margin: 6px 0 8px;
-      color: #111;
-    }
-    .draw-sub{
-      font-size: 16px;
-      color: #777;
-      margin-top: 10px;
-    }
     .confetti{
       position:absolute;
       inset:0;
       pointer-events:none;
-      opacity:.8;
+      opacity:.85;
       background:
         radial-gradient(circle at 10% 20%, rgba(255,106,0,.55), transparent 30%),
         radial-gradient(circle at 80% 10%, rgba(0,0,0,.15), transparent 25%),
@@ -193,76 +234,30 @@
       cursor: pointer;
       color: #666;
     }
+    .draw-title{
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .draw-name{
+      font-size: clamp(42px, 6vw, 86px);
+      font-weight: 1000;
+      margin: 6px 0 8px;
+      color: #111;
+    }
+    .draw-sub{
+      font-size: 16px;
+      color: #777;
+      margin-top: 10px;
+    }
     @keyframes pulse {
       0% { transform: scale(1); }
       35% { transform: scale(1.03); }
       100% { transform: scale(1); }
     }
-    .win{
-      animation: pulse 900ms ease-out 1;
-    }
-
-  /* 主持人懸浮控制卡 */
-.host-card {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
-  padding: 14px 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 998;
-}
- 
-/* 按鈕列 */
-.host-actions {
-  display: flex;
-  gap: 10px;
-}
- 
-/* 抽獎按鈕 */
-.btn-draw {
-  background: linear-gradient(135deg, #ff7a00, #ff9a3c);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  border: none;
-  border-radius: 999px;
-  padding: 10px 18px;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(255,122,0,0.35);
-}
- 
-.btn-draw:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(255,122,0,0.45);
-}
- 
-/* 清空按鈕 */
-.btn-clear {
-  background: #fff;
-  color: #333;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 999px;
-  padding: 10px 14px;
-  cursor: pointer;
-}
- 
-.btn-clear:hover {
-  background: #f3f3f3;
-}
- 
-/* 參與者文字 */
-.host-info {
-  font-size: 14px;
-  color: #555;
-  text-align: right;
-}
+    .win{ animation: pulse 900ms ease-out 1; }
   </style>
 </head>
 
@@ -271,23 +266,14 @@
     <img src="logo.png" alt="SOLIS">
   </div>
 
-  <!-- 主持人控制台 -->
-  <div class="host-panel" id="hostPanel">
-  <!-- 左邊那張卡留空（或之後你想放活動名稱也可以） -->
- 
-  <!-- 右邊：按鈕 + 參與者（放在立即抽獎下面） -->
+  <!-- 主持人控制卡（右上角） -->
   <div class="host-card" id="hostCard">
-  <div class="host-actions" id="hostActions">
-    <button class="btn-draw" id="drawBtn">🎉 立即抽獎</button>
-    <button class="btn-clear" id="clearBtn">清空名單</button>
+    <div class="host-actions" id="hostActions">
+      <button class="btn-draw" id="drawBtn">🎉 立即抽獎</button>
+      <button class="btn-clear" id="clearBtn">清空名單</button>
+    </div>
+    <div class="host-info" id="playerCount">參與者：0 人（一人一票）</div>
   </div>
- 
-  <div class="host-info" id="playerCount">
-    參與者：0 人（一人一票）
-  </div>
-</div>
-/* ✅ 重要：預設所有人都看不到按鈕（只有 host=1 才會被 JS 打開） */
-#hostActions { display: none !important; }
 
   <div class="wrap">
     <h1>SOLIS 許願牆</h1>
@@ -295,36 +281,27 @@
 
     <div class="grid input-area">
       <input id="name" placeholder="請輸入你的名字（必填）">
-      <input id="message" placeholder="請輸入你想對SOLIS說的話~（例如：我要中頭獎）">
+      <input id="message" placeholder="請輸入你想對 SOLIS 說的話～（例如：我要中頭獎）">
       <button id="send">送出</button>
     </div>
 
     <div class="wall" id="wall"></div>
   </div>
 
-  <!-- QR（大螢幕模式顯示） -->
+  <!-- QR（只在 wall=1 顯示） -->
   <div class="qr-box" id="qrBox">
     <canvas id="qr"></canvas>
     <p>掃描簽到</p>
   </div>
-<!-- 主持人控制卡（右上角） -->
-<div class="host-card" id="hostCard">
-  <div class="host-actions">
-    <button class="btn-draw" id="drawBtn">🎉 立即抽獎</button>
-    <button class="btn-clear" id="clearBtn">清空名單</button>
-  </div>
-  <div class="host-info" id="playerCount">
-    參與者：0 人（一人一票）
-  </div>
-</div>
-  <!-- 抽獎動畫（主持人觸發） -->
+
+  <!-- 抽獎動畫 overlay（主持人觸發） -->
   <div class="draw-overlay" id="drawOverlay">
     <div class="draw-box" id="drawBox">
       <div class="confetti"></div>
       <button class="draw-close" id="drawClose" aria-label="Close">✕</button>
       <div class="draw-title">WINNER</div>
       <div class="draw-name" id="drawName">準備抽獎…</div>
-      <div class="draw-sub" id="drawSub"> </div>
+      <div class="draw-sub" id="drawSub"></div>
     </div>
   </div>
 
@@ -332,48 +309,35 @@
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 
   <script>
+    // ===== 解析網址參數 =====
     const params = new URLSearchParams(window.location.search);
-const isHost = params.get("host") === "1";
- 
-// ✅ 雙保險：非主持人一定隱藏按鈕
-const hostActions = document.getElementById("hostActions");
-if (hostActions) hostActions.style.display = isHost ? "flex" : "none";
     const isWall = params.get("wall") === "1";
     const isHost = params.get("host") === "1";
 
     if (isWall) document.body.classList.add("wall-only");
-    if (isHost) document.body.classList.add("host-only");
 
+    // ✅ 主持人按鈕：只有 host=1 才顯示
+    const hostActions = document.getElementById("hostActions");
+    if (hostActions) hostActions.style.display = isHost ? "flex" : "none";
+
+    // ===== Socket.IO =====
     const socket = io();
     const wall = document.getElementById("wall");
     const nameEl = document.getElementById("name");
     const msgEl = document.getElementById("message");
     const btn = document.getElementById("send");
 
-    // 主持人 UI
-    const hostPanel = document.getElementById("hostPanel");
-    const pCount = document.getElementById("pCount");
-    const btnDraw = document.getElementById("btnDraw");
-    const btnReset = document.getElementById("btnReset");
-
-    // 抽獎 overlay
-    const drawOverlay = document.getElementById("drawOverlay");
-    const drawName = document.getElementById("drawName");
-    const drawSub = document.getElementById("drawSub");
-    const drawClose = document.getElementById("drawClose");
-    const drawBox = document.getElementById("drawBox");
-
-    function now() {
-      const d = new Date();
-      const pad = n => String(n).padStart(2,"0");
-      return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-    }
-
     // 鎖名字（同裝置）
     const lockedName = localStorage.getItem("event_name");
     if (lockedName) {
       nameEl.value = lockedName;
       nameEl.disabled = true;
+    }
+
+    function now() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2,"0");
+      return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
     btn.addEventListener("click", () => {
@@ -403,12 +367,8 @@ if (hostActions) hostActions.style.display = isHost ? "flex" : "none";
       `;
       wall.prepend(div);
 
-      setTimeout(() => div.classList.remove("is-new"), 2000);
+      setTimeout(() => div.classList.remove("is-new"), 1800);
       while (wall.children.length > 50) wall.removeChild(wall.lastChild);
-    });
-
-    socket.on("participants_count", (d) => {
-      if (pCount) pCount.textContent = String(d?.count ?? 0);
     });
 
     function escapeHtml(str) {
@@ -417,7 +377,7 @@ if (hostActions) hostActions.style.display = isHost ? "flex" : "none";
       }[s]));
     }
 
-    // ===== QR：只在 wall 模式顯示 =====
+    // ===== QR：只在 wall=1 顯示 =====
     if (isWall) {
       const qrBox = document.getElementById("qrBox");
       qrBox.style.display = "block";
@@ -428,94 +388,57 @@ if (hostActions) hostActions.style.display = isHost ? "flex" : "none";
       });
     }
 
-    // ===== 主持人功能 =====
-    if (isHost) {
-      hostPanel.style.display = "flex";
-      socket.emit("host_stats");
+    // ===== 主持人：抽獎/清空（目前先做前端示意，不會真的清 server）=====
+    const drawBtn = document.getElementById("drawBtn");
+    const clearBtn = document.getElementById("clearBtn");
 
-      btnDraw.addEventListener("click", () => {
-        // 開啟 overlay，先做假動畫（快速跳字）
-        openDrawOverlay();
-        fakeRollingText("抽獎中…");
-        socket.emit("host_draw");
-      });
+    const drawOverlay = document.getElementById("drawOverlay");
+    const drawBox = document.getElementById("drawBox");
+    const drawName = document.getElementById("drawName");
+    const drawSub = document.getElementById("drawSub");
+    const drawClose = document.getElementById("drawClose");
 
-      btnReset.addEventListener("click", () => {
-        if (!confirm("確定要清空名單/留言/得獎紀錄？")) return;
-        socket.emit("host_reset");
-      });
-
-      drawClose.addEventListener("click", closeDrawOverlay);
-      drawOverlay.addEventListener("click", (e) => {
-        if (e.target === drawOverlay) closeDrawOverlay();
-      });
-      window.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeDrawOverlay();
-      });
-    }
-
-    socket.on("host_reset_done", () => {
-      // 讓主持人知道清空了（牆面也會自然清空，因為 server entries 清掉了，但前端畫面不會自動清）
-      // 這裡直接刷新最簡單：
-      location.reload();
-    });
-
-    // 收到抽獎結果：顯示大動畫
-    socket.on("draw_result", (r) => {
-      if (!isHost) return; // 只讓主持人頁顯示抽獎 UI
-
-      if (!r?.ok) {
-        drawName.textContent = r?.reason || "抽獎失敗";
-        drawSub.textContent = "";
-        drawBox.classList.remove("win");
-        return;
-      }
-
-      // 顯示得獎者
-      drawName.textContent = r.winner;
-      drawSub.textContent = `參與者共 ${r.total} 人｜恭喜得獎！`;
-
-      drawBox.classList.remove("win");
-      void drawBox.offsetWidth; // 重新觸發動畫
-      drawBox.classList.add("win");
-    });
-
-    // ===== 抽獎 overlay helper =====
     function openDrawOverlay(){
       drawOverlay.style.display = "flex";
-      drawName.textContent = "準備抽獎…";
+      drawName.textContent = "抽獎中…";
       drawSub.textContent = "";
       drawBox.classList.remove("win");
     }
     function closeDrawOverlay(){
       drawOverlay.style.display = "none";
     }
-    function fakeRollingText(text){
-      // 簡單跳字感（不需要拿名單）
-      const frames = ["抽獎中", "抽獎中.", "抽獎中..", "抽獎中..."];
-      let i = 0;
-      const t = setInterval(() => {
-        if (drawOverlay.style.display !== "flex") { clearInterval(t); return; }
-        drawName.textContent = frames[i % frames.length];
-        i++;
-      }, 160);
-      // 1.8 秒後停止（通常 server 也會回來結果）
-      setTimeout(() => clearInterval(t), 1800);
+    drawClose.addEventListener("click", closeDrawOverlay);
+    drawOverlay.addEventListener("click", (e) => { if (e.target === drawOverlay) closeDrawOverlay(); });
+
+    if (isHost) {
+      drawBtn.addEventListener("click", () => {
+        openDrawOverlay();
+        // 你之後會接後端真正抽獎，現在先做嗨一下的假動畫
+        const frames = ["抽獎中", "抽獎中.", "抽獎中..", "抽獎中..."];
+        let i = 0;
+        const t = setInterval(() => {
+          if (drawOverlay.style.display !== "flex") { clearInterval(t); return; }
+          drawName.textContent = frames[i % frames.length];
+          i++;
+        }, 140);
+        setTimeout(() => {
+          clearInterval(t);
+          drawName.textContent = "（下一步接真正抽獎）";
+          drawSub.textContent = "等你確認 server.js 那邊抽獎邏輯後，我幫你接起來";
+          drawBox.classList.remove("win"); void drawBox.offsetWidth; drawBox.classList.add("win");
+        }, 1600);
+      });
+
+      clearBtn.addEventListener("click", () => {
+        if (confirm("確定要清空名單嗎？（下一步會接 server 真正清空）")) {
+          alert("已觸發清空（示意）");
+        }
+      });
+    } else {
+      // 來賓就算看得到 DOM，也不綁事件
+      drawBtn.disabled = true;
+      clearBtn.disabled = true;
     }
-    // 主持人控制卡（暫時只有顯示用）
-const drawBtn = document.getElementById("drawBtn");
-const clearBtn = document.getElementById("clearBtn");
-const playerCountEl = document.getElementById("playerCount");
- 
-// 之後抽獎會接在這裡
-drawBtn.addEventListener("click", () => {
-  alert("🎉 抽獎功能下一步啟用");
-});
- 
-// 清空名單（目前只是示意）
-clearBtn.addEventListener("click", () => {
-  alert("名單已清空（下一步會真的清）");
-});
   </script>
 </body>
 </html>
