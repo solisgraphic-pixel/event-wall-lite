@@ -33,12 +33,14 @@
       font-size: 44px;
       letter-spacing: .5px;
     }
-    .hint{
-      color: var(--muted);
-      font-size: 15px;
-      text-align:center;
-      margin-bottom: 18px;
-    }
+.hint{
+  color: #444;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 22px;
+  letter-spacing: 0.6px;
+}
 
     /* 輸入區 */
     .grid{
@@ -319,6 +321,12 @@
 .host-info.flash {
   animation: countFlash 600ms ease-out;
 }
+.qr-highlight{
+  font-size: 1.25em;          /* ⬅ 放大重點 */
+  font-weight: 800;
+  color: #ff6a00;             /* SOLIS 橘 */
+  letter-spacing: 0.5px;
+}
 
   </style>
 </head>
@@ -581,6 +589,15 @@ socket.on("participants_count", (d) => {
         drawSub.textContent = "🎉 恭喜得獎！";
       }, 800);
     });
+    // 只放大「請掃描 QR Code」那段
+const hintEl = document.querySelector(".hint");
+if (hintEl) {
+  hintEl.innerHTML = hintEl.innerHTML.replace(
+    "請掃描 QR Code",
+    `<span class="qr-highlight">請掃描 QR Code</span>`
+  );
+}
+
   </script>
 </body>
 </html>
