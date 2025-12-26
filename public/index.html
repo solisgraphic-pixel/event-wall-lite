@@ -389,18 +389,31 @@ if (isHost) document.body.classList.add("is-host");
       const pad = n => String(n).padStart(2,"0");
       return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
-
-    btn.addEventListener("click", () => {
-      const name = nameEl.value.trim();
-      const message = msgEl.value.trim() || "我已簽到";
-      if (!name) { alert("請先輸入名字"); return; }
-
-      if (!localStorage.getItem("event_name")) {
-        localStorage.setItem("event_name", name);
-        nameEl.disabled = true;
-      }
-
-      // ===== 一人一票：每台裝置一個 token（存在 localStorage）=====
+let sending = false;
+btn.addEventListener("click", () => {
+  if (sending) return;          // ⛔ 防止連點
+  sending = true;
+  setTimeout(() => (sending = false), 600); // 0.6 秒後才能再送
+ 
+  const name = nameEl.value.trim();
+  const message = msgEl.value.trim() || "我已簽到";
+ 
+  if (!name) {
+    alert("請先輸入名字");
+    return;
+  }
+ 
+  if (!localStorage.getItem("event_name")) {
+    localStorage.setItem("event_name", name);
+    nameEl.disabled = true;
+  }
+ 
+  socket.emit("checkin", { name, message, time: now() });
+  msgEl.value = "";
+  msgEl.focus();
+});
+ 
+ 
 let myToken = localStorage.getItem("event_token");
 if (!myToken) {
   myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
