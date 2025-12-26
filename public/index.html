@@ -327,6 +327,20 @@
   color: #ff6a00;             /* SOLIS 橘 */
   letter-spacing: 0.5px;
 }
+.qr-text{
+  margin-top: 10px;
+  font-size: 20px;          /* ⬅ 比原本大一點就好 */
+  font-weight: 900;
+  color: #ff6a00;           /* SOLIS 橘 */
+  letter-spacing: 1px;
+  animation: qrBreath 1.6s ease-in-out infinite;
+}
+
+/* 微呼吸，不閃不吵 */
+@keyframes qrBreath{
+  0%,100%{ opacity: 1; }
+  50%{ opacity: 0.75; }
+}
 
   </style>
 </head>
@@ -360,7 +374,8 @@
   <!-- QR（wall=1 或 host=1 顯示） -->
   <div class="qr-box" id="qrBox">
     <canvas id="qr"></canvas>
-    <p>掃描參加抽獎</p>
+ <p class="qr-text">掃描參加抽獎</p>
+
   </div>
 
   <!-- 抽獎 overlay（主持人觸發） -->
