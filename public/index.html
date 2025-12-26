@@ -211,16 +211,40 @@
 
   <!-- 主持人控制台 -->
   <div class="host-panel" id="hostPanel">
-    <div class="host-card">
-      <span class="host-badge">主持人模式</span>
-      <span class="host-stat">參與者：<b id="pCount">0</b> 人（一人一票）</span>
-    </div>
-    <div class="host-actions host-card">
+  <!-- 左邊那張卡留空（或之後你想放活動名稱也可以） -->
+  <div class="host-card host-left">
+    <!-- 這裡可以不放任何字 -->
+  </div>
+ 
+  <!-- 右邊：按鈕 + 參與者（放在立即抽獎下面） -->
+  <div class="host-actions host-card host-right">
+    <div class="host-btns">
       <button class="btn-orange" id="btnDraw">🎉 立即抽獎</button>
       <button class="btn-ghost" id="btnReset">清空名單</button>
     </div>
+ 
+    <div class="host-stat host-stat-under">
+      參與者：<b id="pCount">0</b> 人（公平：一人一票）
+    </div>
   </div>
-
+</div>
+.host-right{
+  flex-direction: column;
+  align-items: flex-end;   /* 讓整塊靠右，符合你現在按鈕位置 */
+  gap: 10px;
+}
+ 
+.host-btns{
+  display: flex;
+  gap: 12px;
+}
+ 
+.host-stat-under{
+  font-size: 14px;
+  color: #666;
+  width: 100%;
+  text-align: center;      /* 參與者置中在按鈕卡下方 */
+}
   <div class="wrap">
     <h1>SOLIS 許願牆</h1>
     <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到｜有機會抽精美小禮一份喔</div>
