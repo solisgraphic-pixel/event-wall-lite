@@ -400,7 +400,14 @@ if (isHost) document.body.classList.add("is-host");
         nameEl.disabled = true;
       }
 
-      socket.emit("checkin", { name, message, time: now() });
+      // ===== 一人一票：每台裝置一個 token（存在 localStorage）=====
+let myToken = localStorage.getItem("event_token");
+if (!myToken) {
+  myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
+  localStorage.setItem("event_token", myToken);
+}
+ 
+socket.emit("checkin", { token: myToken, name, message, time: now() });
       msgEl.value = "";
       msgEl.focus();
     });
@@ -481,11 +488,11 @@ socket.on("draw_result", (r) => {
     if (isWall) {
       const qrBox = document.getElementById("qrBox");
       qrBox.style.display = "block";
-      new QRious({
-        element: document.getElementById("qr"),
-        value: window.location.origin,
-        size: 180
-      });
+new QRious({
+  element: document.getElementById("qr"),
+  value: `${window.location.origin}/`, // ✅ 永遠只到來賓頁（不要帶參數）
+  size: 180
+});
     }
 
     // ===== 主持人：抽獎/清空（目前先做前端示意，不會真的清 server）=====
