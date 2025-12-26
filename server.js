@@ -7,61 +7,71 @@ const server = http.createServer(app);
 const io = new Server(server);
  
 app.use(express.static("public"));
-// ===== 互動牆資料（server 端）=====
-const entries = [];                 // 留言（可選：你要不要保留歷史）
-const tokenToName = new Map();      // token -> 固定名字（第一次為準）
-const participants = new Set();     // 一人一票（用 token 去重）
  
-function broadcastCount(io){
+// ===== 互動牆資料（server 端）=====
+// 若你不需要存歷史留言，可以不使用 entries；但先保留以後好擴充
+const entries = [];                 // 留言（可選：要不要保留歷史）
+const participants = new Set();     // 一人一票（用「名字」去重）
+ 
+function broadcastCount() {
   io.emit("participants_count", { count: participants.size });
 }
  
-function pickWinners(n){
+// 抽 N 名（公平洗牌）
+function pickWinners(n) {
   const arr = Array.from(participants);
- 
-  // 洗牌（公平）
-  for (let i = arr.length - 1; i > 0; i--){
+  for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
- 
   return arr.slice(0, Math.min(n, arr.length));
 }
-const participants = new Set(); // 一人一票：用名字當 key（配合你手機端鎖名字）
-const entries = [];             // 若你本來就有存留言，可保留你的版本
+ 
 io.on("connection", (socket) => {
-  // 讓新連線的人一進來就拿到目前參與人數
+  // 新連線：先送目前參與人數
   socket.emit("participants_count", { count: participants.size });
  
+  // 收到留言/簽到
   socket.on("checkin", (p) => {
     const name = String(p?.name ?? "").trim();
     const message = String(p?.message ?? "").trim();
     const time = String(p?.time ?? "").trim();
- 
     if (!name) return;
  
     // ✅ 一人一票：同名只算一次
-    if (!participants.has(name)) {
-      participants.add(name);
-      io.emit("participants_count", { count: participants.size });
-    }
+    const before = participants.size;
+    participants.add(name);
+    if (participants.size !== before) broadcastCount();
+ 
+    // （可選）存起來
+    entries.push({ name, message, time });
  
     // ✅ 廣播留言到牆
     io.emit("wall", { name, message, time });
   });
  
-  // 主持人清空（如果你有清空按鈕）
+  // 主持人抽獎：預設抽 3 名（也可傳 {n:3}）
+  socket.on("host_draw", ({ n } = {}) => {
+    const N = Math.max(1, Math.min(50, Number(n ?? 3) || 3));
+    const winners = pickWinners(N);
+    socket.emit("draw_result", {
+      ok: true,
+      winners,               // 例如 ["A","B","C"]
+      total: participants.size
+    });
+  });
+ 
+  // 主持人清空
   socket.on("host_reset", () => {
     participants.clear();
-    // entries.length = 0; // 你如果有存留言/名單，視你的程式而定
-    io.emit("participants_count", { count: 0 });
+    entries.length = 0; // 如果你不想清留言，把這行刪掉
+    broadcastCount();
     io.emit("host_reset_done");
   });
-});
- 
 });
  
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log("Listening on port", PORT);
 });
+ 
