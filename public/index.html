@@ -154,11 +154,12 @@
     #hostActions{ display:none; }
     body.is-host #hostActions{ display:flex; }
 
-    .host-actions{
-      display:flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
+.host-actions{
+  display:flex;
+  gap: 10px;
+  justify-content: center; /* ✅ 置中，左右留白一致 */
+}
+
     .btn-draw{
       background: linear-gradient(135deg, #ff7a00, #ff9a3c);
       color: #fff;
