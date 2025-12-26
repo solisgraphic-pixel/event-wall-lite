@@ -37,15 +37,15 @@
  
 .line{
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: baseline;
   flex-wrap: wrap;
 }
  
 .line .name{
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 800;
-  color: #111;
+  color: #777;
 }
  
 .line .time{
@@ -61,7 +61,7 @@
  
 .line .msg{
   font-size: 26px;
-  font-weight: 650;
+  font-weight: 700;
   line-height: 1.35;
   color: #111;
   word-break: break-word;
@@ -171,9 +171,8 @@ btn.addEventListener("click", () => {
      div.innerHTML = `
   <div class="line">
     <span class="name">${escapeHtml(p.name)}</span>
-    <span class="time">${escapeHtml(p.time)}</span>
-    <span class="colon">：</span>
-    <span class="msg">${escapeHtml(p.message)}</span>
+<span class="time">${escapeHtml(p.time)}：</span>
+<span class="msg">${escapeHtml(p.message)}</span>
   </div>
 `;
       wall.prepend(div);
