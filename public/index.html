@@ -134,21 +134,22 @@
     }
 
     /* 主持人懸浮控制卡 */
-    .host-card{
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(8px);
-      border-radius: 18px;
-      padding: 14px 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 998;
-      min-width: 260px;
-    }
+.host-card{
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  border-radius: 18px;
+  padding: 12px 14px;          /* ⬅ 左右縮小 */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  display: inline-flex;        /* ⬅ 關鍵：不再硬撐寬 */
+  flex-direction: column;
+  gap: 8px;
+  z-index: 998;
+  align-items: center;         /* ⬅ 全部置中 */
+}
+
 
     /* ✅ 只有 host=1 才顯示按鈕 */
     #hostActions{ display:none; }
@@ -183,7 +184,8 @@
 .host-info{
   font-size: 14px;
   color: #555;
-  text-align: center;   /* ✅ 置中 */
+  text-align: center;   /* ⬅ 置中 */
+  width: 100%;          /* ⬅ 不再被右推 */
 }
 
 
