@@ -61,7 +61,7 @@
     }
     button:hover{ opacity:.92; }
 
-    /* 模式：大螢幕隱藏輸入 */
+    /* 大螢幕牆：隱藏輸入 */
     .wall-only .input-area{ display:none; }
 
     /* 留言牆 */
@@ -113,7 +113,7 @@
       outline: 3px solid rgba(255,106,0,0.22);
     }
 
-    /* QR（只在 wall=1 顯示） */
+    /* QR（wall=1 或 host=1 顯示） */
     .qr-box{
       position: fixed;
       left: 24px;
@@ -133,7 +133,7 @@
       color: #111;
     }
 
-    /* 主持人懸浮控制卡（預設顯示框架，但按鈕會被藏） */
+    /* 主持人懸浮控制卡 */
     .host-card{
       position: fixed;
       top: 24px;
@@ -150,9 +150,10 @@
       min-width: 260px;
     }
 
-    /* ✅ 重要：所有人預設看不到按鈕（只有 host=1 才顯示） */
-    #hostActions{ display: none ; }
-body.is-host #hostActions{ display: flex; }
+    /* ✅ 只有 host=1 才顯示按鈕 */
+    #hostActions{ display:none; }
+    body.is-host #hostActions{ display:flex; }
+
     .host-actions{
       display:flex;
       gap: 10px;
@@ -190,7 +191,7 @@ body.is-host #hostActions{ display: flex; }
       text-align: right;
     }
 
-    /* 抽獎全螢幕 overlay */
+    /* 抽獎 overlay */
     .draw-overlay{
       position: fixed;
       inset: 0;
@@ -258,51 +259,47 @@ body.is-host #hostActions{ display: flex; }
       100% { transform: scale(1); }
     }
     .win{ animation: pulse 900ms ease-out 1; }
-    /* ===== 抽 3 名逐一揭曉（名單樣式） ===== */
-.draw-list{
-  margin-top: 10px;
-  display: grid;
-  gap: 14px;
-  justify-items: center;
-}
- 
-.draw-pill{
-  width: min(640px, 92%);
-  background: #fff;
-  border-radius: 18px;
-  padding: 16px 18px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-  display:flex;
-  align-items: baseline;
-  gap: 14px;
-  opacity: 0;
-  transform: translateY(10px) scale(.98);
-}
- 
-.draw-rank{
-  font-weight: 1000;
-  font-size: 18px;
-  color: #ff6a00;
-  letter-spacing: 1px;
-  white-space: nowrap;
-}
- 
-.draw-winner{
-  font-weight: 1000;
-  font-size: clamp(28px, 3.6vw, 44px);
-  color:#111;
-  word-break: break-word;
-}
- 
-@keyframes revealIn{
-  0% { opacity:0; transform: translateY(14px) scale(.97); }
-  60%{ opacity:1; transform: translateY(0) scale(1.02); }
-  100%{ opacity:1; transform: translateY(0) scale(1); }
-}
- 
-.draw-pill.show{
-  animation: revealIn 520ms ease-out forwards;
-}
+
+    /* 抽 3 名逐一揭曉 */
+    .draw-list{
+      margin-top: 10px;
+      display: none;
+      gap: 14px;
+      justify-items: center;
+    }
+    .draw-pill{
+      width: min(640px, 92%);
+      background: #fff;
+      border-radius: 18px;
+      padding: 16px 18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+      display:flex;
+      align-items: baseline;
+      gap: 14px;
+      opacity: 0;
+      transform: translateY(10px) scale(.98);
+    }
+    .draw-rank{
+      font-weight: 1000;
+      font-size: 18px;
+      color: #ff6a00;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+    .draw-winner{
+      font-weight: 1000;
+      font-size: clamp(28px, 3.6vw, 44px);
+      color:#111;
+      word-break: break-word;
+    }
+    @keyframes revealIn{
+      0% { opacity:0; transform: translateY(14px) scale(.97); }
+      60%{ opacity:1; transform: translateY(0) scale(1.02); }
+      100%{ opacity:1; transform: translateY(0) scale(1); }
+    }
+    .draw-pill.show{
+      animation: revealIn 520ms ease-out forwards;
+    }
   </style>
 </head>
 
@@ -313,11 +310,10 @@ body.is-host #hostActions{ display: flex; }
 
   <!-- 主持人控制卡（右上角） -->
   <div class="host-card" id="hostCard">
-<div class="host-actions" id="hostActions">
-  
-  <button class="btn-draw" id="draw3Btn">🎉 抽 3 名</button>
-  <button class="btn-clear" id="clearBtn">清空名單</button>
-</div>
+    <div class="host-actions" id="hostActions">
+      <button class="btn-draw" id="draw3Btn">🎉 抽 3 名</button>
+      <button class="btn-clear" id="clearBtn">清空名單</button>
+    </div>
     <div class="host-info" id="playerCount">參與者：0 人（一人一票）</div>
   </div>
 
@@ -334,24 +330,21 @@ body.is-host #hostActions{ display: flex; }
     <div class="wall" id="wall"></div>
   </div>
 
-  <!-- QR（只在 wall=1 顯示） -->
+  <!-- QR（wall=1 或 host=1 顯示） -->
   <div class="qr-box" id="qrBox">
     <canvas id="qr"></canvas>
     <p>掃描簽到</p>
   </div>
 
-  <!-- 抽獎動畫 overlay（主持人觸發） -->
+  <!-- 抽獎 overlay（主持人觸發） -->
   <div class="draw-overlay" id="drawOverlay">
     <div class="draw-box" id="drawBox">
       <div class="confetti"></div>
       <button class="draw-close" id="drawClose" aria-label="Close">✕</button>
-     <div class="draw-title">WINNERS</div>
-<div class="draw-name" id="drawName">準備抽獎…</div>
- 
-<!-- ✅ 新增：逐一揭曉的名單區 -->
-<div class="draw-list" id="drawList" style="display:none;"></div>
- 
-<div class="draw-sub" id="drawSub"></div>
+      <div class="draw-title">WINNERS</div>
+      <div class="draw-name" id="drawName">準備抽獎…</div>
+      <div class="draw-list" id="drawList"></div>
+      <div class="draw-sub" id="drawSub"></div>
     </div>
   </div>
 
@@ -365,22 +358,32 @@ body.is-host #hostActions{ display: flex; }
     const isHost = params.get("host") === "1";
 
     if (isWall) document.body.classList.add("wall-only");
-if (isHost) document.body.classList.add("is-host");
-    // ✅ 主持人按鈕：只有 host=1 才顯示
-
+    if (isHost) document.body.classList.add("is-host");
 
     // ===== Socket.IO =====
     const socket = io();
+
     const wall = document.getElementById("wall");
     const nameEl = document.getElementById("name");
     const msgEl = document.getElementById("message");
     const btn = document.getElementById("send");
 
-    // 鎖名字（同裝置）
-    const lockedName = localStorage.getItem("event_name");
-    if (lockedName) {
-      nameEl.value = lockedName;
-      nameEl.disabled = true;
+    const playerCountEl = document.getElementById("playerCount");
+
+    const draw3Btn = document.getElementById("draw3Btn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    const drawOverlay = document.getElementById("drawOverlay");
+    const drawBox = document.getElementById("drawBox");
+    const drawName = document.getElementById("drawName");
+    const drawSub = document.getElementById("drawSub");
+    const drawClose = document.getElementById("drawClose");
+    const drawList = document.getElementById("drawList");
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, s => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[s]));
     }
 
     function now() {
@@ -388,43 +391,55 @@ if (isHost) document.body.classList.add("is-host");
       const pad = n => String(n).padStart(2,"0");
       return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
-let sending = false;
-btn.addEventListener("click", () => {
-  if (sending) return;          // ⛔ 防止連點
-  sending = true;
-  setTimeout(() => (sending = false), 600); // 0.6 秒後才能再送
- 
-  const name = nameEl.value.trim();
-  const message = msgEl.value.trim() || "我已簽到";
- 
-  if (!name) {
-    alert("請先輸入名字");
-    return;
-  }
- 
-  if (!localStorage.getItem("event_name")) {
-    localStorage.setItem("event_name", name);
-    nameEl.disabled = true;
-  }
- 
-  socket.emit("checkin", { name, message, time: now() });
-  msgEl.value = "";
-  msgEl.focus();
-});
- 
- 
-let myToken = localStorage.getItem("event_token");
-if (!myToken) {
-  myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
-  localStorage.setItem("event_token", myToken);
-}
- 
-socket.emit("checkin", { token: myToken, name, message, time: now() });
+
+    // ===== token：一人一票（同裝置固定）=====
+    let myToken = localStorage.getItem("event_token");
+    if (!myToken) {
+      myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
+      localStorage.setItem("event_token", myToken);
+    }
+
+    // ===== 鎖名字（同裝置）=====
+    const lockedName = localStorage.getItem("event_name");
+    if (lockedName) {
+      nameEl.value = lockedName;
+      nameEl.disabled = true;
+    }
+
+    // ===== 防連點送出 =====
+    let sending = false;
+
+    function sendCheckin(){
+      if (sending) return;
+      sending = true;
+      setTimeout(() => (sending = false), 650);
+
+      const name = nameEl.value.trim();
+      const message = msgEl.value.trim() || "我已簽到";
+      if (!name) { alert("請先輸入名字"); return; }
+
+      if (!localStorage.getItem("event_name")) {
+        localStorage.setItem("event_name", name);
+        nameEl.disabled = true;
+      }
+
+      socket.emit("checkin", { token: myToken, name, message, time: now() });
       msgEl.value = "";
       msgEl.focus();
+    }
+
+    btn.addEventListener("click", sendCheckin);
+
+    // （可選）手機在留言框按 Enter 送出
+    msgEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendCheckin();
+      }
     });
 
-    socket.on("wall", p => {
+    // ===== 即時牆 =====
+    socket.on("wall", (p) => {
       const div = document.createElement("div");
       div.className = "item is-new";
       div.innerHTML = `
@@ -439,183 +454,118 @@ socket.emit("checkin", { token: myToken, name, message, time: now() });
       setTimeout(() => div.classList.remove("is-new"), 1800);
       while (wall.children.length > 50) wall.removeChild(wall.lastChild);
     });
-// ===== 抽獎結果（支援抽 3 名）=====
-socket.on("draw_result", (r) => {
-  if (!isHost) return; // 只有主持人看到動畫
- 
-  const winners = Array.isArray(r?.winners)
-    ? r.winners
-    : (r?.winner ? [r.winner] : []);
- 
-  openDrawOverlay();
- 
-  if (!r?.ok || winners.length === 0) {
-    drawName.textContent = r?.reason || "抽獎失敗";
-    drawSub.textContent = "";
-    return;
-  }
- 
-  // 過場
-  drawName.style.display = "block";
-  drawName.textContent = "抽獎中…";
-  drawSub.textContent = `參與者共 ${r.total ?? winners.length} 人`;
- 
-  const listEl = document.getElementById("drawList");
-  listEl.innerHTML = "";
-  listEl.style.display = "none";
- 
-  // 0.8 秒後開始逐一揭曉
-  setTimeout(() => {
-    drawName.style.display = "none";
-    listEl.style.display = "grid";
- 
-    winners.slice(0, 3).forEach((name, idx) => {
-      const pill = document.createElement("div");
-      pill.className = "draw-pill";
-      pill.innerHTML = `
-        <div class="draw-rank">第 ${idx + 1} 位</div>
-        <div class="draw-winner">${escapeHtml(name)}</div>
-      `;
-      listEl.appendChild(pill);
- 
-      setTimeout(() => {
-        pill.classList.add("show");
-        drawBox.classList.remove("win");
-        void drawBox.offsetWidth;
-        drawBox.classList.add("win");
-      }, idx * 700);
+
+    // ===== 參與者人數 =====
+    socket.on("participants_count", (d) => {
+      const c = Number(d?.count ?? 0);
+      if (playerCountEl) playerCountEl.textContent = `參與者：${c} 人（一人一票）`;
     });
- 
-    drawSub.textContent = "🎉 恭喜得獎！";
-  }, 800);
-});
- 
-    function escapeHtml(str) {
-      return String(str).replace(/[&<>"']/g, s => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[s]));
-    }
 
-    // ===== QR：只在 wall=1 顯示 =====
+    // ===== QR：wall 或 host 顯示（掃到首頁，不帶 host）=====
     if (isWall || isHost) {
-  const qrBox = document.getElementById("qrBox");
-  if (qrBox) qrBox.style.display = "block";
- 
-  new QRious({
-    element: document.getElementById("qr"),
-    value: window.location.origin, // 來賓掃到首頁（沒有 host=1）
-    size: 180
-  });
-}
+      const qrBox = document.getElementById("qrBox");
+      if (qrBox) qrBox.style.display = "block";
+      new QRious({
+        element: document.getElementById("qr"),
+        value: window.location.origin,
+        size: 180
+      });
+    }
 
-    // ===== 主持人：抽獎/清空（目前先做前端示意，不會真的清 server）=====
-   // ===== 主持人：抽獎/清空（目前先做前端示意，之後再接 server 真抽獎）=====
-
-const draw3Btn = document.getElementById("draw3Btn");
-const clearBtn = document.getElementById("clearBtn");
- 
-const drawOverlay = document.getElementById("drawOverlay");
-const drawBox = document.getElementById("drawBox");
-const drawName = document.getElementById("drawName");
-const drawSub = document.getElementById("drawSub");
-const drawClose = document.getElementById("drawClose");
- 
-function openDrawOverlay(){
-  drawOverlay.style.display = "flex";
-  drawName.textContent = "抽獎中…";
-  drawSub.textContent = "";
-  drawBox.classList.remove("win");
-}
-function closeDrawOverlay(){
-  drawOverlay.style.display = "none";
-}
-function sleep(ms){ return new Promise(res => setTimeout(res, ms)); }
- 
-drawClose.addEventListener("click", closeDrawOverlay);
-drawOverlay.addEventListener("click", (e) => { if (e.target === drawOverlay) closeDrawOverlay(); });
- 
-function rollingText(durationMs = 1200){
-  const frames = ["抽獎中", "抽獎中.", "抽獎中..", "抽獎中..."];
-  let i = 0;
-  const t = setInterval(() => {
-    if (drawOverlay.style.display !== "flex") { clearInterval(t); return; }
-    drawName.textContent = frames[i % frames.length];
-    i++;
-  }, 140);
-  setTimeout(() => clearInterval(t), durationMs);
-}
- 
-// ⚠️ 先用前端「示意抽獎」：從當前牆上的名字抓出唯一名單
-function getUniqueNamesFromWall(){
-  const nodes = document.querySelectorAll(".line .name");
-  const names = [];
-  nodes.forEach(n => names.push(n.textContent.trim()));
-  return Array.from(new Set(names)).filter(Boolean);
-}
- 
-function pickRandomUnique(list, count){
-  const arr = list.slice();
-  // 洗牌
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr.slice(0, Math.min(count, arr.length));
-}
- 
-async function showWinners(winners){
-  for (let i = 0; i < winners.length; i++){
-    drawName.textContent = winners[i];
-    drawSub.textContent = `第 ${i+1} 位得獎者（共抽 ${winners.length} 名）`;
-    drawBox.classList.remove("win"); void drawBox.offsetWidth; drawBox.classList.add("win");
-    await sleep(1100);
-  }
-  drawName.textContent = `🎉 恭喜：${winners.join("、")}`;
-  drawSub.textContent = `本輪抽出 ${winners.length} 名`;
-  drawBox.classList.remove("win"); void drawBox.offsetWidth; drawBox.classList.add("win");
-}
- 
-if (isHost) {
- 
-
-  draw3Btn.addEventListener("click", async () => {
-    openDrawOverlay();
-    rollingText(1200);
- 
-    // ✅ 示意：抽 3 名（不重複）
-    const list = getUniqueNamesFromWall();
-    if (list.length === 0) {
-      drawName.textContent = "目前尚無參與者";
+    // ===== 抽獎 Overlay 控制 =====
+    function openDrawOverlay(){
+      drawOverlay.style.display = "flex";
+      drawName.style.display = "block";
+      drawName.textContent = "抽獎中…";
       drawSub.textContent = "";
-      return;
+      drawList.style.display = "none";
+      drawList.innerHTML = "";
+      drawBox.classList.remove("win");
     }
-    const winners = pickRandomUnique(list, 3);
-    await sleep(1250);
-    await showWinners(winners);
- 
-    // ✅ 之後你會改成：socket.emit("host_draw", {count:3});
-  });
- 
-  clearBtn.addEventListener("click", () => {
-    if (confirm("確定要清空名單嗎？（下一步會接 server 真正清空）")) {
-      alert("已觸發清空（示意）");
+    function closeDrawOverlay(){
+      drawOverlay.style.display = "none";
     }
-  });
-} else {
-  // 來賓就算看得到 DOM，也不綁事件
- 
-  if (draw3Btn) draw3Btn.disabled = true;
-  clearBtn.disabled = true;
-}
-// ===== 主持人：抽 3 名（真正呼叫 server）=====
-const drawBtn = document.getElementById("drawBtn");
- 
-if (drawBtn) {
-  drawBtn.addEventListener("click", () => {
-    openDrawOverlay();              // 打開抽獎動畫
-    socket.emit("host_draw", { n: 3 }); // 跟 server 說：抽 3 名
-  });
-}
+    drawClose.addEventListener("click", closeDrawOverlay);
+    drawOverlay.addEventListener("click", (e) => { if (e.target === drawOverlay) closeDrawOverlay(); });
+
+    function rollingText(durationMs = 1200){
+      const frames = ["抽獎中", "抽獎中.", "抽獎中..", "抽獎中..."];
+      let i = 0;
+      const t = setInterval(() => {
+        if (drawOverlay.style.display !== "flex") { clearInterval(t); return; }
+        drawName.textContent = frames[i % frames.length];
+        i++;
+      }, 140);
+      setTimeout(() => clearInterval(t), durationMs);
+    }
+
+    // ===== 主持人按鈕 =====
+    if (isHost) {
+      draw3Btn.addEventListener("click", () => {
+        openDrawOverlay();
+        rollingText(1200);
+        socket.emit("host_draw", { n: 3 });
+      });
+
+      clearBtn.addEventListener("click", () => {
+        if (!confirm("確定要清空名單嗎？")) return;
+        socket.emit("host_reset");
+      });
+    } else {
+      // 來賓不綁事件（也避免有人硬點）
+      if (draw3Btn) draw3Btn.disabled = true;
+      if (clearBtn) clearBtn.disabled = true;
+    }
+
+    // ===== 抽獎結果：逐一揭曉 3 位 =====
+    socket.on("draw_result", (r) => {
+      if (!isHost) return;
+
+      const winners = Array.isArray(r?.winners)
+        ? r.winners
+        : (r?.winner ? [r.winner] : []);
+
+      openDrawOverlay();
+
+      if (!r?.ok || winners.length === 0) {
+        drawName.textContent = r?.reason || "抽獎失敗";
+        drawSub.textContent = "";
+        return;
+      }
+
+      drawSub.textContent = `參與者共 ${r.total ?? winners.length} 人`;
+      drawName.textContent = "準備揭曉…";
+
+      setTimeout(() => {
+        drawName.style.display = "none";
+        drawList.style.display = "grid";
+        drawList.innerHTML = "";
+
+        winners.slice(0, 3).forEach((name, idx) => {
+          const pill = document.createElement("div");
+          pill.className = "draw-pill";
+          pill.innerHTML = `
+            <div class="draw-rank">第 ${idx + 1} 位</div>
+            <div class="draw-winner">${escapeHtml(name)}</div>
+          `;
+          drawList.appendChild(pill);
+
+          setTimeout(() => {
+            pill.classList.add("show");
+            drawBox.classList.remove("win");
+            void drawBox.offsetWidth;
+            drawBox.classList.add("win");
+          }, idx * 700);
+        });
+
+        drawSub.textContent = "🎉 恭喜得獎！";
+      }, 800);
+    });
+
+    // ===== 清空完成後：刷新畫面（讓牆也清掉）=====
+    socket.on("host_reset_done", () => {
+      location.reload();
+    });
   </script>
 </body>
 </html>
