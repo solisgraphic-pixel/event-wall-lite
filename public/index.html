@@ -276,18 +276,18 @@
   <!-- 左邊那張卡留空（或之後你想放活動名稱也可以） -->
  
   <!-- 右邊：按鈕 + 參與者（放在立即抽獎下面） -->
-  <div class="host-actions host-card host-right">
-    <div class="host-btns">
-      <button class="btn-orange" id="btnDraw">🎉 立即抽獎</button>
-      <button class="btn-ghost" id="btnReset">清空名單</button>
-    </div>
+  <div class="host-card" id="hostCard">
+  <div class="host-actions" id="hostActions">
+    <button class="btn-draw" id="drawBtn">🎉 立即抽獎</button>
+    <button class="btn-clear" id="clearBtn">清空名單</button>
+  </div>
  
-    <div class="host-stat host-stat-under">
-      參與者：<b id="pCount">0</b> 人（一人一票）
-    </div>
+  <div class="host-info" id="playerCount">
+    參與者：0 人（一人一票）
   </div>
 </div>
-
+/* ✅ 重要：預設所有人都看不到按鈕（只有 host=1 才會被 JS 打開） */
+#hostActions { display: none !important; }
 
   <div class="wrap">
     <h1>SOLIS 許願牆</h1>
@@ -333,6 +333,11 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
+const isHost = params.get("host") === "1";
+ 
+// ✅ 雙保險：非主持人一定隱藏按鈕
+const hostActions = document.getElementById("hostActions");
+if (hostActions) hostActions.style.display = isHost ? "flex" : "none";
     const isWall = params.get("wall") === "1";
     const isHost = params.get("host") === "1";
 
