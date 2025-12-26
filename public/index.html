@@ -367,8 +367,7 @@ body.is-host #hostActions{ display: flex; }
     if (isWall) document.body.classList.add("wall-only");
 if (isHost) document.body.classList.add("is-host");
     // ✅ 主持人按鈕：只有 host=1 才顯示
-    const hostActions = document.getElementById("hostActions");
-    if (hostActions) hostActions.style.display = isHost ? "flex" : "none";
+
 
     // ===== Socket.IO =====
     const socket = io();
@@ -498,15 +497,16 @@ socket.on("draw_result", (r) => {
     }
 
     // ===== QR：只在 wall=1 顯示 =====
-    if (isWall) {
-      const qrBox = document.getElementById("qrBox");
-      qrBox.style.display = "block";
-new QRious({
-  element: document.getElementById("qr"),
-  value: `${window.location.origin}/`, // ✅ 永遠只到來賓頁（不要帶參數）
-  size: 180
-});
-    }
+    if (isWall || isHost) {
+  const qrBox = document.getElementById("qrBox");
+  if (qrBox) qrBox.style.display = "block";
+ 
+  new QRious({
+    element: document.getElementById("qr"),
+    value: window.location.origin, // 來賓掃到首頁（沒有 host=1）
+    size: 180
+  });
+}
 
     // ===== 主持人：抽獎/清空（目前先做前端示意，不會真的清 server）=====
    // ===== 主持人：抽獎/清空（目前先做前端示意，之後再接 server 真抽獎）=====
