@@ -106,14 +106,33 @@
       return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
  
-    btn.addEventListener("click", () => {
-      const name = nameEl.value.trim();
-      const message = (msgEl.value.trim() || "我已簽到");
-      if (!name) { alert("請先輸入名字"); return; }
-      socket.emit("checkin", { name, message, time: now() });
-      msgEl.value = "";
-      msgEl.focus();
-    });
+   // 讀取已鎖定的名字（如果有）
+const lockedName = localStorage.getItem("event_name");
+if (lockedName) {
+  nameEl.value = lockedName;
+  nameEl.disabled = true;
+}
+ 
+btn.addEventListener("click", () => {
+  let name = nameEl.value.trim();
+  const message = (msgEl.value.trim() || "我已簽到");
+ 
+  if (!name) {
+    alert("請先輸入名字");
+    return;
+  }
+ 
+  // 第一次送出就鎖名字
+  if (!localStorage.getItem("event_name")) {
+    localStorage.setItem("event_name", name);
+    nameEl.disabled = true;
+  }
+ 
+  socket.emit("checkin", { name, message, time: now() });
+  msgEl.value = "";
+  msgEl.focus();
+});
+ 
  
     socket.on("wall", (p) => {
       const div = document.createElement("div");
