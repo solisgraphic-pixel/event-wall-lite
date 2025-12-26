@@ -151,8 +151,8 @@
     }
 
     /* ✅ 重要：所有人預設看不到按鈕（只有 host=1 才顯示） */
-    #hostActions{ display: none !important; }
-
+    #hostActions{ display: none ; }
+body.is-host #hostActions{ display: flex; }
     .host-actions{
       display:flex;
       gap: 10px;
@@ -315,7 +315,7 @@
     const isHost = params.get("host") === "1";
 
     if (isWall) document.body.classList.add("wall-only");
-
+if (isHost) document.body.classList.add("is-host");
     // ✅ 主持人按鈕：只有 host=1 才顯示
     const hostActions = document.getElementById("hostActions");
     if (hostActions) hostActions.style.display = isHost ? "flex" : "none";
