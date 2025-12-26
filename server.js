@@ -27,74 +27,36 @@ function pickWinners(n){
  
   return arr.slice(0, Math.min(n, arr.length));
 }
+const participants = new Set(); // 一人一票：用名字當 key（配合你手機端鎖名字）
+const entries = [];             // 若你本來就有存留言，可保留你的版本
 io.on("connection", (socket) => {
-  socket.on("checkin", (payload) => {
-    io.emit("wall", payload);
+  // 讓新連線的人一進來就拿到目前參與人數
+  socket.emit("participants_count", { count: participants.size });
+ 
+  socket.on("checkin", (p) => {
+    const name = String(p?.name ?? "").trim();
+    const message = String(p?.message ?? "").trim();
+    const time = String(p?.time ?? "").trim();
+ 
+    if (!name) return;
+ 
+    // ✅ 一人一票：同名只算一次
+    if (!participants.has(name)) {
+      participants.add(name);
+      io.emit("participants_count", { count: participants.size });
+    }
+ 
+    // ✅ 廣播留言到牆
+    io.emit("wall", { name, message, time });
   });
- // 新連線：先把目前參與者人數給他（避免一直顯示 0）
-socket.emit("participants_count", { count: participants.size });
  
-/**
-* 來賓送出簽到/留言
-* 前端會送：{ token, name, message, time }
-*/
-socket.on("checkin", (p) => {
-  const token = String(p?.token || "").trim();
-  let name = String(p?.name || "").trim();
-  const message = String(p?.message || "").trim() || "我已簽到";
-  const time = String(p?.time || "").trim() || "";
- 
-  if (!token || !name) return;
- 
-  // ✅ 名字鎖定：同 token 第一次名字為準
-  if (!tokenToName.has(token)) {
-    tokenToName.set(token, name);
-  } else {
-    name = tokenToName.get(token);
-  }
- 
-  // ✅ 一人一票：token 去重
-  const before = participants.size;
-  participants.add(token);
-  if (participants.size !== before) broadcastCount(io);
- 
-  // ✅ 留言牆
-  const entry = { name, message, time };
-  entries.push(entry);
-  io.emit("wall", entry);
-});
- 
-/**
-* 主持人抽獎：抽 N 名（預設 3）
-* 前端會送：{ n: 3 }
-*/
-socket.on("host_draw", (payload) => {
-  const n = Math.max(1, Math.min(20, Number(payload?.n || 3)));
- 
-  if (participants.size === 0) {
-    io.emit("draw_result", { ok: false, reason: "目前尚無參與者" });
-    return;
-  }
- 
-  const winnerTokens = pickWinners(n);
-  const winners = winnerTokens.map(t => tokenToName.get(t) || "（未知）");
- 
-  io.emit("draw_result", {
-    ok: true,
-    winners,
-    total: participants.size
+  // 主持人清空（如果你有清空按鈕）
+  socket.on("host_reset", () => {
+    participants.clear();
+    // entries.length = 0; // 你如果有存留言/名單，視你的程式而定
+    io.emit("participants_count", { count: 0 });
+    io.emit("host_reset_done");
   });
-});
- 
-/**
-* 主持人清空名單/留言
-*/
-socket.on("host_reset", () => {
-  entries.length = 0;
-  tokenToName.clear();
-  participants.clear();
-  broadcastCount(io);
-  io.emit("host_reset_done", { ok: true });
 });
  
 });
