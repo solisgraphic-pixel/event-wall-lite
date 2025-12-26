@@ -258,6 +258,51 @@ body.is-host #hostActions{ display: flex; }
       100% { transform: scale(1); }
     }
     .win{ animation: pulse 900ms ease-out 1; }
+    /* ===== 抽 3 名逐一揭曉（名單樣式） ===== */
+.draw-list{
+  margin-top: 10px;
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+}
+ 
+.draw-pill{
+  width: min(640px, 92%);
+  background: #fff;
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  display:flex;
+  align-items: baseline;
+  gap: 14px;
+  opacity: 0;
+  transform: translateY(10px) scale(.98);
+}
+ 
+.draw-rank{
+  font-weight: 1000;
+  font-size: 18px;
+  color: #ff6a00;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+ 
+.draw-winner{
+  font-weight: 1000;
+  font-size: clamp(28px, 3.6vw, 44px);
+  color:#111;
+  word-break: break-word;
+}
+ 
+@keyframes revealIn{
+  0% { opacity:0; transform: translateY(14px) scale(.97); }
+  60%{ opacity:1; transform: translateY(0) scale(1.02); }
+  100%{ opacity:1; transform: translateY(0) scale(1); }
+}
+ 
+.draw-pill.show{
+  animation: revealIn 520ms ease-out forwards;
+}
   </style>
 </head>
 
@@ -300,9 +345,13 @@ body.is-host #hostActions{ display: flex; }
     <div class="draw-box" id="drawBox">
       <div class="confetti"></div>
       <button class="draw-close" id="drawClose" aria-label="Close">✕</button>
-      <div class="draw-title">WINNER</div>
-      <div class="draw-name" id="drawName">準備抽獎…</div>
-      <div class="draw-sub" id="drawSub"></div>
+     <div class="draw-title">WINNERS</div>
+<div class="draw-name" id="drawName">準備抽獎…</div>
+ 
+<!-- ✅ 新增：逐一揭曉的名單區 -->
+<div class="draw-list" id="drawList" style="display:none;"></div>
+ 
+<div class="draw-sub" id="drawSub"></div>
     </div>
   </div>
 
@@ -371,7 +420,57 @@ if (isHost) document.body.classList.add("is-host");
       setTimeout(() => div.classList.remove("is-new"), 1800);
       while (wall.children.length > 50) wall.removeChild(wall.lastChild);
     });
-
+// ===== 抽獎結果（支援抽 3 名）=====
+socket.on("draw_result", (r) => {
+  if (!isHost) return; // 只有主持人看到動畫
+ 
+  const winners = Array.isArray(r?.winners)
+    ? r.winners
+    : (r?.winner ? [r.winner] : []);
+ 
+  openDrawOverlay();
+ 
+  if (!r?.ok || winners.length === 0) {
+    drawName.textContent = r?.reason || "抽獎失敗";
+    drawSub.textContent = "";
+    return;
+  }
+ 
+  // 過場
+  drawName.style.display = "block";
+  drawName.textContent = "抽獎中…";
+  drawSub.textContent = `參與者共 ${r.total ?? winners.length} 人`;
+ 
+  const listEl = document.getElementById("drawList");
+  listEl.innerHTML = "";
+  listEl.style.display = "none";
+ 
+  // 0.8 秒後開始逐一揭曉
+  setTimeout(() => {
+    drawName.style.display = "none";
+    listEl.style.display = "grid";
+ 
+    winners.slice(0, 3).forEach((name, idx) => {
+      const pill = document.createElement("div");
+      pill.className = "draw-pill";
+      pill.innerHTML = `
+        <div class="draw-rank">第 ${idx + 1} 位</div>
+        <div class="draw-winner">${escapeHtml(name)}</div>
+      `;
+      listEl.appendChild(pill);
+ 
+      setTimeout(() => {
+        pill.classList.add("show");
+        drawBox.classList.remove("win");
+        void drawBox.offsetWidth;
+        drawBox.classList.add("win");
+      }, idx * 700);
+    });
+ 
+    drawSub.textContent = "🎉 恭喜得獎！";
+  }, 800);
+});
+ 
     function escapeHtml(str) {
       return String(str).replace(/[&<>"']/g, s => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
