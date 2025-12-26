@@ -174,16 +174,6 @@
       transform: translateY(-1px);
       box-shadow: 0 10px 22px rgba(255,122,0,0.45);
     }
-    .btn-clear{
-      background: #fff;
-      color: #333;
-      font-size: 14px;
-      border: 1px solid #ddd;
-      border-radius: 999px;
-      padding: 10px 14px;
-      cursor: pointer;
-    }
-    .btn-clear:hover{ background:#f3f3f3; }
 
     .host-info{
       font-size: 14px;
@@ -368,9 +358,8 @@
     const btn = document.getElementById("send");
 
     const playerCountEl = document.getElementById("playerCount");
-
     const draw3Btn = document.getElementById("draw3Btn");
-  
+
     const drawOverlay = document.getElementById("drawOverlay");
     const drawBox = document.getElementById("drawBox");
     const drawName = document.getElementById("drawName");
@@ -390,7 +379,7 @@
       return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
-    // ===== token：一人一票（同裝置固定）=====
+    // ===== token：同裝置固定（可帶給 server，但你 server 目前用 name 去重也 OK）=====
     let myToken = localStorage.getItem("event_token");
     if (!myToken) {
       myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
@@ -427,8 +416,6 @@
     }
 
     btn.addEventListener("click", sendCheckin);
-
-    // （可選）手機在留言框按 Enter 送出
     msgEl.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
@@ -456,7 +443,7 @@
     // ===== 參與者人數 =====
     socket.on("participants_count", (d) => {
       const c = Number(d?.count ?? 0);
-      if (playerCountEl) playerCountEl.textContent = ``參與者：${count} 人`;
+      if (playerCountEl) playerCountEl.textContent = `參與者：${c} 人`;
     });
 
     // ===== QR：wall 或 host 顯示（掃到首頁，不帶 host）=====
@@ -465,7 +452,7 @@
       if (qrBox) qrBox.style.display = "block";
       new QRious({
         element: document.getElementById("qr"),
-        value: window.location.origin,
+        value: window.location.origin, // 來賓掃到首頁
         size: 180
       });
     }
@@ -497,16 +484,14 @@
       setTimeout(() => clearInterval(t), durationMs);
     }
 
-    // ===== 主持人按鈕 =====
-    if (isHost) {
+    // ===== 主持人按鈕：抽 3 名 =====
+    if (isHost && draw3Btn) {
       draw3Btn.addEventListener("click", () => {
         openDrawOverlay();
         rollingText(1200);
         socket.emit("host_draw", { n: 3 });
       });
-
-
-   
+    }
 
     // ===== 抽獎結果：逐一揭曉 3 位 =====
     socket.on("draw_result", (r) => {
@@ -524,7 +509,7 @@
         return;
       }
 
-      drawSub.textContent = `參與者共 ${r.total ?? winners.length} 人`;
+      drawSub.textContent = `參與者共 ${Number(r.total ?? winners.length)} 人`;
       drawName.textContent = "準備揭曉…";
 
       setTimeout(() => {
@@ -551,11 +536,6 @@
 
         drawSub.textContent = "🎉 恭喜得獎！";
       }, 800);
-    });
-
-    // ===== 清空完成後：刷新畫面（讓牆也清掉）=====
-    socket.on("host_reset_done", () => {
-      location.reload();
     });
   </script>
 </body>
