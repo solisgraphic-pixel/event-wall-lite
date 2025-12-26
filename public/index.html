@@ -594,6 +594,15 @@ if (isHost) {
   if (draw3Btn) draw3Btn.disabled = true;
   clearBtn.disabled = true;
 }
+// ===== 主持人：抽 3 名（真正呼叫 server）=====
+const drawBtn = document.getElementById("drawBtn");
+ 
+if (drawBtn) {
+  drawBtn.addEventListener("click", () => {
+    openDrawOverlay();              // 打開抽獎動畫
+    socket.emit("host_draw", { n: 3 }); // 跟 server 說：抽 3 名
+  });
+}
   </script>
 </body>
 </html>
