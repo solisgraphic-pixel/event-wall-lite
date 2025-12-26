@@ -269,7 +269,7 @@ body.is-host #hostActions{ display: flex; }
   <!-- 主持人控制卡（右上角） -->
   <div class="host-card" id="hostCard">
 <div class="host-actions" id="hostActions">
-  <button class="btn-draw" id="drawBtn">🎉 抽 1 名</button>
+  
   <button class="btn-draw" id="draw3Btn">🎉 抽 3 名</button>
   <button class="btn-clear" id="clearBtn">清空名單</button>
 </div>
@@ -391,7 +391,7 @@ if (isHost) document.body.classList.add("is-host");
 
     // ===== 主持人：抽獎/清空（目前先做前端示意，不會真的清 server）=====
    // ===== 主持人：抽獎/清空（目前先做前端示意，之後再接 server 真抽獎）=====
-const drawBtn = document.getElementById("drawBtn");
+
 const draw3Btn = document.getElementById("draw3Btn");
 const clearBtn = document.getElementById("clearBtn");
  
@@ -457,24 +457,8 @@ async function showWinners(winners){
 }
  
 if (isHost) {
-  drawBtn.addEventListener("click", async () => {
-    openDrawOverlay();
-    rollingText(900);
  
-    // ✅ 示意：抽 1 名
-    const list = getUniqueNamesFromWall();
-    if (list.length === 0) {
-      drawName.textContent = "目前尚無參與者";
-      drawSub.textContent = "";
-      return;
-    }
-    const winners = pickRandomUnique(list, 1);
-    await sleep(950);
-    await showWinners(winners);
- 
-    // ✅ 之後你會改成：socket.emit("host_draw", {count:1});
-  });
- 
+
   draw3Btn.addEventListener("click", async () => {
     openDrawOverlay();
     rollingText(1200);
@@ -500,7 +484,7 @@ if (isHost) {
   });
 } else {
   // 來賓就算看得到 DOM，也不綁事件
-  drawBtn.disabled = true;
+ 
   if (draw3Btn) draw3Btn.disabled = true;
   clearBtn.disabled = true;
 }
