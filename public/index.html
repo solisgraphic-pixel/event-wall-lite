@@ -33,14 +33,14 @@
       font-size: 44px;
       letter-spacing: .5px;
     }
-.hint{
-  color: #444;
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 22px;
-  letter-spacing: 0.6px;
-}
+    .hint{
+      color: #444;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 22px;
+      letter-spacing: 0.6px;
+    }
 
     /* 輸入區 */
     .grid{
@@ -136,37 +136,32 @@
     }
 
     /* 主持人懸浮控制卡 */
-.host-card{
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(8px);
-  border-radius: 18px;
-  padding: 12px 14px;          /* ⬅ 左右縮小 */
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  display: inline-flex;        /* ⬅ 關鍵：不再硬撐寬 */
-  flex-direction: column;
-  gap: 8px;
-  z-index: 998;
-  align-items: center;         /* ⬅ 全部置中 */
-}
-
+    .host-card{
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      border-radius: 18px;
+      padding: 12px 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      display: inline-flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 998;
+      align-items: center;
+    }
 
     /* ✅ 只有 host=1 才顯示按鈕 */
     #hostActions{ display:none; }
     body.is-host #hostActions{ display:flex; }
 
-.host-actions{
-  display:flex;
-  gap: 10px;
-  justify-content: center; /* ✅ 置中，左右留白一致 */
-}
-.host-card{
-  align-items: center;  /* ✅ 讓按鈕與文字共用中線 */
-}
+    .host-actions{
+      display:flex;
+      gap: 10px;
+      justify-content: center;
+    }
 
-    
     .btn-draw{
       background: linear-gradient(135deg, #ff7a00, #ff9a3c);
       color: #fff;
@@ -183,13 +178,12 @@
       box-shadow: 0 10px 22px rgba(255,122,0,0.45);
     }
 
-.host-info{
-  font-size: 14px;
-  color: #555;
-  text-align: center;   /* ⬅ 置中 */
-  width: 100%;          /* ⬅ 不再被右推 */
-}
-
+    .host-info{
+      font-size: 14px;
+      color: #555;
+      text-align: center;
+      width: 100%;
+    }
 
     /* 抽獎 overlay */
     .draw-overlay{
@@ -302,47 +296,27 @@
     }
 
     /* 人數增加閃爍動畫 */
-@keyframes countFlash {
-  0% {
-    color: #ff6a00;
-    transform: scale(1);
-  }
-  40% {
-    color: #ff6a00;
-    transform: scale(1.15);
-  }
-  100% {
-    color: #555;
-    transform: scale(1);
-  }
-}
+    @keyframes countFlash {
+      0% { color: #ff6a00; transform: scale(1); }
+      40% { color: #ff6a00; transform: scale(1.15); }
+      100% { color: #555; transform: scale(1); }
+    }
+    .host-info.flash { animation: countFlash 600ms ease-out; }
 
-/* 套用動畫用的 class */
-.host-info.flash {
-  animation: countFlash 600ms ease-out;
-}
-.qr-highlight{
-  font-size: 1.25em;          /* ⬅ 放大重點 */
-  font-weight: 800;
-  color: #ff6a00;             /* SOLIS 橘 */
-  letter-spacing: 0.5px;
-}
-
+    /* ✅✅ 這段一定要在 <style> 裡，且放最後：QR 文字強化 */
+    .qr-box .qr-text{
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: 900;
+      color: #ff6a00;
+      letter-spacing: 1px;
+      animation: qrBreath 1.6s ease-in-out infinite;
+    }
+    @keyframes qrBreath{
+      0%,100%{ opacity: 1; }
+      50%{ opacity: 0.75; }
+    }
   </style>
-  .qr-text{
-  margin-top: 10px;
-  font-size: 20px;
-  font-weight: 900;
-  color: #ff6a00;
-  letter-spacing: 1px;
-  animation: qrBreath 1.6s ease-in-out infinite;
-}
-
-@keyframes qrBreath{
-  0%,100%{ opacity: 1; }
-  50%{ opacity: 0.75; }
-}
-
 </head>
 
 <body>
@@ -372,11 +346,10 @@
   </div>
 
   <!-- QR（wall=1 或 host=1 顯示） -->
-<div class="qr-box" id="qrBox">
-  <canvas id="qr"></canvas>
-  <p class="qr-text">掃描參加抽獎</p>
-</div>
-
+  <div class="qr-box" id="qrBox">
+    <canvas id="qr"></canvas>
+    <p class="qr-text">掃描參加抽獎</p>
+  </div>
 
   <!-- 抽獎 overlay（主持人觸發） -->
   <div class="draw-overlay" id="drawOverlay">
@@ -394,7 +367,6 @@
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 
   <script>
-    // ===== 解析網址參數 =====
     const params = new URLSearchParams(window.location.search);
     const isWall = params.get("wall") === "1";
     const isHost = params.get("host") === "1";
@@ -402,7 +374,6 @@
     if (isWall) document.body.classList.add("wall-only");
     if (isHost) document.body.classList.add("is-host");
 
-    // ===== Socket.IO =====
     const socket = io();
 
     const wall = document.getElementById("wall");
@@ -432,23 +403,19 @@
       return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
-    // ===== token：同裝置固定（可帶給 server，但你 server 目前用 name 去重也 OK）=====
     let myToken = localStorage.getItem("event_token");
     if (!myToken) {
       myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
       localStorage.setItem("event_token", myToken);
     }
 
-    // ===== 鎖名字（同裝置）=====
     const lockedName = localStorage.getItem("event_name");
     if (lockedName) {
       nameEl.value = lockedName;
       nameEl.disabled = true;
     }
 
-    // ===== 防連點送出 =====
     let sending = false;
-
     function sendCheckin(){
       if (sending) return;
       sending = true;
@@ -476,7 +443,6 @@
       }
     });
 
-    // ===== 即時牆 =====
     socket.on("wall", (p) => {
       const div = document.createElement("div");
       div.className = "item is-new";
@@ -493,38 +459,31 @@
       while (wall.children.length > 50) wall.removeChild(wall.lastChild);
     });
 
-    // ===== 參與者人數 =====
-let lastCount = 0;
+    let lastCount = 0;
+    socket.on("participants_count", (d) => {
+      const c = Number(d?.count ?? 0);
+      if (!playerCountEl) return;
 
-socket.on("participants_count", (d) => {
-  const c = Number(d?.count ?? 0);
-  if (!playerCountEl) return;
+      playerCountEl.textContent = `參與者：${c} 人`;
 
-  playerCountEl.textContent = `參與者：${c} 人`;
+      if (c > lastCount) {
+        playerCountEl.classList.remove("flash");
+        void playerCountEl.offsetWidth;
+        playerCountEl.classList.add("flash");
+      }
+      lastCount = c;
+    });
 
-  // ✅ 只有「人數變多」才閃
-  if (c > lastCount) {
-    playerCountEl.classList.remove("flash"); // 重置
-    void playerCountEl.offsetWidth;          // 強制重算，確保動畫會重播
-    playerCountEl.classList.add("flash");
-  }
-
-  lastCount = c;
-});
-
-
-    // ===== QR：wall 或 host 顯示（掃到首頁，不帶 host）=====
     if (isWall || isHost) {
       const qrBox = document.getElementById("qrBox");
       if (qrBox) qrBox.style.display = "block";
       new QRious({
         element: document.getElementById("qr"),
-        value: window.location.origin, // 來賓掃到首頁
+        value: window.location.origin,
         size: 180
       });
     }
 
-    // ===== 抽獎 Overlay 控制 =====
     function openDrawOverlay(){
       drawOverlay.style.display = "flex";
       drawName.style.display = "block";
@@ -551,7 +510,6 @@ socket.on("participants_count", (d) => {
       setTimeout(() => clearInterval(t), durationMs);
     }
 
-    // ===== 主持人按鈕：抽 3 名 =====
     if (isHost && draw3Btn) {
       draw3Btn.addEventListener("click", () => {
         openDrawOverlay();
@@ -560,7 +518,6 @@ socket.on("participants_count", (d) => {
       });
     }
 
-    // ===== 抽獎結果：逐一揭曉 3 位 =====
     socket.on("draw_result", (r) => {
       if (!isHost) return;
 
@@ -604,15 +561,6 @@ socket.on("participants_count", (d) => {
         drawSub.textContent = "🎉 恭喜得獎！";
       }, 800);
     });
-    // 只放大「請掃描 QR Code」那段
-const hintEl = document.querySelector(".hint");
-if (hintEl) {
-  hintEl.innerHTML = hintEl.innerHTML.replace(
-    "請掃描 QR Code",
-    `<span class="qr-highlight">請掃描 QR Code</span>`
-  );
-}
-
   </script>
 </body>
 </html>
