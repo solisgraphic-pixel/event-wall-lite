@@ -545,6 +545,24 @@
     const hasMedia = document.documentElement.classList.contains("has-media");
 
     const socket = io();
+socket.on("checkin_error", (e) => {
+  alert(e?.message || "簽到失敗，請重試");
+
+  // ✅ 重複同桌同名：清掉名字欄位，讓他改名
+  if (e?.code === "DUP_NAME_SAME_TABLE") {
+    if (nameEl) {
+      nameEl.disabled = false;
+      nameEl.value = "";
+      nameEl.focus();
+    }
+    // 注意：桌號可以保留，不用清
+  }
+});
+
+socket.on("checkin_ok", () => {
+  // ✅ 收到 server 成功回覆後再鎖定（更準確）
+  // 若你原本是在 sendCheckin() 送出前就鎖定，建議把「鎖定」搬到這裡
+});
 
     const wall = document.getElementById("wall");
     const nameEl = document.getElementById("name");
