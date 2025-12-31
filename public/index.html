@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SOLIS 許願牆</title>
 
+  <!-- ✅ 先在 head 就把模式 class 加到 <html>，避免後面 JS 掛掉導致版型錯 -->
+  <script>
+  (function () {
+    const p = new URLSearchParams(location.search);
+    const isWall = p.get("wall") === "1";
+    const isHost = p.get("host") === "1";
+    const hasMedia = isWall || isHost;
+
+    const root = document.documentElement; // <html>
+    if (isWall) root.classList.add("wall-only");
+    if (isHost) root.classList.add("is-host");
+    if (hasMedia) root.classList.add("has-media");
+  })();
+  </script>
+
   <style>
     :root{
       --bg:#f7f7f7;
@@ -25,9 +40,9 @@
     }
 
     /* =========================
-       4:3 投影（1024x768）主框
+       投影（1024x768）主框：只對 has-media 生效
     ========================= */
-    body.has-media{
+    html.has-media body{
       width:1024px;
       height:768px;
       margin:0 auto;
@@ -36,104 +51,86 @@
       position:relative;
     }
 
-    /* ===== Header（固定置中：真正置中，不吃 QR 的 margin-left）===== */
-/* ===== Header：預設（手機/來賓）===== */
-.header{
-  width:100%;
-  text-align:center;
-  padding: 16px 10px 6px;
-  margin: 0 auto;
-}
-
-.header h1{
-  margin:0;
-  font-size:36px;
-  letter-spacing:.5px;
-  line-height:1.1;
-}
-
-.header .hint{
-  margin-top:6px;
-  font-size:14px;
-  font-weight:700;
-  color:#444;
-  letter-spacing:.4px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  max-width: 92vw;
-  margin-left:auto;
-  margin-right:auto;
-}
-
-.header .divider{
-  margin:8px auto 0;
-  width: min(760px, 92vw);
-  height:1px;
-  background:#ddd;
-}
-
-/* ✅ 只有投影/主持（has-media）才需要避開左上 QR */
-body.has-media .header{
-  padding-top:10px;
-  padding-bottom:6px;
-  margin-left:200px;
-  width: calc(100% - 200px);
-}
-
-
+    /* =========================
+       Header：預設（手機/來賓）
+    ========================= */
+    .header{
+      width:100%;
+      text-align:center;
+      padding: 16px 10px 6px;
+      margin: 0 auto;
+    }
     .header h1{
       margin:0;
       font-size:36px;
       letter-spacing:.5px;
       line-height:1.1;
     }
-
     .header .hint{
       margin-top:6px;
       font-size:14px;
       font-weight:700;
       color:#444;
       letter-spacing:.4px;
-      white-space:nowrap;      /* 永遠單行 */
-      overflow:hidden;
-      text-overflow:ellipsis;  /* 太長就 ... */
+      white-space: normal;
+      line-height: 1.3;
+      max-width: 92vw;
+      margin-left:auto;
+      margin-right:auto;
     }
-
-    /* ✅ 分隔線只留這一條 */
     .header .divider{
       margin:8px auto 0;
-      width: 520px;
+      width: min(520px, 88vw);
       height:1px;
       background:#ddd;
     }
 
-    /* ===== 舞台：在 Header 下方（左留言 + 右影片，同高度）===== */
-/* ===== 舞台：預設（手機/來賓）===== */
-.stage{
-  margin: 12px auto 0;
-  width: 100%;
-  max-width: 560px;
-  padding: 0 12px;
-  display: grid;
-  grid-template-columns: 1fr;   /* 手機單欄 */
-  gap: 12px;
-}
+    /* =========================
+       Header：投影/主持（has-media）
+       只要避開左上 QR：內容往右縮
+    ========================= */
+    html.has-media .header{
+      padding-top:10px;
+      padding-bottom:6px;
+      margin-left:200px;
+      width: calc(100% - 200px);
+    }
+    html.has-media .header .hint{
+      white-space:nowrap;            /* 投影只要單行 */
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 760px;
+    }
+    html.has-media .header .divider{
+      width: 520px;
+    }
 
-/* ✅ 只有投影/主持（has-media）才變成 4:3 兩欄佈局 + 避開 QR */
-body.has-media .stage{
-  margin-top:14px;
-  margin-left:200px;
-  width: calc(100% - 200px);
-  display:grid;
-  grid-template-columns: 1fr 360px;
-  gap:14px;
-  height: 560px;
-  align-items:stretch;
-  max-width: none;
-  padding: 0;
-}
+    /* =========================
+       舞台：預設（手機/來賓）單欄
+    ========================= */
+    .stage{
+      margin: 12px auto 0;
+      width: 100%;
+      max-width: 560px;
+      padding: 0 12px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
 
+    /* 舞台：投影/主持（兩欄 + 避開 QR） */
+    html.has-media .stage{
+      margin-top:14px;
+      margin-left:200px;
+      width: calc(100% - 200px);
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:14px;
+      height: 560px;
+      align-items:stretch;
+      max-width: none;
+      padding: 0;
+    }
 
     /* 左：留言容器 */
     .panel{
@@ -164,10 +161,10 @@ body.has-media .stage{
     }
     button:hover{ opacity:.92; }
 
-    /* wall 頁：隱藏輸入 */
-    .wall-only .input-area{ display:none; }
+    /* wall 頁：隱藏輸入（只顯示牆） */
+    html.wall-only .input-area{ display:none; }
 
-    /* 留言牆：固定高度可捲動（✅ 不要上方那條線） */
+    /* 留言牆：可捲動 */
     .wall{
       flex:1;
       min-height:0;
@@ -187,10 +184,7 @@ body.has-media .stage{
       align-items: baseline;
       flex-wrap: wrap;
     }
-    .line .name{
-      font-size:18px;
-      font-weight:900;
-    }
+    .line .name{ font-size:18px; font-weight:900; }
     .line .time{
       font-size:14px;
       color:#777;
@@ -211,7 +205,7 @@ body.has-media .stage{
     }
     .item.is-new .line{ animation: popIn 420ms ease-out; outline:3px solid rgba(255,106,0,0.18); }
 
-    /* 右：影片（同舞台高度） */
+    /* 右：影片 */
     .media-slot{
       height:100%;
       background:#000;
@@ -245,7 +239,7 @@ body.has-media .stage{
         #0b0b0b;
     }
 
-    /* ===== QR（左上）===== */
+    /* ===== QR（左上）：只在 has-media 顯示 ===== */
     .qr-box{
       position:fixed;
       left:10px;
@@ -267,7 +261,7 @@ body.has-media .stage{
       letter-spacing:1px;
     }
 
-    /* ===== 右上：抽獎 + 參與者 ===== */
+    /* 右上：主持工具列 */
     .host-top{
       position:fixed;
       right:10px;
@@ -282,11 +276,12 @@ body.has-media .stage{
       gap:10px;
       align-items:center;
     }
-    body.is-host .host-top{ display:flex; }
+    html.is-host .host-top{ display:flex; }
 
     .pill{
       display:inline-flex;
       align-items:center;
+      justify-content:center;
       gap:8px;
       padding:10px 14px;
       border-radius:999px;
@@ -296,6 +291,7 @@ body.has-media .stage{
       cursor:pointer;
       user-select:none;
       white-space:nowrap;
+      min-height: 42px;
     }
     .pill.orange{
       border:none;
@@ -317,7 +313,7 @@ body.has-media .stage{
     }
     .count.flash{ animation:countFlash 600ms ease-out; }
 
-    /* ===== 右下：影片控制（ICON-only）===== */
+    /* 右下：影片控制 */
     .controls{
       position:fixed;
       right:10px;
@@ -332,7 +328,7 @@ body.has-media .stage{
       gap:10px;
       align-items:center;
     }
-    body.is-host .controls{ display:flex; }
+    html.is-host .controls{ display:flex; }
 
     .icon-btn{
       width:46px;
@@ -350,29 +346,26 @@ body.has-media .stage{
     }
     .icon-btn:hover{ background:#f3f3f3; }
 
-    /* ===== LOGO（底部置中）===== */
+    /* LOGO：投影固定底部置中；手機正常流排版 */
     .brand{
+      text-align:center;
+      margin: 18px auto 8px;
+      opacity:.95;
+      pointer-events:none;
+    }
+    .brand img{ max-height:88px; }
+
+    html.has-media .brand{
       position:fixed;
       left:50%;
       bottom:12px;
       transform:translateX(-50%);
       z-index:997;
-      pointer-events:none;
-      opacity:.95;
+      margin:0;
     }
-    .brand img{ max-height:56px; }
+    html.has-media .brand img{ max-height:72px; }
 
-    /* ✅ 投影版（has-media）LOGO 放大 */
-body.has-media .brand img{
-  max-height: 72px;
-}
-
-/* ✅ 手機/來賓頁 LOGO 放大 */
-body:not(.has-media) .brand img{
-  max-height: 88px;
-}
-
-    /* ===== 抽獎 overlay（保留原本）===== */
+    /* 抽獎 overlay */
     .draw-overlay{
       position: fixed;
       inset: 0;
@@ -441,7 +434,7 @@ body:not(.has-media) .brand img{
       justify-items: center;
     }
     .draw-pill{
-      width: min(640px, 92%);
+      width: min(720px, 92%);
       background: #fff;
       border-radius: 18px;
       padding: 16px 18px;
@@ -461,7 +454,7 @@ body:not(.has-media) .brand img{
     }
     .draw-winner{
       font-weight: 1000;
-      font-size: clamp(28px, 3.6vw, 44px);
+      font-size: clamp(24px, 3.2vw, 40px);
       color:#111;
       word-break: break-word;
     }
@@ -470,90 +463,25 @@ body:not(.has-media) .brand img{
       60%{ opacity:1; transform: translateY(0) scale(1.02); }
       100%{ opacity:1; transform: translateY(0) scale(1); }
     }
-    /* =========================
-   ✅ 手機/來賓頁修正（沒有 has-media 時）
-   目的：不要被投影版 fixed / margin-left 推歪
-========================= */
-
-/* 來賓頁：Header 不要 fixed、回到正常排版 */
-body:not(.has-media) .header{
-  position: static !important;
-  transform: none !important;
-  width: auto !important;
-  pointer-events: auto !important;
-  padding: 16px 10px 6px !important;
-  margin: 0 auto !important;
-}
-
-/* 來賓頁：分隔線與副標寬度用螢幕百分比 */
-body:not(.has-media) .header .divider{
-  width: min(520px, 92vw) !important;
-}
-body:not(.has-media) .header .hint{
-  max-width: 92vw !important;
-}
-
-/* 來賓頁：舞台不要 margin-left 200、不要固定高度 560 */
-body:not(.has-media) .stage{
-  margin-top: 12px !important;
-  margin-left: 0 !important;
-  width: 100% !important;
-  height: auto !important;
-  grid-template-columns: 1fr !important; /* 單欄 */
-  padding: 0 12px !important;
-  max-width: 560px;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* 來賓頁：影片區不顯示（本來就不會顯示，但加保險） */
-body:not(.has-media) .media-slot{
-  display: none !important;
-}
-
-/* 來賓頁：底部 LOGO 不要 fixed，避免擋表單 */
-body:not(.has-media) .brand{
-  position: static !important;
-  transform: none !important;
-  margin: 18px auto 8px !important;
-  text-align: center;
-}
-
     .draw-pill.show{ animation: revealIn 520ms ease-out forwards; }
-    /* ✅ 手機/來賓頁：副標允許換行，不要被 ... 截掉 */
-body:not(.has-media) .header .hint{
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
-  line-height: 1.3;
-  padding: 0 8px;
-}
-
-/* 手機頁分隔線跟著變短一點 */
-body:not(.has-media) .header .divider{
-  width: min(520px, 88vw) !important;
-}
-
   </style>
 </head>
 
 <body>
-
   <!-- QR -->
   <div class="qr-box" id="qrBox">
     <canvas id="qr"></canvas>
     <div class="qr-text">掃描參加抽獎</div>
   </div>
 
-  <!-- 右上：抽獎 + 參與者 -->
-<div class="host-top" id="hostTop">
-  <div class="pill orange" id="draw3Btn" title="抽 3 名">🎉</div>
-  <div class="pill" id="resetLocal" title="清空本機測試資料">🧹</div>
-  <div class="count" id="playerCount">參與者：0 人</div>
-</div>
+  <!-- 右上：主持工具 -->
+  <div class="host-top" id="hostTop">
+    <div class="pill orange" id="draw3Btn" title="抽 3 名">🎉</div>
+    <div class="pill" id="resetLocal" title="清空本機測試資料">🧹</div>
+    <div class="count" id="playerCount">參與者：0 人</div>
+  </div>
 
-
-  <!-- 右下：影片控制（icon-only） -->
+  <!-- 右下：影片控制 -->
   <div class="controls" id="controls">
     <input id="pickVideo" type="file" accept="video/*" style="display:none;">
     <button class="icon-btn" id="pickVideoBtn" title="選影片" aria-label="選影片">📁</button>
@@ -563,14 +491,14 @@ body:not(.has-media) .header .divider{
     <button class="icon-btn" id="vidNext" title="下一支" aria-label="下一支">⏭️</button>
   </div>
 
-  <!-- Header（固定置中） -->
+  <!-- Header -->
   <div class="header">
     <h1>SOLIS 許願牆</h1>
     <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到｜有機會抽精美小禮一份喔</div>
     <div class="divider"></div>
   </div>
 
-  <!-- 舞台（標題下方：左留言 / 右影片） -->
+  <!-- 舞台 -->
   <div class="stage">
     <div class="panel">
       <div class="grid input-area">
@@ -590,7 +518,7 @@ body:not(.has-media) .header .divider{
     </div>
   </div>
 
-  <!-- 底部置中 LOGO -->
+  <!-- LOGO -->
   <div class="brand">
     <img src="logo.png" alt="SOLIS">
   </div>
@@ -611,16 +539,10 @@ body:not(.has-media) .header .divider{
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const isWall = params.get("wall") === "1";
-    const isHost = params.get("host") === "1";
-
-    if (isWall) document.body.classList.add("wall-only");
-    if (isHost) document.body.classList.add("is-host");
-
-    const hasMedia = (isWall || isHost);
-    if (hasMedia) document.body.classList.add("has-media");
-console.log({ isWall, isHost, hasMedia, href: location.href });
+    // ✅ 用 <html> 的 class（已在 head 設好）
+    const isWall = document.documentElement.classList.contains("wall-only");
+    const isHost = document.documentElement.classList.contains("is-host");
+    const hasMedia = document.documentElement.classList.contains("has-media");
 
     const socket = io();
 
@@ -629,7 +551,6 @@ console.log({ isWall, isHost, hasMedia, href: location.href });
     const msgEl  = document.getElementById("message");
     const btn    = document.getElementById("send");
     const tableEl = document.getElementById("tableNo");
-
 
     const playerCountEl = document.getElementById("playerCount");
     const draw3Btn = document.getElementById("draw3Btn");
@@ -666,24 +587,28 @@ console.log({ isWall, isHost, hasMedia, href: location.href });
       return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
+    // token：同裝置固定
     let myToken = localStorage.getItem("event_token");
     if (!myToken) {
       myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
       localStorage.setItem("event_token", myToken);
     }
 
+    // 鎖名字
     const lockedName = localStorage.getItem("event_name");
     if (lockedName && nameEl) {
       nameEl.value = lockedName;
       nameEl.disabled = true;
     }
-// ===== 鎖桌號（同裝置）=====
-const lockedTable = localStorage.getItem("event_table");
-if (lockedTable && tableEl) {
-  tableEl.value = lockedTable;
-  tableEl.disabled = true;
-}
 
+    // 鎖桌號
+    const lockedTable = localStorage.getItem("event_table");
+    if (lockedTable && tableEl) {
+      tableEl.value = lockedTable;
+      tableEl.disabled = true;
+    }
+
+    // 防連點送出
     let sending = false;
     function sendCheckin(){
       if (!nameEl || !msgEl) return;
@@ -692,29 +617,23 @@ if (lockedTable && tableEl) {
       sending = true;
       setTimeout(() => (sending = false), 650);
 
-const tableNo = tableEl ? tableEl.value.trim() : "";
-const name = nameEl.value.trim();
-const message = msgEl.value.trim() || "我已簽到";
+      const tableNo = tableEl ? tableEl.value.trim() : "";
+      const name = nameEl.value.trim();
+      const message = msgEl.value.trim() || "我已簽到";
 
-if (!tableNo) { alert("請先輸入桌號"); return; }
-if (!name) { alert("請先輸入名字"); return; }
+      if (!tableNo) { alert("請先輸入桌號"); return; }
+      if (!name) { alert("請先輸入名字"); return; }
 
-if (tableEl && !localStorage.getItem("event_table")) {
-  localStorage.setItem("event_table", tableNo);
-  tableEl.disabled = true;
-}
-if (!localStorage.getItem("event_name")) {
-  localStorage.setItem("event_name", name);
-  nameEl.disabled = true;
-}
-
-
+      if (tableEl && !localStorage.getItem("event_table")) {
+        localStorage.setItem("event_table", tableNo);
+        tableEl.disabled = true;
+      }
       if (!localStorage.getItem("event_name")) {
         localStorage.setItem("event_name", name);
         nameEl.disabled = true;
       }
 
-socket.emit("checkin", { token: myToken, tableNo, name, message, time: now() });
+      socket.emit("checkin", { token: myToken, tableNo, name, message, time: now() });
 
       msgEl.value = "";
       msgEl.focus();
@@ -730,15 +649,21 @@ socket.emit("checkin", { token: myToken, tableNo, name, message, time: now() });
       });
     }
 
+    // 即時牆：顯示桌號＋名字（更好找人）
     socket.on("wall", (p) => {
       if (!wall) return;
+      const tableNo = String(p?.tableNo ?? "").trim();
+      const name = String(p?.name ?? "").trim();
+      const message = String(p?.message ?? "").trim();
+      const time = String(p?.time ?? "").trim();
+
       const div = document.createElement("div");
       div.className = "item is-new";
       div.innerHTML = `
         <div class="line">
-          <span class="name">${escapeHtml(p.name)}</span>
-          <span class="time">${escapeHtml(p.time)}：</span>
-          <span class="msg">${escapeHtml(p.message)}</span>
+          <span class="name">${escapeHtml(tableNo ? `桌${tableNo}｜${name}` : name)}</span>
+          <span class="time">${escapeHtml(time)}：</span>
+          <span class="msg">${escapeHtml(message)}</span>
         </div>
       `;
       wall.prepend(div);
@@ -747,6 +672,7 @@ socket.emit("checkin", { token: myToken, tableNo, name, message, time: now() });
       while (wall.children.length > 60) wall.removeChild(wall.lastChild);
     });
 
+    // 參與者人數
     let lastCount = 0;
     socket.on("participants_count", (d) => {
       const c = Number(d?.count ?? 0);
@@ -762,7 +688,8 @@ socket.emit("checkin", { token: myToken, tableNo, name, message, time: now() });
       lastCount = c;
     });
 
-    if (isWall || isHost) {
+    // QR（has-media 才顯示）
+    if (hasMedia) {
       if (qrBox) qrBox.style.display = "block";
       try{
         new QRious({
@@ -775,6 +702,7 @@ socket.emit("checkin", { token: myToken, tableNo, name, message, time: now() });
       }
     }
 
+    // 抽獎 overlay
     function openDrawOverlay(){
       if (!drawOverlay || !drawName || !drawSub || !drawList || !drawBox) return;
       drawOverlay.style.display = "flex";
@@ -808,6 +736,7 @@ socket.emit("checkin", { token: myToken, tableNo, name, message, time: now() });
       setTimeout(() => clearInterval(t), durationMs);
     }
 
+    // 主持抽獎
     if (isHost && draw3Btn) {
       draw3Btn.addEventListener("click", () => {
         openDrawOverlay();
@@ -816,11 +745,19 @@ socket.emit("checkin", { token: myToken, tableNo, name, message, time: now() });
       });
     }
 
+    // ✅ 顯示抽獎結果（支援兩種格式）
+    // A) server 回傳 winners: ["A","B","C"] （舊版）
+    // B) server 回傳 winners: [{tableNo:"2", name:"A"}, ...] （新版）
     socket.on("draw_result", (r) => {
       if (!isHost) return;
       if (!drawName || !drawSub || !drawList || !drawBox) return;
 
-      const winners = Array.isArray(r?.winners) ? r.winners : (r?.winner ? [r.winner] : []);
+      const winnersRaw = Array.isArray(r?.winners) ? r.winners : [];
+      const winners = winnersRaw.map(w => {
+        if (typeof w === "string") return { tableNo: "？", name: w };
+        return { tableNo: String(w?.tableNo ?? "？"), name: String(w?.name ?? "？") };
+      });
+
       openDrawOverlay();
 
       if (!r?.ok || winners.length === 0) {
@@ -837,48 +774,12 @@ socket.emit("checkin", { token: myToken, tableNo, name, message, time: now() });
         drawList.style.display = "grid";
         drawList.innerHTML = "";
 
-socket.on("draw_result", (r) => {
-  if (!isHost) return;
-  if (!drawName || !drawSub || !drawList || !drawBox) return;
-
-  const winnersRaw = Array.isArray(r?.winners) ? r.winners : [];
-  const winners = winnersRaw.map(w => {
-    if (typeof w === "string") return { tableNo: "？", name: w };
-    return { tableNo: String(w?.tableNo ?? "？"), name: String(w?.name ?? "？") };
-  });
-
-  openDrawOverlay();
-
-  if (!r?.ok || winners.length === 0) {
-    drawName.textContent = r?.reason || "抽獎失敗";
-    drawSub.textContent = "";
-    return;
-  }
-
-  drawSub.textContent = `參與者共 ${Number(r.total ?? winners.length)} 人`;
-  drawName.textContent = "準備揭曉…";
-
-  setTimeout(() => {
-    drawName.style.display = "none";
-    drawList.style.display = "grid";
-    drawList.innerHTML = "";
-
-    winners.slice(0, 3).forEach((w, idx) => {
-      const pill = document.createElement("div");
-      pill.className = "draw-pill";
-      pill.innerHTML = `
-        <div class="draw-rank">第 ${idx + 1} 位</div>
-        <div class="draw-winner">桌 ${escapeHtml(w.tableNo)}｜${escapeHtml(w.name)}</div>
-      `;
-      drawList.appendChild(pill);
-
-      setTimeout(() => pill.classList.add("show"), idx * 650);
-    });
-
-    drawSub.textContent = "🎉 恭喜得獎！";
-  }, 800);
-});
-</div>
+        winners.slice(0, 3).forEach((w, idx) => {
+          const pill = document.createElement("div");
+          pill.className = "draw-pill";
+          pill.innerHTML = `
+            <div class="draw-rank">第 ${idx + 1} 位</div>
+            <div class="draw-winner">桌 ${escapeHtml(w.tableNo)}｜${escapeHtml(w.name)}</div>
           `;
           drawList.appendChild(pill);
 
@@ -889,11 +790,11 @@ socket.on("draw_result", (r) => {
       }, 800);
     });
 
+    // ====== 影片 ======
     function showFallback(on){
       if (!mediaFallback) return;
       mediaFallback.style.display = on ? "flex" : "none";
     }
-
     function bindEndedHoldLastFrame(){
       if (!bgVideo) return;
       bgVideo.onended = () => {
@@ -904,69 +805,48 @@ socket.on("draw_result", (r) => {
       };
     }
 
+    // has-media 顯示影片區
     if (hasMedia && mediaSlot) {
       mediaSlot.style.display = "block";
       showFallback(true);
     }
 
-   // host：本機選影片（最穩：不強制自動播，改成讓「播放鍵」播）
-if (isHost && pickVideo && pickVideoBtn && bgVideo) {
-  const tryPlay = async () => {
-    try{
-      await bgVideo.play();
-      console.log("✅ play ok");
-    }catch(err){
-      console.warn("⛔ play blocked:", err);
-      alert("影片已載入，但被瀏覽器擋自動播放。\n請按右下 ▶️ 播放一次即可。");
+    // host：本機選影片（不強制自動播；按 ▶️ 播）
+    if (isHost && pickVideo && pickVideoBtn && bgVideo) {
+      pickVideoBtn.addEventListener("click", () => pickVideo.click());
+
+      pickVideo.addEventListener("change", async () => {
+        const file = pickVideo.files?.[0];
+        if (!file) return;
+
+        // 釋放舊 blob
+        if (bgVideo.dataset.blobUrl) {
+          URL.revokeObjectURL(bgVideo.dataset.blobUrl);
+          bgVideo.dataset.blobUrl = "";
+        }
+
+        const url = URL.createObjectURL(file);
+        bgVideo.dataset.blobUrl = url;
+
+        bgVideo.src = url;
+        bgVideo.loop = false;
+        bgVideo.muted = true; // 最不會被擋
+        bgVideo.playsInline = true;
+        bgVideo.preload = "auto";
+
+        showFallback(false);
+        bindEndedHoldLastFrame();
+
+        bgVideo.load();
+      });
     }
-  };
-
-  pickVideoBtn.addEventListener("click", () => pickVideo.click());
-
-  pickVideo.addEventListener("change", async () => {
-    const file = pickVideo.files?.[0];
-    if (!file) return;
-
-    // ✅ 釋放舊的 blob URL（避免越選越卡）
-    if (bgVideo.dataset.blobUrl) {
-      URL.revokeObjectURL(bgVideo.dataset.blobUrl);
-      bgVideo.dataset.blobUrl = "";
-    }
-
-    const url = URL.createObjectURL(file);
-    bgVideo.dataset.blobUrl = url;
-
-    bgVideo.src = url;
-    bgVideo.loop = false;
-    bgVideo.muted = true;          // ✅ 建議維持靜音，最不會被擋
-    bgVideo.playsInline = true;
-    bgVideo.preload = "auto";
-
-    // ✅ 顯示影片區、關掉 fallback
-    showFallback(false);
-
-    // ✅ 播完停最後一格
-    bindEndedHoldLastFrame();
-
-    // ✅ 等影片真的載到可播再試著播（成功就直接播；失敗就提示按 ▶️）
-    bgVideo.addEventListener("canplay", () => {
-      // 不要每次 canplay 都重複觸發
-      if (bgVideo.dataset.didAutoPlay === "1") return;
-      bgVideo.dataset.didAutoPlay = "1";
-      tryPlay();
-    }, { once: true });
-
-    // 若 canplay 沒來，也給手動播放留路
-    bgVideo.load();
-  });
-}
 
     function nextVideo(){
       if (isHost && pickVideo) pickVideo.click();
     }
 
     if (isHost && bgVideo) {
-      if (vidPlay)  vidPlay.addEventListener("click", () => bgVideo.play().catch(()=>{}));
+      if (vidPlay)  vidPlay.addEventListener("click", () => bgVideo.play().catch(()=>alert("請先選擇影片檔案")));
       if (vidPause) vidPause.addEventListener("click", () => bgVideo.pause());
       if (vidMute)  vidMute.addEventListener("click", () => {
         bgVideo.muted = !bgVideo.muted;
@@ -974,20 +854,20 @@ if (isHost && pickVideo && pickVideoBtn && bgVideo) {
       });
       if (vidNext)  vidNext.addEventListener("click", nextVideo);
     }
+
+    // ✅ 清空本機測試綁定
     const resetBtn = document.getElementById("resetLocal");
-if (resetBtn) {
-  resetBtn.addEventListener("click", () => {
-    if (!confirm("確定要清空此手機的測試綁定資料嗎？")) return;
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        if (!confirm("確定要清空此裝置的測試綁定資料嗎？")) return;
 
-    localStorage.removeItem("event_name");
-    localStorage.removeItem("event_table");
-    localStorage.removeItem("event_token");
+        localStorage.removeItem("event_name");
+        localStorage.removeItem("event_table");
+        localStorage.removeItem("event_token");
 
-    location.reload();
-  });
-}
-
-
+        location.reload();
+      });
+    }
   </script>
 </body>
 </html>
