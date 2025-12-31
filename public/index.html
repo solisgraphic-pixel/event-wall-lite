@@ -426,6 +426,16 @@ body.has-media .wall{
   padding-top: 0 !important;
   margin-top: 0 !important;
 }
+/* ===== 標題真正置中（不被 QR 影響）===== */
+body.has-media .wrap h1,
+body.has-media .wrap .hint{
+  width: 100%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 標題區整體往下推，避開左上 QR */
 
   </style>
 </head>
