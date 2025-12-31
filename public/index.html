@@ -729,26 +729,57 @@
       showFallback(true);
     }
 
-    if (isHost && pickVideo && pickVideoBtn && bgVideo) {
-      pickVideoBtn.addEventListener("click", () => pickVideo.click());
-
-      pickVideo.addEventListener("change", () => {
-        const file = pickVideo.files?.[0];
-        if (!file) return;
-
-        const url = URL.createObjectURL(file);
-
-        bgVideo.src = url;
-        bgVideo.loop = false;
-        bgVideo.muted = true;
-        bgVideo.playsInline = true;
-
-        showFallback(false);
-        bindEndedHoldLastFrame();
-
-        bgVideo.play().catch(() => {});
-      });
+   // host：本機選影片（最穩：不強制自動播，改成讓「播放鍵」播）
+if (isHost && pickVideo && pickVideoBtn && bgVideo) {
+  const tryPlay = async () => {
+    try{
+      await bgVideo.play();
+      console.log("✅ play ok");
+    }catch(err){
+      console.warn("⛔ play blocked:", err);
+      alert("影片已載入，但被瀏覽器擋自動播放。\n請按右下 ▶️ 播放一次即可。");
     }
+  };
+
+  pickVideoBtn.addEventListener("click", () => pickVideo.click());
+
+  pickVideo.addEventListener("change", async () => {
+    const file = pickVideo.files?.[0];
+    if (!file) return;
+
+    // ✅ 釋放舊的 blob URL（避免越選越卡）
+    if (bgVideo.dataset.blobUrl) {
+      URL.revokeObjectURL(bgVideo.dataset.blobUrl);
+      bgVideo.dataset.blobUrl = "";
+    }
+
+    const url = URL.createObjectURL(file);
+    bgVideo.dataset.blobUrl = url;
+
+    bgVideo.src = url;
+    bgVideo.loop = false;
+    bgVideo.muted = true;          // ✅ 建議維持靜音，最不會被擋
+    bgVideo.playsInline = true;
+    bgVideo.preload = "auto";
+
+    // ✅ 顯示影片區、關掉 fallback
+    showFallback(false);
+
+    // ✅ 播完停最後一格
+    bindEndedHoldLastFrame();
+
+    // ✅ 等影片真的載到可播再試著播（成功就直接播；失敗就提示按 ▶️）
+    bgVideo.addEventListener("canplay", () => {
+      // 不要每次 canplay 都重複觸發
+      if (bgVideo.dataset.didAutoPlay === "1") return;
+      bgVideo.dataset.didAutoPlay = "1";
+      tryPlay();
+    }, { once: true });
+
+    // 若 canplay 沒來，也給手動播放留路
+    bgVideo.load();
+  });
+}
 
     function nextVideo(){
       if (isHost && pickVideo) pickVideo.click();
