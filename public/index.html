@@ -37,44 +37,57 @@
     }
 
     /* ===== Header（標題區置中）===== */
-    .header{
-      width:100%;
-      text-align:center;
-      padding-top:4px;
-      padding-bottom:6px;
-    }
+/* ===== Header（標題區置中）===== */
+.header{
+  width:100%;
+  text-align:center;
+  padding-top:10px;      /* ✅ 往下 */
+  padding-bottom:6px;
+  margin-left:200px;     /* ✅ 讓整個標題區避開左上 QR */
+  width: calc(100% - 200px);
+}
+
     .header h1{
       margin:0;
       font-size:36px;
       letter-spacing:.5px;
       line-height:1.1;
     }
-    .header .hint{
-      margin-top:6px;
-      font-size:14px;
-      font-weight:700;
-      color:#444;
-      letter-spacing:.4px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .header .divider{
-      margin:8px auto 0;
-      width:min(720px, 86%);
-      height:1px;
-      background:#ddd;
-    }
+   .header .hint{
+  margin-top:6px;
+  font-size:14px;
+  font-weight:700;
+  color:#444;
+  letter-spacing:.4px;
+  white-space:nowrap;      /* ✅ 永遠單行 */
+  overflow:hidden;
+  text-overflow:ellipsis;  /* ✅ 太長就 ... */
+  max-width: 720px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.header .divider{
+  margin:8px auto 0;
+  width: 520px;       /* ✅ 分隔線變短（單行） */
+  height:1px;
+  background:#ddd;
+}
+
 
     /* ===== 舞台：標題下方（左留言 + 右影片，同高度）===== */
-    .stage{
-      margin-top:10px;
-      display:grid;
-      grid-template-columns: 1fr 360px;
-      gap:14px;
-      height: 560px;                /* ✅ 左右同高的關鍵 */
-      align-items:stretch;
-    }
+   /* ===== 舞台：標題下方（左留言 + 右影片，同高度）===== */
+.stage{
+  margin-top:14px;                       /* ✅ 往下 */
+  margin-left:200px;                     /* ✅ 避開 QR */
+  width: calc(100% - 200px);
+  display:grid;
+  grid-template-columns: 1fr 360px;
+  gap:14px;
+  height: 560px;
+  align-items:stretch;
+}
+
 
     /* 左：留言容器（做成可捲動） */
     .panel{
@@ -428,10 +441,10 @@
   <div class="controls" id="controls">
     <input id="pickVideo" type="file" accept="video/*" style="display:none;">
     <button class="icon-btn" id="pickVideoBtn" title="選影片" aria-label="選影片">📁</button>
-    <button class="icon-btn" id="vidPlay" title="播放" aria-label="播放">▶</button>
-    <button class="icon-btn" id="vidPause" title="暫停" aria-label="暫停">⏸</button>
+    <button class="icon-btn" id="vidPlay" title="播放" aria-label="播放">▶️</button>
+    <button class="icon-btn" id="vidPause" title="暫停" aria-label="暫停">⏸️</button>
     <button class="icon-btn" id="vidMute" title="靜音/有聲" aria-label="靜音/有聲">🔇</button>
-    <button class="icon-btn" id="vidNext" title="下一支" aria-label="下一支">⏭</button>
+    <button class="icon-btn" id="vidNext" title="下一支" aria-label="下一支">⏭️</button>
   </div>
 
   <!-- Header（置中） -->
