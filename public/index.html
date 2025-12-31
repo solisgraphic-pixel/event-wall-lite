@@ -381,6 +381,81 @@
       100%{ opacity:1; transform: translateY(0) scale(1); }
     }
     .draw-pill.show{ animation: revealIn 520ms ease-out forwards; }
+    /* =========================
+   4:3 投影專用 (1024x768)
+   只要有 has-media (wall/host) 就套用
+========================= */
+body.has-media{
+  padding: 12px;                 /* 原本 20 太大，4:3 會擠 */
+}
+
+/* 整個舞台鎖 1024 寬，避免被拉爆 */
+body.has-media .stage{
+  max-width: 1024px;
+  margin: 0 auto;
+  gap: 12px;
+  grid-template-columns: 1fr 320px;   /* ✅ 左留言、右影片（右欄固定） */
+  align-items: start;
+}
+
+/* 右側影片區：改用「固定高度」去塞進 768 */
+body.has-media .media-slot{
+  width: 320px;                     /* 右欄寬度 */
+  height: 520px;                    /* ✅ 4:3 內比較舒服的高度 */
+  aspect-ratio: auto;               /* 取消 aspect-ratio，避免互相打架 */
+  position: sticky;
+  top: 96px;                        /* ✅ 避開右上控制卡 */
+  border-radius: 18px;
+}
+
+/* ✅ 影片完整顯示：不裁切 */
+body.has-media .media-slot video{
+  object-fit: contain;              /* 你要「看齊全」就用 contain */
+  background: #000;
+}
+
+/* 右上控制卡縮小，避免壓到內容 */
+body.has-media .host-card{
+  top: 10px;
+  right: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+}
+
+body.has-media .btn-draw{
+  padding: 8px 14px;
+  font-size: 14px;
+}
+body.has-media .btn-ghost{
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+/* 左上 QR 縮小一點，避免擠到標題 */
+body.has-media .qr-box{
+  left: 10px;
+  top: 10px;
+  padding: 10px;
+  border-radius: 16px;
+}
+
+/* 你的 LOGO、標題、提示字在 4:3 要縮，不然會跟 QR/控制卡打架 */
+body.has-media .brand img{ max-height: 120px; }
+body.has-media h1{ font-size: 36px; margin: 6px 0 4px; }
+body.has-media .hint{ font-size: 14px; margin-bottom: 10px; }
+
+/* 留言牆不要太胖，不然左邊會爆 */
+body.has-media .wrap{
+  max-width: 100%;
+}
+
+/* 留言區上方留一點空間，避免被 QR 擋住 */
+body.has-media .wrap{
+  padding-left: 210px;   /* ✅ 讓左上 QR 不會蓋到標題區 */
+}
+
+/* 如果你覺得標題還是被壓到：可以把 padding-left 改 230 */
+
   </style>
 </head>
 
