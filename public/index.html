@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SOLIS 許願牆</title>
 
-  <!-- ✅ 先在 head 就把模式 class 加到 <html>，避免後面 JS 掛掉導致版型錯 -->
+  <!-- ✅ 先在 head 就把模式 class 加到 <html> -->
   <script>
   (function () {
     const p = new URLSearchParams(location.search);
@@ -87,7 +87,7 @@
 
     /* =========================
        Header：投影/主持（has-media）
-       只要避開左上 QR：內容往右縮
+       避開左上 QR：內容往右縮
     ========================= */
     html.has-media .header{
       padding-top:10px;
@@ -96,7 +96,7 @@
       width: calc(100% - 200px);
     }
     html.has-media .header .hint{
-      white-space:nowrap;            /* 投影只要單行 */
+      white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
       max-width: 760px;
@@ -184,20 +184,17 @@
       align-items: baseline;
       flex-wrap: wrap;
     }
+
     .line .name{ font-size:18px; font-weight:900; }
-    .line .time{
+
+    /* ✅ 桌號/時間同樣式 */
+    .line .meta{
       font-size:14px;
       color:#777;
+      font-weight:800;
       white-space:nowrap;
       font-variant-numeric: tabular-nums;
     }
-    .line .meta{
-  font-size:14px;
-  color:#777;
-  font-weight:800;
-  white-space:nowrap;
-  font-variant-numeric: tabular-nums;
-}
 
     .line .msg{
       font-size:24px;
@@ -247,7 +244,7 @@
         #0b0b0b;
     }
 
-    /* ===== QR（左上）：只在 has-media 顯示 ===== */
+    /* QR（左上） */
     .qr-box{
       position:fixed;
       left:10px;
@@ -269,35 +266,29 @@
       letter-spacing:1px;
     }
 
-    /* 右上：主持工具列 */
-.host-top{
-  position:fixed;
-  right:10px;
-  top:10px;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(8px);
-  border-radius:16px;
-  padding:10px 12px;
-  box-shadow: var(--shadow2);
-  z-index:998;
-  display:none;
-  flex-direction:column;   /* ✅ 上下排 */
-  gap:8px;
-  align-items:flex-end;    /* ✅ 靠右對齊 */
-}
+    /* 右上：主持工具列（✅ class 在 html，所以要用 html.is-host） */
+    .host-top{
+      position:fixed;
+      right:10px;
+      top:10px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      border-radius:16px;
+      padding:10px 12px;
+      box-shadow: var(--shadow2);
+      z-index:998;
+      display:none;
+      flex-direction:column;
+      gap:8px;
+      align-items:flex-end;
+    }
+    html.is-host .host-top{ display:flex; }
 
-body.is-host .host-top{ display:flex; }
-
-.host-actions{
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-
-.host-top .count{
-  align-self:flex-end;     /* ✅ 參與者靠右 */
-}
-
+    .host-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
 
     .pill{
       display:inline-flex;
@@ -320,6 +311,7 @@ body.is-host .host-top{ display:flex; }
       color:#fff;
       box-shadow: 0 6px 16px rgba(255,122,0,0.35);
     }
+
     .count{
       font-size:14px;
       color:#555;
@@ -334,7 +326,7 @@ body.is-host .host-top{ display:flex; }
     }
     .count.flash{ animation:countFlash 600ms ease-out; }
 
-    /* 右下：影片控制 */
+    /* 右下：影片控制（✅ class 在 html，所以用 html.is-host） */
     .controls{
       position:fixed;
       right:10px;
@@ -496,14 +488,13 @@ body.is-host .host-top{ display:flex; }
   </div>
 
   <!-- 右上：主持工具 -->
-<div class="host-top" id="hostTop">
-  <div class="host-actions">
-    <div class="pill orange" id="draw3Btn" title="抽 3 名">🎉</div>
-    <div class="pill" id="resetLocal" title="清空本機測試資料">🧹</div>
+  <div class="host-top" id="hostTop">
+    <div class="host-actions">
+      <div class="pill orange" id="draw3Btn" title="抽 3 名">🎉</div>
+      <div class="pill" id="resetLocal" title="清空本機測試資料">🧹</div>
+    </div>
+    <div class="count" id="playerCount">參與者：0 人</div>
   </div>
-  <div class="count" id="playerCount">參與者：0 人</div>
-</div>
-
 
   <!-- 右下：影片控制 -->
   <div class="controls" id="controls">
@@ -569,24 +560,6 @@ body.is-host .host-top{ display:flex; }
     const hasMedia = document.documentElement.classList.contains("has-media");
 
     const socket = io();
-socket.on("checkin_error", (e) => {
-  alert(e?.message || "簽到失敗，請重試");
-
-  // ✅ 重複同桌同名：清掉名字欄位，讓他改名
-  if (e?.code === "DUP_NAME_SAME_TABLE") {
-    if (nameEl) {
-      nameEl.disabled = false;
-      nameEl.value = "";
-      nameEl.focus();
-    }
-    // 注意：桌號可以保留，不用清
-  }
-});
-
-socket.on("checkin_ok", () => {
-  // ✅ 收到 server 成功回覆後再鎖定（更準確）
-  // 若你原本是在 sendCheckin() 送出前就鎖定，建議把「鎖定」搬到這裡
-});
 
     const wall = document.getElementById("wall");
     const nameEl = document.getElementById("name");
@@ -629,35 +602,32 @@ socket.on("checkin_ok", () => {
       return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
-    // token：同裝置固定
+    // ===== token：同裝置固定 =====
     let myToken = localStorage.getItem("event_token");
     if (!myToken) {
       myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
       localStorage.setItem("event_token", myToken);
     }
 
-    // 鎖名字
+    // ===== 鎖名字 =====
     const lockedName = localStorage.getItem("event_name");
     if (lockedName && nameEl) {
       nameEl.value = lockedName;
       nameEl.disabled = true;
     }
 
-    // 鎖桌號
+    // ===== 鎖桌號 =====
     const lockedTable = localStorage.getItem("event_table");
     if (lockedTable && tableEl) {
       tableEl.value = lockedTable;
       tableEl.disabled = true;
     }
 
-    // 防連點送出
+    // ===== 防連點送出 =====
     let sending = false;
     function sendCheckin(){
       if (!nameEl || !msgEl) return;
       if (sending) return;
-
-      sending = true;
-      setTimeout(() => (sending = false), 650);
 
       const tableNo = tableEl ? tableEl.value.trim() : "";
       const name = nameEl.value.trim();
@@ -666,6 +636,10 @@ socket.on("checkin_ok", () => {
       if (!tableNo) { alert("請先輸入桌號"); return; }
       if (!name) { alert("請先輸入名字"); return; }
 
+      sending = true;
+      setTimeout(() => (sending = false), 650);
+
+      // 先鎖（你原本的邏輯）
       if (tableEl && !localStorage.getItem("event_table")) {
         localStorage.setItem("event_table", tableNo);
         tableEl.disabled = true;
@@ -691,27 +665,42 @@ socket.on("checkin_ok", () => {
       });
     }
 
-    // 即時牆：顯示桌號＋名字（更好找人）
-div.innerHTML = `
-  <div class="line">
-    <span class="meta">桌${escapeHtml(p.tableNo ?? "")}</span>
-    <span class="name">${escapeHtml(p.name)}</span>
-    <span class="meta">${escapeHtml(p.time)}：</span>
-    <span class="msg">${escapeHtml(p.message)}</span>
-  </div>
-`;
-</span>
-          <span class="time">${escapeHtml(time)}：</span>
-          <span class="msg">${escapeHtml(message)}</span>
+    // ✅ 若 server 回報重複同桌同名：讓他改名
+    socket.on("checkin_error", (e) => {
+      alert(e?.message || "簽到失敗，請重試");
+      if (e?.code === "DUP_NAME_SAME_TABLE") {
+        localStorage.removeItem("event_name");
+        if (nameEl) {
+          nameEl.disabled = false;
+          nameEl.value = "";
+          nameEl.focus();
+        }
+      }
+    });
+
+    // ===== 即時牆 =====
+    socket.on("wall", (p) => {
+      if (!wall) return;
+
+      const div = document.createElement("div");
+      div.className = "item is-new";
+
+      div.innerHTML = `
+        <div class="line">
+          <span class="meta">桌${escapeHtml(p.tableNo ?? "")}</span>
+          <span class="name">${escapeHtml(p.name ?? "")}</span>
+          <span class="meta">${escapeHtml(p.time ?? "")}：</span>
+          <span class="msg">${escapeHtml(p.message ?? "")}</span>
         </div>
       `;
+
       wall.prepend(div);
 
       setTimeout(() => div.classList.remove("is-new"), 1200);
       while (wall.children.length > 60) wall.removeChild(wall.lastChild);
     });
 
-    // 參與者人數
+    // ===== 參與者人數 =====
     let lastCount = 0;
     socket.on("participants_count", (d) => {
       const c = Number(d?.count ?? 0);
@@ -727,7 +716,7 @@ div.innerHTML = `
       lastCount = c;
     });
 
-    // QR（has-media 才顯示）
+    // ===== QR（has-media 才顯示）=====
     if (hasMedia) {
       if (qrBox) qrBox.style.display = "block";
       try{
@@ -741,7 +730,7 @@ div.innerHTML = `
       }
     }
 
-    // 抽獎 overlay
+    // ===== 抽獎 overlay =====
     function openDrawOverlay(){
       if (!drawOverlay || !drawName || !drawSub || !drawList || !drawBox) return;
       drawOverlay.style.display = "flex";
@@ -784,9 +773,7 @@ div.innerHTML = `
       });
     }
 
-    // ✅ 顯示抽獎結果（支援兩種格式）
-    // A) server 回傳 winners: ["A","B","C"] （舊版）
-    // B) server 回傳 winners: [{tableNo:"2", name:"A"}, ...] （新版）
+    // 顯示抽獎結果（支援字串或物件）
     socket.on("draw_result", (r) => {
       if (!isHost) return;
       if (!drawName || !drawSub || !drawList || !drawBox) return;
@@ -821,7 +808,6 @@ div.innerHTML = `
             <div class="draw-winner">桌 ${escapeHtml(w.tableNo)}｜${escapeHtml(w.name)}</div>
           `;
           drawList.appendChild(pill);
-
           setTimeout(() => pill.classList.add("show"), idx * 650);
         });
 
@@ -829,7 +815,7 @@ div.innerHTML = `
       }, 800);
     });
 
-    // ====== 影片 ======
+    // ===== 影片 =====
     function showFallback(on){
       if (!mediaFallback) return;
       mediaFallback.style.display = on ? "flex" : "none";
@@ -850,7 +836,7 @@ div.innerHTML = `
       showFallback(true);
     }
 
-    // host：本機選影片（不強制自動播；按 ▶️ 播）
+    // host：本機選影片
     if (isHost && pickVideo && pickVideoBtn && bgVideo) {
       pickVideoBtn.addEventListener("click", () => pickVideo.click());
 
@@ -858,7 +844,6 @@ div.innerHTML = `
         const file = pickVideo.files?.[0];
         if (!file) return;
 
-        // 釋放舊 blob
         if (bgVideo.dataset.blobUrl) {
           URL.revokeObjectURL(bgVideo.dataset.blobUrl);
           bgVideo.dataset.blobUrl = "";
@@ -869,7 +854,7 @@ div.innerHTML = `
 
         bgVideo.src = url;
         bgVideo.loop = false;
-        bgVideo.muted = true; // 最不會被擋
+        bgVideo.muted = true;
         bgVideo.playsInline = true;
         bgVideo.preload = "auto";
 
@@ -894,16 +879,14 @@ div.innerHTML = `
       if (vidNext)  vidNext.addEventListener("click", nextVideo);
     }
 
-    // ✅ 清空本機測試綁定
+    // 清空本機測試綁定
     const resetBtn = document.getElementById("resetLocal");
     if (resetBtn) {
       resetBtn.addEventListener("click", () => {
         if (!confirm("確定要清空此裝置的測試綁定資料嗎？")) return;
-
         localStorage.removeItem("event_name");
         localStorage.removeItem("event_table");
         localStorage.removeItem("event_token");
-
         location.reload();
       });
     }
