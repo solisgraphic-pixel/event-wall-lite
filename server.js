@@ -37,24 +37,52 @@ io.on("connection", (socket) => {
   socket.emit("participants_count", { count: participantsByToken.size });
 
   // 收到留言/簽到
-  socket.on("checkin", (p) => {
-    const token = String(p?.token ?? "").trim();
-    const tableNo = String(p?.tableNo ?? "").trim();
-    const name = String(p?.name ?? "").trim();
-    const message = String(p?.message ?? "").trim();
-    const time = String(p?.time ?? "").trim();
+socket.on("checkin", (p) => {
+  const token = String(p?.token ?? "").trim();
+  const tableNo = String(p?.tableNo ?? "").trim();
+  const name = String(p?.name ?? "").trim();
+  const message = String(p?.message ?? "").trim();
+  const time = String(p?.time ?? "").trim();
 
-    if (!token) return; // ✅ 必須有 token 才能去重
-    if (!name) return;
+  if (!token) return;
+  if (!tableNo) {
+    socket.emit("checkin_error", { code: "NO_TABLE", message: "請先輸入桌號" });
+    return;
+  }
+  if (!name) {
+    socket.emit("checkin_error", { code: "NO_NAME", message: "請先輸入名字" });
+    return;
+  }
 
-    // ✅ token 去重：同一裝置只算一次（但可更新桌號/名字）
-    const existed = participantsByToken.has(token);
-    participantsByToken.set(token, {
-      token,
-      tableNo: tableNo || (participantsByToken.get(token)?.tableNo ?? ""),
-      name,
-      lastSeen: Date.now()
-    });
+  // ✅ 同桌不可同名：桌號相同且名字相同 -> 拒絕
+  const newKey = `${tableNo}|${name}`;
+  for (const k of participantsByKey.keys()) {
+    // k 格式是 "桌號|名字"
+    if (k === newKey) {
+      socket.emit("checkin_error", {
+        code: "DUP_NAME_SAME_TABLE",
+        message: `桌號 ${tableNo} 已有人使用「${name}」，請換一個名字`
+      });
+      return;
+    }
+  }
+
+  // ===== 正常加入（雙層去重保留）=====
+  const keyExisted = participantsByKey.has(newKey);
+  participantsByToken.set(token, { token, tableNo, name, lastSeen: Date.now() });
+
+  if (!keyExisted) {
+    participantsByKey.set(newKey, { token, tableNo, name, lastSeen: Date.now() });
+    broadcastCount();
+  }
+
+  entries.push({ token, tableNo, name, message, time });
+
+  io.emit("wall", { tableNo, name, message, time });
+
+  // 可選：回成功，讓前端知道可鎖定
+  socket.emit("checkin_ok", { ok: true });
+});
 
     if (!existed) broadcastCount();
 
