@@ -362,6 +362,16 @@ body.has-media .stage{
     }
     .brand img{ max-height:56px; }
 
+    /* ✅ 投影版（has-media）LOGO 放大 */
+body.has-media .brand img{
+  max-height: 72px;
+}
+
+/* ✅ 手機/來賓頁 LOGO 放大 */
+body:not(.has-media) .brand img{
+  max-height: 88px;
+}
+
     /* ===== 抽獎 overlay（保留原本）===== */
     .draw-overlay{
       position: fixed;
@@ -536,10 +546,12 @@ body:not(.has-media) .header .divider{
   </div>
 
   <!-- 右上：抽獎 + 參與者 -->
-  <div class="host-top" id="hostTop">
-    <div class="pill orange" id="draw3Btn" title="抽 3 名">🎉</div>
-    <div class="count" id="playerCount">參與者：0 人</div>
-  </div>
+<div class="host-top" id="hostTop">
+  <div class="pill orange" id="draw3Btn" title="抽 3 名">🎉</div>
+  <div class="pill" id="resetLocal" title="清空本機測試資料">🧹</div>
+  <div class="count" id="playerCount">參與者：0 人</div>
+</div>
+
 
   <!-- 右下：影片控制（icon-only） -->
   <div class="controls" id="controls">
@@ -608,6 +620,7 @@ body:not(.has-media) .header .divider{
 
     const hasMedia = (isWall || isHost);
     if (hasMedia) document.body.classList.add("has-media");
+console.log({ isWall, isHost, hasMedia, href: location.href });
 
     const socket = io();
 
@@ -824,12 +837,48 @@ socket.emit("checkin", { token: myToken, tableNo, name, message, time: now() });
         drawList.style.display = "grid";
         drawList.innerHTML = "";
 
-        winners.slice(0, 3).forEach((name, idx) => {
-          const pill = document.createElement("div");
-          pill.className = "draw-pill";
-          pill.innerHTML = `
-            <div class="draw-rank">第 ${idx + 1} 位</div>
-            <div class="draw-winner">${escapeHtml(name)}</div>
+socket.on("draw_result", (r) => {
+  if (!isHost) return;
+  if (!drawName || !drawSub || !drawList || !drawBox) return;
+
+  const winnersRaw = Array.isArray(r?.winners) ? r.winners : [];
+  const winners = winnersRaw.map(w => {
+    if (typeof w === "string") return { tableNo: "？", name: w };
+    return { tableNo: String(w?.tableNo ?? "？"), name: String(w?.name ?? "？") };
+  });
+
+  openDrawOverlay();
+
+  if (!r?.ok || winners.length === 0) {
+    drawName.textContent = r?.reason || "抽獎失敗";
+    drawSub.textContent = "";
+    return;
+  }
+
+  drawSub.textContent = `參與者共 ${Number(r.total ?? winners.length)} 人`;
+  drawName.textContent = "準備揭曉…";
+
+  setTimeout(() => {
+    drawName.style.display = "none";
+    drawList.style.display = "grid";
+    drawList.innerHTML = "";
+
+    winners.slice(0, 3).forEach((w, idx) => {
+      const pill = document.createElement("div");
+      pill.className = "draw-pill";
+      pill.innerHTML = `
+        <div class="draw-rank">第 ${idx + 1} 位</div>
+        <div class="draw-winner">桌 ${escapeHtml(w.tableNo)}｜${escapeHtml(w.name)}</div>
+      `;
+      drawList.appendChild(pill);
+
+      setTimeout(() => pill.classList.add("show"), idx * 650);
+    });
+
+    drawSub.textContent = "🎉 恭喜得獎！";
+  }, 800);
+});
+</div>
           `;
           drawList.appendChild(pill);
 
@@ -937,15 +986,7 @@ if (resetBtn) {
     location.reload();
   });
 }
-/* ✅ 投影版（has-media）LOGO 放大 */
-body.has-media .brand img{
-  max-height: 72px;
-}
 
-/* ✅ 手機/來賓頁 LOGO 放大 */
-body:not(.has-media) .brand img{
-  max-height: 88px;
-}
 
   </script>
 </body>
