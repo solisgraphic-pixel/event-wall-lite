@@ -686,14 +686,15 @@
       const div = document.createElement("div");
       div.className = "item is-new";
 
-      div.innerHTML = `
-        <div class="line">
-          <span class="meta">桌${escapeHtml(p.tableNo ?? "")}</span>
-          <span class="name">${escapeHtml(p.name ?? "")}</span>
-          <span class="meta">${escapeHtml(p.time ?? "")}：</span>
-          <span class="msg">${escapeHtml(p.message ?? "")}</span>
-        </div>
-      `;
+div.innerHTML = `
+  <div class="line">
+    <span class="meta">${escapeHtml(p.tableNo ?? "")}桌</span>
+    <span class="name">${escapeHtml(p.name)}</span>
+    <span class="meta">${escapeHtml(p.time)}：</span>
+    <span class="msg">${escapeHtml(p.message)}</span>
+  </div>
+`;
+
 
       wall.prepend(div);
 
