@@ -37,16 +37,50 @@
     }
 
     /* ===== Header（固定置中：真正置中，不吃 QR 的 margin-left）===== */
-    .header{
-      position: fixed;
-      left: 50%;
-      top: 10px;
-      transform: translateX(-50%);
-      width: 760px;            /* 4:3 安全寬度 */
-      text-align: center;
-      z-index: 996;
-      pointer-events: none;    /* 不要擋到點擊 */
-    }
+/* ===== Header：預設（手機/來賓）===== */
+.header{
+  width:100%;
+  text-align:center;
+  padding: 16px 10px 6px;
+  margin: 0 auto;
+}
+
+.header h1{
+  margin:0;
+  font-size:36px;
+  letter-spacing:.5px;
+  line-height:1.1;
+}
+
+.header .hint{
+  margin-top:6px;
+  font-size:14px;
+  font-weight:700;
+  color:#444;
+  letter-spacing:.4px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width: 92vw;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.header .divider{
+  margin:8px auto 0;
+  width: min(760px, 92vw);
+  height:1px;
+  background:#ddd;
+}
+
+/* ✅ 只有投影/主持（has-media）才需要避開左上 QR */
+body.has-media .header{
+  padding-top:10px;
+  padding-bottom:6px;
+  margin-left:200px;
+  width: calc(100% - 200px);
+}
+
 
     .header h1{
       margin:0;
@@ -75,20 +109,31 @@
     }
 
     /* ===== 舞台：在 Header 下方（左留言 + 右影片，同高度）===== */
-    .stage{
-      /* ✅ 讓標題區完全不會壓到內容 */
-      margin-top: 120px;
+/* ===== 舞台：預設（手機/來賓）===== */
+.stage{
+  margin: 12px auto 0;
+  width: 100%;
+  max-width: 560px;
+  padding: 0 12px;
+  display: grid;
+  grid-template-columns: 1fr;   /* 手機單欄 */
+  gap: 12px;
+}
 
-      /* ✅ 舞台避開左上 QR（內容往右縮） */
-      margin-left:200px;
-      width: calc(100% - 200px);
+/* ✅ 只有投影/主持（has-media）才變成 4:3 兩欄佈局 + 避開 QR */
+body.has-media .stage{
+  margin-top:14px;
+  margin-left:200px;
+  width: calc(100% - 200px);
+  display:grid;
+  grid-template-columns: 1fr 360px;
+  gap:14px;
+  height: 560px;
+  align-items:stretch;
+  max-width: none;
+  padding: 0;
+}
 
-      display:grid;
-      grid-template-columns: 1fr 360px;
-      gap:14px;
-      height: 560px;
-      align-items:stretch;
-    }
 
     /* 左：留言容器 */
     .panel{
@@ -415,6 +460,55 @@
       60%{ opacity:1; transform: translateY(0) scale(1.02); }
       100%{ opacity:1; transform: translateY(0) scale(1); }
     }
+    /* =========================
+   ✅ 手機/來賓頁修正（沒有 has-media 時）
+   目的：不要被投影版 fixed / margin-left 推歪
+========================= */
+
+/* 來賓頁：Header 不要 fixed、回到正常排版 */
+body:not(.has-media) .header{
+  position: static !important;
+  transform: none !important;
+  width: auto !important;
+  pointer-events: auto !important;
+  padding: 16px 10px 6px !important;
+  margin: 0 auto !important;
+}
+
+/* 來賓頁：分隔線與副標寬度用螢幕百分比 */
+body:not(.has-media) .header .divider{
+  width: min(520px, 92vw) !important;
+}
+body:not(.has-media) .header .hint{
+  max-width: 92vw !important;
+}
+
+/* 來賓頁：舞台不要 margin-left 200、不要固定高度 560 */
+body:not(.has-media) .stage{
+  margin-top: 12px !important;
+  margin-left: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  grid-template-columns: 1fr !important; /* 單欄 */
+  padding: 0 12px !important;
+  max-width: 560px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 來賓頁：影片區不顯示（本來就不會顯示，但加保險） */
+body:not(.has-media) .media-slot{
+  display: none !important;
+}
+
+/* 來賓頁：底部 LOGO 不要 fixed，避免擋表單 */
+body:not(.has-media) .brand{
+  position: static !important;
+  transform: none !important;
+  margin: 18px auto 8px !important;
+  text-align: center;
+}
+
     .draw-pill.show{ animation: revealIn 520ms ease-out forwards; }
   </style>
 </head>
