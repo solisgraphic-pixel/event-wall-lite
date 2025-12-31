@@ -14,7 +14,6 @@
       --orange:#ff6a00;
       --shadow: 0 10px 24px rgba(0,0,0,0.06);
     }
-
     *{ box-sizing: border-box; }
 
     body{
@@ -26,7 +25,7 @@
     }
 
     .brand{ text-align:center; margin-bottom:10px; }
-    .brand img{ max-height: 180px; } /* 你之前說 180px OK */
+    .brand img{ max-height: 180px; }
 
     h1{
       margin: 10px 0 6px;
@@ -34,7 +33,6 @@
       font-size: 44px;
       letter-spacing: .5px;
     }
-
     .hint{
       color: #444;
       font-size: 18px;
@@ -44,46 +42,45 @@
       letter-spacing: 0.6px;
     }
 
-    /* ===== 版面：wall/host 才啟用「影片區 + 互動牆」雙欄 ===== */
+    /* ===== 版面：預設單欄；wall/host 才雙欄（左留言 / 右影片）===== */
     .stage{
       max-width: 1280px;
       margin: 0 auto;
       display: grid;
       gap: 18px;
+      grid-template-columns: 1fr; /* 預設單欄 */
+      align-items: start;
     }
-    /* 預設（來賓一般頁）單欄 */
-    .stage{ grid-template-columns: 1fr; }
+    body.has-media .stage{
+      grid-template-columns: 1fr 360px; /* ✅ 左留言 右影片 */
+    }
 
-    /* wall 或 host 才改雙欄（左：直式影片、右：互動牆） */
-body.has-media .stage{
-  grid-template-columns: 1fr 360px;  /* ✅ 左留言 右影片 */
-  align-items: start;
-}
-
-
-    /* 手機或窄螢幕：改成上下排列，避免太擠 */
     @media (max-width: 980px){
       body.has-media .stage{
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr;  /* 窄螢幕上下排列 */
       }
-      .media-slot{ width: min(420px, 92vw); margin: 0 auto; }
+      .media-slot{
+        width: min(420px, 92vw);
+        margin: 0 auto;
+        position: relative;
+        top: 0;
+      }
     }
 
     .wrap{ max-width: 1100px; margin: 0 auto; }
 
-    /* ===== 直式影片區（19.5:9）===== */
-.media-slot{
-  width: 360px;              /* 你可依現場螢幕改 320~420 */
-  aspect-ratio: 9 / 16;      /* ✅ 直式 9:16 */
-  background:#000;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 18px 44px rgba(0,0,0,0.18);
-  position: sticky;
-  top: 20px;
-}
-
-
+    /* ===== 右：直式影片區（9:16）===== */
+    .media-slot{
+      width: 360px;
+      aspect-ratio: 9 / 16;   /* ✅ 9:16 */
+      background:#000;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 18px 44px rgba(0,0,0,0.18);
+      position: sticky;
+      top: 20px;
+      display:none; /* JS 會在 wall/host 才顯示 */
+    }
     .media-slot video{
       width:100%;
       height:100%;
@@ -91,8 +88,6 @@ body.has-media .stage{
       display:block;
       background:#000;
     }
-
-    /* 沒有影片時的封面（可放 LOGO / 文字） */
     .media-fallback{
       width:100%;
       height:100%;
@@ -109,6 +104,7 @@ body.has-media .stage{
         radial-gradient(circle at 30% 20%, rgba(255,106,0,0.35), transparent 40%),
         radial-gradient(circle at 70% 80%, rgba(255,255,255,0.08), transparent 45%),
         #0b0b0b;
+      display:none;
     }
 
     /* ===== 輸入區 ===== */
@@ -142,7 +138,6 @@ body.has-media .stage{
       border-top: 1px solid #ddd;
     }
     .item{ margin-bottom: 18px; }
-
     .line{
       background: var(--card);
       border-radius: 18px;
@@ -172,7 +167,6 @@ body.has-media .stage{
       word-break: break-word;
     }
 
-    /* 新留言動畫 */
     @keyframes popIn{
       0%{ transform: translateY(12px) scale(.96); opacity:0; }
       60%{ transform: translateY(0) scale(1.03); opacity:1; }
@@ -188,7 +182,7 @@ body.has-media .stage{
       outline: 3px solid rgba(255,106,0,0.22);
     }
 
-    /* ===== QR（wall=1 或 host=1 顯示）===== */
+    /* ===== QR（wall/host 顯示）===== */
     .qr-box{
       position: fixed;
       left: 24px;
@@ -214,7 +208,7 @@ body.has-media .stage{
       50%{ opacity: 0.75; }
     }
 
-    /* ===== 主持人懸浮控制卡（右上）===== */
+    /* ===== 主持人卡（右上）===== */
     .host-card{
       position: fixed;
       top: 24px;
@@ -230,8 +224,6 @@ body.has-media .stage{
       z-index: 998;
       align-items: center;
     }
-
-    /* 只有 host=1 才顯示按鈕 */
     #hostActions{ display:none; }
     body.is-host #hostActions{ display:flex; }
 
@@ -241,7 +233,6 @@ body.has-media .stage{
       justify-content: center;
       flex-wrap: wrap;
     }
-
     .btn-draw{
       background: linear-gradient(135deg, #ff7a00, #ff9a3c);
       color: #fff;
@@ -257,7 +248,6 @@ body.has-media .stage{
       transform: translateY(-1px);
       box-shadow: 0 10px 22px rgba(255,122,0,0.45);
     }
-
     .btn-ghost{
       background: #fff;
       color: #111;
@@ -278,7 +268,6 @@ body.has-media .stage{
       transform-origin: center;
     }
 
-    /* 人數增加閃一下 */
     @keyframes countFlash {
       0% { color: var(--orange); transform: scale(1); }
       40%{ color: var(--orange); transform: scale(1.15); }
@@ -355,7 +344,6 @@ body.has-media .stage{
     }
     .win{ animation: pulse 900ms ease-out 1; }
 
-    /* 抽 3 名逐一揭曉 */
     .draw-list{
       margin-top: 10px;
       display: none;
@@ -404,37 +392,45 @@ body.has-media .stage{
   <!-- 主持人控制卡（右上角） -->
   <div class="host-card" id="hostCard">
     <div class="host-actions" id="hostActions">
-  <button class="btn-draw" id="draw3Btn">🎉 抽 3 名</button>
+      <button class="btn-draw" id="draw3Btn">🎉 抽 3 名</button>
 
-  <!-- ✅ 新增：選影片 -->
-  <input id="pickVideo" type="file" accept="video/*" style="display:none;">
-  <button class="btn-ghost" id="pickVideoBtn">📁 選影片</button>
+      <!-- ✅ 本機選影片 -->
+      <input id="pickVideo" type="file" accept="video/*" style="display:none;">
+      <button class="btn-ghost" id="pickVideoBtn">📁 選影片</button>
 
-  <button class="btn-ghost" id="vidPlay">▶︎ 播放</button>
-  <button class="btn-ghost" id="vidPause">⏸ 暫停</button>
-  <button class="btn-ghost" id="vidMute">🔇 靜音</button>
-  <button class="btn-ghost" id="vidNext">⏭ 下一支</button>
-</div>
-
+      <button class="btn-ghost" id="vidPlay">▶︎ 播放</button>
+      <button class="btn-ghost" id="vidPause">⏸ 暫停</button>
+      <button class="btn-ghost" id="vidMute">🔇 靜音</button>
+      <button class="btn-ghost" id="vidNext">⏭ 下一支</button>
+    </div>
     <div class="host-info" id="playerCount">參與者：0 人</div>
   </div>
 
   <div class="stage">
 
-  <!-- ✅ 左：互動牆內容 -->
-  <div class="wrap">
-    ...
-  </div>
+    <!-- ✅ 左：互動牆內容（一定要是完整內容，不要用 ...） -->
+    <div class="wrap">
+      <h1>SOLIS 許願牆</h1>
+      <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到｜有機會抽精美小禮一份喔</div>
 
-  <!-- ✅ 右：直式影片（只在 wall/host 顯示） -->
-  <div class="media-slot" id="mediaSlot" style="display:none;">
-    <video id="bgVideo" playsinline preload="metadata"></video>
-    <div class="media-fallback" id="mediaFallback" style="display:none;">
-      SOLIS 活動現場<br/>播放區
+      <div class="grid input-area">
+        <input id="name" placeholder="請輸入你的名字（必填）">
+        <input id="message" placeholder="請輸入你想對 SOLIS 說的話～（例如：我要中頭獎）">
+        <button id="send">送出</button>
+      </div>
+
+      <div class="wall" id="wall"></div>
     </div>
-  </div>
 
-</div>
+    <!-- ✅ 右：直式影片 -->
+    <div class="media-slot" id="mediaSlot">
+      <video id="bgVideo" playsinline preload="metadata"></video>
+      <div class="media-fallback" id="mediaFallback">
+        SOLIS 活動現場<br/>播放區
+      </div>
+    </div>
+
+  </div>
 
   <!-- QR（wall=1 或 host=1 顯示） -->
   <div class="qr-box" id="qrBox">
@@ -442,7 +438,7 @@ body.has-media .stage{
     <div class="qr-text">掃描參加抽獎</div>
   </div>
 
-  <!-- 抽獎 overlay（主持人觸發） -->
+  <!-- 抽獎 overlay -->
   <div class="draw-overlay" id="drawOverlay">
     <div class="draw-box" id="drawBox">
       <div class="confetti"></div>
@@ -466,7 +462,6 @@ body.has-media .stage{
     if (isWall) document.body.classList.add("wall-only");
     if (isHost) document.body.classList.add("is-host");
 
-    // wall 或 host 才顯示影片區
     const hasMedia = (isWall || isHost);
     if (hasMedia) document.body.classList.add("has-media");
 
@@ -488,12 +483,28 @@ body.has-media .stage{
     const drawClose = document.getElementById("drawClose");
     const drawList = document.getElementById("drawList");
 
+    const qrBox = document.getElementById("qrBox");
+
+    // ===== 影片 =====
+    const mediaSlot = document.getElementById("mediaSlot");
+    const bgVideo = document.getElementById("bgVideo");
+    const mediaFallback = document.getElementById("mediaFallback");
+
+    // ===== 本機選影片 =====
+    const pickVideo = document.getElementById("pickVideo");
+    const pickVideoBtn = document.getElementById("pickVideoBtn");
+
+    // ===== 播放控制 =====
+    const vidPlay = document.getElementById("vidPlay");
+    const vidPause = document.getElementById("vidPause");
+    const vidMute = document.getElementById("vidMute");
+    const vidNext = document.getElementById("vidNext");
+
     function escapeHtml(str) {
       return String(str).replace(/[&<>"']/g, s => ({
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
       }[s]));
     }
-
     function now() {
       const d = new Date();
       const pad = n => String(n).padStart(2,"0");
@@ -507,17 +518,20 @@ body.has-media .stage{
       localStorage.setItem("event_token", myToken);
     }
 
-    // ===== 鎖名字（同裝置）=====
+    // ===== 鎖名字 =====
     const lockedName = localStorage.getItem("event_name");
-    if (lockedName) {
+    if (lockedName && nameEl) {
       nameEl.value = lockedName;
       nameEl.disabled = true;
     }
 
     // ===== 防連點送出 =====
     let sending = false;
+
     function sendCheckin(){
+      if (!nameEl || !msgEl) return;
       if (sending) return;
+
       sending = true;
       setTimeout(() => (sending = false), 650);
 
@@ -534,16 +548,20 @@ body.has-media .stage{
       msgEl.value = "";
       msgEl.focus();
     }
-    btn.addEventListener("click", sendCheckin);
-    msgEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        sendCheckin();
-      }
-    });
+
+    if (btn) btn.addEventListener("click", sendCheckin);
+    if (msgEl) {
+      msgEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          sendCheckin();
+        }
+      });
+    }
 
     // ===== 即時牆 =====
     socket.on("wall", (p) => {
+      if (!wall) return;
       const div = document.createElement("div");
       div.className = "item is-new";
       div.innerHTML = `
@@ -575,19 +593,24 @@ body.has-media .stage{
       lastCount = c;
     });
 
-    // ===== QR：wall 或 host 顯示（掃到首頁，不帶 host）=====
+    // ===== QR：wall 或 host 顯示 =====
     if (isWall || isHost) {
-      const qrBox = document.getElementById("qrBox");
       if (qrBox) qrBox.style.display = "block";
-      new QRious({
-        element: document.getElementById("qr"),
-        value: window.location.origin,
-        size: 180
-      });
+      try{
+        new QRious({
+          element: document.getElementById("qr"),
+          value: window.location.origin,
+          size: 180
+        });
+      }catch(e){
+        // QR lib 沒載到也不要讓整支 JS 掛掉
+        console.warn("QR init failed", e);
+      }
     }
 
-    // ===== 抽獎 Overlay 控制 =====
+    // ===== 抽獎 Overlay =====
     function openDrawOverlay(){
+      if (!drawOverlay || !drawName || !drawSub || !drawList || !drawBox) return;
       drawOverlay.style.display = "flex";
       drawName.style.display = "block";
       drawName.textContent = "抽獎中…";
@@ -597,12 +620,19 @@ body.has-media .stage{
       drawBox.classList.remove("win");
     }
     function closeDrawOverlay(){
+      if (!drawOverlay) return;
       drawOverlay.style.display = "none";
     }
-    drawClose.addEventListener("click", closeDrawOverlay);
-    drawOverlay.addEventListener("click", (e) => { if (e.target === drawOverlay) closeDrawOverlay(); });
+
+    if (drawClose) drawClose.addEventListener("click", closeDrawOverlay);
+    if (drawOverlay) {
+      drawOverlay.addEventListener("click", (e) => {
+        if (e.target === drawOverlay) closeDrawOverlay();
+      });
+    }
 
     function rollingText(durationMs = 1200){
+      if (!drawName || !drawOverlay) return;
       const frames = ["抽獎中", "抽獎中.", "抽獎中..", "抽獎中..."];
       let i = 0;
       const t = setInterval(() => {
@@ -613,7 +643,6 @@ body.has-media .stage{
       setTimeout(() => clearInterval(t), durationMs);
     }
 
-    // 主持人：抽 3 名（呼叫 server）
     if (isHost && draw3Btn) {
       draw3Btn.addEventListener("click", () => {
         openDrawOverlay();
@@ -622,9 +651,9 @@ body.has-media .stage{
       });
     }
 
-    // 抽獎結果：逐一揭曉 3 位
     socket.on("draw_result", (r) => {
       if (!isHost) return;
+      if (!drawName || !drawSub || !drawList || !drawBox) return;
 
       const winners = Array.isArray(r?.winners) ? r.winners : (r?.winner ? [r.winner] : []);
       openDrawOverlay();
@@ -664,55 +693,24 @@ body.has-media .stage{
       }, 800);
     });
 
-    // ===== 直式影片：只在 wall/host 顯示 =====
-    const mediaSlot = document.getElementById("mediaSlot");
-    const bgVideo = document.getElementById("bgVideo");
-    // ===== 主持人：本機選影片播放 =====
-const pickVideo = document.getElementById("pickVideo");
-const pickVideoBtn = document.getElementById("pickVideoBtn");
+    // ===== 影片區：只在 wall/host 顯示 =====
+    function showFallback(on){
+      if (!mediaFallback) return;
+      mediaFallback.style.display = on ? "flex" : "none";
+    }
 
-if (isHost && pickVideo && pickVideoBtn && bgVideo) {
-
-  // 點「選影片」→ 打開系統檔案選擇器
-  pickVideoBtn.addEventListener("click", () => {
-    pickVideo.click();
-  });
-
-  // 選到影片後立即播放
-  pickVideo.addEventListener("change", () => {
-    const file = pickVideo.files?.[0];
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-
-    bgVideo.src = url;
-    bgVideo.loop = true;      // 活動最穩：循環播
-    bgVideo.muted = true;    // ✅ 必須靜音才能自動播
-    bgVideo.playsInline = true;
-
-    bgVideo.play().catch(() => {});
-  });
-}
-
-    const mediaFallback = document.getElementById("mediaFallback");
-
-    // 你把影片放在 public/media/ 底下，這裡填檔名就好
     const playlist = [
       "/media/demo.mp4",
       "/media/demo2.mp4"
     ];
     let vidIndex = 0;
 
-    function showFallback(on){
-      if (!mediaFallback) return;
-      mediaFallback.style.display = on ? "flex" : "none";
-    }
-
     function loadVideo(src, autoplay=true){
       if (!bgVideo) return;
+
       bgVideo.src = src;
-      bgVideo.loop = true;         // 活動最穩：循環播放（你也可改 false）
-      bgVideo.muted = true;        // 預設靜音，避免現場爆音
+      bgVideo.loop = true;
+      bgVideo.muted = true;      // 預設靜音（自動播放需要）
       bgVideo.playsInline = true;
 
       bgVideo.onloadeddata = () => {
@@ -720,31 +718,45 @@ if (isHost && pickVideo && pickVideoBtn && bgVideo) {
         if (autoplay) bgVideo.play().catch(() => {});
       };
       bgVideo.onerror = () => {
-        // 找不到影片或格式不支援 → 顯示封面
         showFallback(true);
       };
     }
 
     if (hasMedia && mediaSlot) {
       mediaSlot.style.display = "block";
-
-      // 若你還沒放影片檔，會顯示封面
       showFallback(true);
-      loadVideo(playlist[vidIndex], true);
 
-      // 影片播完（若你把 loop 改成 false）→ 顯示封面（選項 B）
-      bgVideo.addEventListener("ended", () => {
-        showFallback(true);
+      // 有影片檔就播，沒有也不會炸
+      if (bgVideo && playlist.length > 0) {
+        loadVideo(playlist[vidIndex], true);
+      }
+    } else {
+      // 來賓一般頁：不顯示影片區
+      if (mediaSlot) mediaSlot.style.display = "none";
+    }
+
+    // ===== host：本機選影片 =====
+    if (isHost && pickVideo && pickVideoBtn && bgVideo) {
+      pickVideoBtn.addEventListener("click", () => pickVideo.click());
+
+      pickVideo.addEventListener("change", () => {
+        const file = pickVideo.files?.[0];
+        if (!file) return;
+
+        const url = URL.createObjectURL(file);
+        bgVideo.src = url;
+        bgVideo.loop = true;
+        bgVideo.muted = true;
+        bgVideo.playsInline = true;
+
+        showFallback(false);
+        bgVideo.play().catch(() => {});
       });
     }
 
-    // ===== 主持人影片控制（只綁 host）=====
-    const vidPlay = document.getElementById("vidPlay");
-    const vidPause = document.getElementById("vidPause");
-    const vidMute = document.getElementById("vidMute");
-    const vidNext = document.getElementById("vidNext");
-
+    // ===== host：影片控制 =====
     function nextVideo(){
+      if (!bgVideo || playlist.length === 0) return;
       vidIndex = (vidIndex + 1) % playlist.length;
       loadVideo(playlist[vidIndex], true);
     }
