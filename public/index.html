@@ -938,39 +938,49 @@
       bgVideo.load();
     }
 
-    function nextVideo() {
-      if (!playlist.length) {
-        alert("請先選擇影片（可一次多選）");
-        return;
-      }
-      currentIndex++;
-      if (currentIndex >= playlist.length) currentIndex = 0; // 循環
-      loadVideoByIndex(currentIndex);
-    }
+function nextVideo() {
+  if (!playlist.length) {
+    alert("請先選擇影片（可一次多選）");
+    return;
+  }
+
+  currentIndex = (currentIndex + 1) % playlist.length;
+  loadVideoByIndex(currentIndex);
+}
+
 
     // host：本機選影片（可多選）
     if (isHost && pickVideo && pickVideoBtn && bgVideo) {
       pickVideoBtn.addEventListener("click", () => pickVideo.click());
 
-      pickVideo.addEventListener("change", () => {
-        const files = Array.from(pickVideo.files || []);
-        if (!files.length) return;
+pickVideo.addEventListener("change", () => {
+  const files = Array.from(pickVideo.files || []);
+  if (!files.length) return;
 
-        // ✅ 依檔名排序（A→Z / 01→99）
-        files.sort((a, b) =>
-          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" })
-        );
+  // ✅ 依檔名排序（A→Z / 01→99）
+  files.sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, {
+      numeric: true,
+      sensitivity: "base"
+    })
+  );
 
-        // 清掉舊的 blob（避免累積卡頓）
-        playlist.forEach(v => {
-          try { URL.revokeObjectURL(v.url); } catch(e){}
-        });
+  // ✅ 清掉舊的 blob URL（避免記憶體爆）
+  playlist.forEach(v => {
+    try { URL.revokeObjectURL(v.url); } catch(e){}
+  });
 
-        playlist = files.map(file => ({
-          file,
-          name: file.name,
-          url: URL.createObjectURL(file)
-        }));
+  // ✅ 只用「排序後」的結果建立播放清單
+  playlist = files.map(file => ({
+    name: file.name,
+    url: URL.createObjectURL(file)
+  }));
+
+  // ✅ 關鍵：每次重新選影片，一定從第 0 支開始
+  currentIndex = 0;
+  loadVideoByIndex(currentIndex);
+});
+
 
         currentIndex = 0;
         loadVideoByIndex(currentIndex);
