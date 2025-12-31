@@ -567,6 +567,13 @@
     const msgEl  = document.getElementById("message");
     const btn    = document.getElementById("send");
     const tableEl = document.getElementById("tableNo");
+// ✅ 使用者輸入桌號時就即時整理（不會跳動太誇張）
+if (tableEl && !tableEl.disabled) {
+  tableEl.addEventListener("blur", () => {
+    const v = normalizeTableNo(tableEl.value);
+    if (v) tableEl.value = v;
+  });
+}
 
     const playerCountEl = document.getElementById("playerCount");
     const draw3Btn = document.getElementById("draw3Btn");
@@ -602,6 +609,29 @@
   const pad = n => String(n).padStart(2,"0");
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
+// ✅ 桌號防呆：各種輸入都轉成純數字（例：第一桌、桌1、1 桌、01桌 → 1）
+function normalizeTableNo(input) {
+  const raw = String(input ?? "").trim();
+
+  // 1) 把「第一桌」這種中文數字也處理掉（常用範圍先做 1~20）
+  const zhMap = {
+    "一":1,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9,"十":10,
+    "十一":11,"十二":12,"十三":13,"十四":14,"十五":15,"十六":16,"十七":17,"十八":18,"十九":19,"二十":20,
+    "壹":1,"貳":2,"參":3,"肆":4,"伍":5,"陸":6,"柒":7,"捌":8,"玖":9,"拾":10
+  };
+
+  // 抓「第X桌」裡的 X
+  const m = raw.match(/第?\s*([壹貳參肆伍陸柒捌玖拾一二三四五六七八九十]+)\s*桌?/);
+  if (m && zhMap[m[1]] != null) return String(zhMap[m[1]]);
+
+  // 2) 其他情況：只留數字
+  const digits = raw.replace(/[^\d]/g, "");
+  if (!digits) return "";
+
+  // 3) 去掉前導 0（01 → 1），但全是 0 也不要
+  const n = String(parseInt(digits, 10));
+  return (n === "NaN" || n === "0") ? "" : n;
+}
 
     // ===== token：同裝置固定 =====
     let myToken = localStorage.getItem("event_token");
@@ -630,7 +660,8 @@
       if (!nameEl || !msgEl) return;
       if (sending) return;
 
-      const tableNo = tableEl ? tableEl.value.trim() : "";
+const tableNo = tableEl ? normalizeTableNo(tableEl.value) : "";
+
       const name = nameEl.value.trim();
       const message = msgEl.value.trim() || "我已簽到";
 
@@ -680,27 +711,62 @@
     });
 
     // ===== 即時牆 =====
-    socket.on("wall", (p) => {
-      if (!wall) return;
+// ✅ 效能版：批次插入 + 節流
+const wallQueue = [];
+let wallFlushTimer = null;
 
-      const div = document.createElement("div");
-      div.className = "item is-new";
+function flushWall() {
+  wallFlushTimer = null;
+  if (!wall) return;
+  if (wallQueue.length === 0) return;
 
-div.innerHTML = `
-  <div class="line">
-    <span class="meta">${escapeHtml(p.tableNo ?? "")}桌</span>
-    <span class="name">${escapeHtml(p.name)}</span>
-    <span class="meta">${escapeHtml(p.time)}：</span>
-    <span class="msg">${escapeHtml(p.message)}</span>
-  </div>
-`;
+  const frag = document.createDocumentFragment();
 
+  // 一次最多處理 12 筆，避免一次塞太多造成卡頓
+  const batch = wallQueue.splice(0, 12);
 
-      wall.prepend(div);
+  for (const p of batch) {
+    const div = document.createElement("div");
+    div.className = "item is-new";
+    div.innerHTML = `
+      <div class="line">
+        <span class="meta">${escapeHtml(p.tableNo ?? "")}桌</span>
+        <span class="name">${escapeHtml(p.name ?? "")}</span>
+        <span class="meta">${escapeHtml(p.time ?? "")}：</span>
+        <span class="msg">${escapeHtml(p.message ?? "")}</span>
+      </div>
+    `;
+    frag.appendChild(div);
 
-      setTimeout(() => div.classList.remove("is-new"), 1200);
-      while (wall.children.length > 60) wall.removeChild(wall.lastChild);
-    });
+    // 動畫結束移除 is-new（避免一直算樣式）
+    setTimeout(() => div.classList.remove("is-new"), 900);
+  }
+
+  // ✅ 批次插入：最新在最上面
+  wall.prepend(frag);
+
+  // ✅ 保留 80 筆
+  while (wall.children.length > 80) wall.removeChild(wall.lastChild);
+
+  // 如果 queue 還有，繼續排下一次 flush
+  if (wallQueue.length > 0) scheduleFlush();
+}
+
+function scheduleFlush() {
+  if (wallFlushTimer) return;
+  wallFlushTimer = setTimeout(flushWall, 80); // 節流：80ms 一次
+}
+
+socket.on("wall", (p) => {
+  // ✅ 先整理桌號（保險：就算 server 沒轉好也能顯示一致）
+  const normalized = {
+    ...p,
+    tableNo: normalizeTableNo(p?.tableNo ?? "") || String(p?.tableNo ?? "")
+  };
+  wallQueue.push(normalized);
+  scheduleFlush();
+});
+;
 
     // ===== 參與者人數 =====
     let lastCount = 0;
