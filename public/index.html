@@ -13,88 +13,168 @@
       --card:#fff;
       --orange:#ff6a00;
       --shadow: 0 10px 24px rgba(0,0,0,0.06);
+      --shadow2: 0 10px 30px rgba(0,0,0,0.15);
     }
     *{ box-sizing:border-box; }
 
     body{
       font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif;
       margin:0;
-      padding:20px;
       background:var(--bg);
       color:var(--text);
     }
 
-    /* LOGO（一般模式） */
-    .brand{ text-align:center; margin-bottom:10px; }
-    .brand img{ max-height:180px; display:inline-block; }
-
-    h1{
-      margin:10px 0 6px;
-      text-align:center;
-      font-size:44px;
-      letter-spacing:.5px;
-    }
-    .hint{
-      color:#444;
-      font-size:18px;
-      font-weight:600;
-      text-align:center;
-      margin-bottom:22px;
-      letter-spacing:.6px;
-    }
-
-    /* 舞台：預設單欄；wall/host 才雙欄 */
-    .stage{
-      max-width:1280px;
+    /* =========================
+       4:3 投影（1024x768）主框
+    ========================= */
+    body.has-media{
+      width:1024px;
+      height:768px;
       margin:0 auto;
+      padding:10px;
+      overflow:hidden;
+      position:relative;
+    }
+
+    /* ===== Header（標題區置中）===== */
+    .header{
+      width:100%;
+      text-align:center;
+      padding-top:4px;
+      padding-bottom:6px;
+    }
+    .header h1{
+      margin:0;
+      font-size:36px;
+      letter-spacing:.5px;
+      line-height:1.1;
+    }
+    .header .hint{
+      margin-top:6px;
+      font-size:14px;
+      font-weight:700;
+      color:#444;
+      letter-spacing:.4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .header .divider{
+      margin:8px auto 0;
+      width:min(720px, 86%);
+      height:1px;
+      background:#ddd;
+    }
+
+    /* ===== 舞台：標題下方（左留言 + 右影片，同高度）===== */
+    .stage{
+      margin-top:10px;
       display:grid;
-      gap:18px;
+      grid-template-columns: 1fr 360px;
+      gap:14px;
+      height: 560px;                /* ✅ 左右同高的關鍵 */
+      align-items:stretch;
+    }
+
+    /* 左：留言容器（做成可捲動） */
+    .panel{
+      background:transparent;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+    }
+
+    .grid.input-area{
+      display:grid;
       grid-template-columns:1fr;
-      align-items:start;
+      gap:10px;
+      margin-bottom:10px;
     }
-    body.has-media .stage{
-      grid-template-columns:1fr 360px; /* 左留言 / 右影片 */
+    input, button{
+      font-size:16px;
+      padding:12px 14px;
+      border-radius:12px;
+    }
+    input{ border:1px solid #ccc; background:#fff; }
+    button{
+      background:#111;
+      color:#fff;
+      border:none;
+      cursor:pointer;
+    }
+    button:hover{ opacity:.92; }
+
+    /* wall 頁：隱藏輸入 */
+    .wall-only .input-area{ display:none; }
+
+    /* 留言牆：固定高度可捲動 */
+    .wall{
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      padding-top:10px;
+      border-top:1px solid #ddd;
+    }
+    .item{ margin-bottom:14px; }
+    .line{
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      display:flex;
+      gap: 10px;
+      align-items: baseline;
+      flex-wrap: wrap;
+    }
+    .line .name{
+      font-size:18px;
+      font-weight:900;
+    }
+    .line .time{
+      font-size:14px;
+      color:#777;
+      white-space:nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .line .msg{
+      font-size:24px;
+      font-weight:900;
+      line-height:1.22;
+      word-break:break-word;
     }
 
-    @media (max-width: 980px){
-      body.has-media .stage{ grid-template-columns:1fr; }
-      .media-slot{
-        width:min(420px, 92vw);
-        margin:0 auto;
-        position:relative;
-        top:0;
-      }
+    @keyframes popIn{
+      0%{ transform: translateY(10px) scale(.98); opacity:0; }
+      60%{ transform: translateY(0) scale(1.02); opacity:1; }
+      100%{ transform: translateY(0) scale(1); opacity:1; }
     }
+    .item.is-new .line{ animation: popIn 420ms ease-out; outline:3px solid rgba(255,106,0,0.18); }
 
-    .wrap{ max-width:1100px; margin:0 auto; }
-
-    /* 影片區（一般模式） */
+    /* 右：影片（同舞台高度） */
     .media-slot{
-      width:360px;
-      aspect-ratio:9/16;
+      height:100%;
       background:#000;
       border-radius:20px;
       overflow:hidden;
-      box-shadow:0 18px 44px rgba(0,0,0,0.18);
-      position:sticky;
-      top:20px;
-      display:none; /* JS 在 wall/host 才打開 */
+      box-shadow: 0 18px 44px rgba(0,0,0,0.18);
+      display:none; /* JS 控制：wall/host 才顯示 */
+      position:relative;
     }
     .media-slot video{
       width:100%;
       height:100%;
-      object-fit:cover;
-      display:block;
+      object-fit: contain;   /* ✅ 要看齊全 */
       background:#000;
+      display:block;
     }
     .media-fallback{
-      width:100%;
-      height:100%;
+      position:absolute;
+      inset:0;
       display:none;
       align-items:center;
       justify-content:center;
-      padding:18px;
-      color:rgba(255,255,255,0.86);
+      color:rgba(255,255,255,0.88);
       text-align:center;
       font-weight:900;
       letter-spacing:1px;
@@ -105,188 +185,149 @@
         #0b0b0b;
     }
 
-    /* 輸入區 */
-    .grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:12px;
-      margin-bottom:18px;
-    }
-    input, button{
-      font-size:18px;
-      padding:14px 16px;
-      border-radius:12px;
-    }
-    input{ border:1px solid #ccc; }
-    button{
-      background:#111;
-      color:#fff;
-      border:none;
-      cursor:pointer;
-    }
-    button:hover{ opacity:.92; }
-    .wall-only .input-area{ display:none; }
-
-    /* 留言牆 */
-    .wall{
-      margin-top:24px;
-      padding-top:10px;
-      border-top:1px solid #ddd;
-    }
-    .item{ margin-bottom:18px; }
-    .line{
-      background:var(--card);
-      border-radius:18px;
-      padding:18px 22px;
-      box-shadow:var(--shadow);
-      display:flex;
-      gap:12px;
-      align-items:baseline;
-      flex-wrap:wrap;
-    }
-    .line .name{
-      font-size:22px;
-      font-weight:900;
-      color:var(--text);
-    }
-    .line .time{
-      font-size:16px;
-      color:#777;
-      font-variant-numeric:tabular-nums;
-      white-space:nowrap;
-    }
-    .line .msg{
-      font-size:30px;
-      font-weight:800;
-      line-height:1.25;
-      color:var(--text);
-      word-break:break-word;
-    }
-
-    @keyframes popIn{
-      0%{ transform:translateY(12px) scale(.96); opacity:0; }
-      60%{ transform:translateY(0) scale(1.03); opacity:1; }
-      100%{ transform:translateY(0) scale(1); opacity:1; }
-    }
-    @keyframes glow{
-      0%{ box-shadow:var(--shadow); }
-      40%{ box-shadow:0 18px 42px rgba(255,106,0,0.25); }
-      100%{ box-shadow:var(--shadow); }
-    }
-    .item.is-new .line{
-      animation:popIn 420ms ease-out, glow 1200ms ease-out;
-      outline:3px solid rgba(255,106,0,0.22);
-    }
-
-    /* QR */
+    /* ===== QR（左上）===== */
     .qr-box{
       position:fixed;
-      left:24px;
-      top:24px;
+      left:10px;
+      top:10px;
       background:#fff;
-      padding:14px;
-      border-radius:18px;
-      box-shadow:0 8px 28px rgba(0,0,0,0.18);
+      padding:10px;
+      border-radius:16px;
+      box-shadow: var(--shadow2);
       text-align:center;
       z-index:999;
       display:none;
     }
+    #qr{ width:154px; height:154px; } /* ✅ 768/5 ≈ 154 */
     .qr-text{
-      margin-top:10px;
-      font-size:20px;
+      margin-top:8px;
+      font-size:16px;
       font-weight:900;
       color:var(--orange);
       letter-spacing:1px;
-      animation:qrBreath 1.6s ease-in-out infinite;
-    }
-    @keyframes qrBreath{
-      0%,100%{ opacity:1; }
-      50%{ opacity:.75; }
     }
 
-    /* 主持人控制列（一般模式：右上） */
-    .host-card{
+    /* ===== 右上：抽獎 + 參與者 ===== */
+    .host-top{
       position:fixed;
-      top:24px;
-      right:24px;
-      background:rgba(255,255,255,0.92);
-      backdrop-filter:blur(8px);
-      border-radius:18px;
-      padding:12px 14px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.15);
-      display:inline-flex;
-      flex-direction:column;
-      gap:8px;
+      right:10px;
+      top:10px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      border-radius:16px;
+      padding:10px 12px;
+      box-shadow: var(--shadow2);
       z-index:998;
-      align-items:center;
-    }
-    #hostActions{ display:none; }
-    body.is-host #hostActions{ display:flex; }
-
-    .host-actions{
-      display:flex;
+      display:none;
       gap:10px;
-      justify-content:center;
-      flex-wrap:wrap;
       align-items:center;
     }
-    .btn-draw{
-      background:linear-gradient(135deg, #ff7a00, #ff9a3c);
-      color:#fff;
-      font-size:16px;
-      font-weight:900;
-      border:none;
-      border-radius:999px;
-      padding:10px 18px;
-      cursor:pointer;
-      box-shadow:0 6px 16px rgba(255,122,0,0.35);
-    }
-    .btn-ghost{
-      background:#fff;
-      color:#111;
-      font-size:14px;
-      font-weight:800;
-      border:1px solid #ddd;
-      border-radius:999px;
-      padding:10px 14px;
-      cursor:pointer;
-    }
-    .btn-ghost:hover{ background:#f3f3f3; }
+    body.is-host .host-top{ display:flex; }
 
-    .host-info{
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid #ddd;
+      background:#fff;
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .pill.orange{
+      border:none;
+      background: linear-gradient(135deg, #ff7a00, #ff9a3c);
+      color:#fff;
+      box-shadow: 0 6px 16px rgba(255,122,0,0.35);
+    }
+    .count{
       font-size:14px;
       color:#555;
-      text-align:center;
-      width:100%;
-      transform-origin:center;
+      font-weight:800;
+      padding:0 4px;
+      white-space:nowrap;
     }
     @keyframes countFlash {
       0% { color:var(--orange); transform:scale(1); }
-      40%{ color:var(--orange); transform:scale(1.15); }
+      40%{ color:var(--orange); transform:scale(1.12); }
       100%{ color:#555; transform:scale(1); }
     }
-    .host-info.flash{ animation:countFlash 600ms ease-out; }
+    .count.flash{ animation:countFlash 600ms ease-out; }
 
-    /* 抽獎 overlay */
-    .draw-overlay{
+    /* ===== 右下：影片控制（ICON-only）===== */
+    .controls{
       position:fixed;
-      inset:0;
-      background:rgba(0,0,0,0.55);
+      right:10px;
+      bottom:10px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px);
+      border-radius:16px;
+      padding:10px 10px;
+      box-shadow: var(--shadow2);
+      z-index:998;
       display:none;
-      z-index:2000;
+      gap:10px;
+      align-items:center;
+    }
+    body.is-host .controls{ display:flex; }
+
+    .icon-btn{
+      width:46px;
+      height:46px;
+      border-radius:999px;
+      border:1px solid #ddd;
+      background:#fff;
+      cursor:pointer;
+      display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:24px;
+      font-size:18px;
+      font-weight:900;
+      user-select:none;
+    }
+    .icon-btn:hover{ background:#f3f3f3; }
+    .icon-btn.orange{
+      border:none;
+      background: linear-gradient(135deg, #ff7a00, #ff9a3c);
+      color:#fff;
+      box-shadow: 0 6px 16px rgba(255,122,0,0.35);
+    }
+
+    /* ===== LOGO（底部置中，小小的，不搶版面）===== */
+    .brand{
+      position:fixed;
+      left:50%;
+      bottom:12px;
+      transform:translateX(-50%);
+      z-index:997;
+      pointer-events:none;
+      opacity:.95;
+    }
+    .brand img{ max-height:56px; }
+
+    /* ===== 抽獎 overlay ===== */
+    .draw-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
     }
     .draw-box{
-      width:min(920px, 94vw);
-      background:#fff;
-      border-radius:24px;
-      box-shadow:0 24px 80px rgba(0,0,0,0.35);
-      padding:26px 26px 22px;
-      text-align:center;
-      position:relative;
-      overflow:hidden;
+      width: min(920px, 94vw);
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+      padding: 26px 26px 22px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
     .confetti{
       position:absolute;
@@ -298,197 +339,119 @@
         radial-gradient(circle at 80% 10%, rgba(0,0,0,.15), transparent 25%),
         radial-gradient(circle at 90% 70%, rgba(255,106,0,.35), transparent 28%),
         radial-gradient(circle at 30% 80%, rgba(0,0,0,.08), transparent 25%);
-      mix-blend-mode:multiply;
-      transform:scale(1.1);
+      mix-blend-mode: multiply;
+      transform: scale(1.1);
     }
     .draw-close{
       position:absolute;
-      right:18px;
-      top:14px;
+      right: 18px;
+      top: 14px;
       border:none;
-      background:transparent;
-      font-size:22px;
-      cursor:pointer;
-      color:#666;
+      background: transparent;
+      font-size: 22px;
+      cursor: pointer;
+      color: #666;
     }
     .draw-title{
-      font-size:18px;
-      color:#666;
-      margin-bottom:12px;
-      font-weight:900;
-      letter-spacing:1px;
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 12px;
+      font-weight: 900;
+      letter-spacing: 1px;
     }
     .draw-name{
-      font-size:clamp(42px, 6vw, 86px);
-      font-weight:1000;
-      margin:6px 0 8px;
-      color:#111;
+      font-size: clamp(42px, 6vw, 86px);
+      font-weight: 1000;
+      margin: 6px 0 8px;
+      color: #111;
     }
     .draw-sub{
-      font-size:16px;
-      color:#777;
-      margin-top:10px;
+      font-size: 16px;
+      color: #777;
+      margin-top: 10px;
     }
-    @keyframes pulse {
-      0% { transform:scale(1); }
-      35%{ transform:scale(1.03); }
-      100%{ transform:scale(1); }
-    }
-    .win{ animation:pulse 900ms ease-out 1; }
-
     .draw-list{
-      margin-top:10px;
-      display:none;
-      gap:14px;
-      justify-items:center;
+      margin-top: 10px;
+      display: none;
+      gap: 14px;
+      justify-items: center;
     }
     .draw-pill{
-      width:min(640px, 92%);
-      background:#fff;
-      border-radius:18px;
-      padding:16px 18px;
-      box-shadow:0 12px 30px rgba(0,0,0,0.12);
+      width: min(640px, 92%);
+      background: #fff;
+      border-radius: 18px;
+      padding: 16px 18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
       display:flex;
-      align-items:baseline;
-      gap:14px;
-      opacity:0;
-      transform:translateY(10px) scale(.98);
+      align-items: baseline;
+      gap: 14px;
+      opacity: 0;
+      transform: translateY(10px) scale(.98);
     }
     .draw-rank{
-      font-weight:1000;
-      font-size:18px;
-      color:var(--orange);
-      letter-spacing:1px;
-      white-space:nowrap;
+      font-weight: 1000;
+      font-size: 18px;
+      color: var(--orange);
+      letter-spacing: 1px;
+      white-space: nowrap;
     }
     .draw-winner{
-      font-weight:1000;
-      font-size:clamp(28px, 3.6vw, 44px);
+      font-weight: 1000;
+      font-size: clamp(28px, 3.6vw, 44px);
       color:#111;
-      word-break:break-word;
+      word-break: break-word;
     }
     @keyframes revealIn{
-      0% { opacity:0; transform:translateY(14px) scale(.97); }
-      60%{ opacity:1; transform:translateY(0) scale(1.02); }
-      100%{ opacity:1; transform:translateY(0) scale(1); }
+      0% { opacity:0; transform: translateY(14px) scale(.97); }
+      60%{ opacity:1; transform: translateY(0) scale(1.02); }
+      100%{ opacity:1; transform: translateY(0) scale(1); }
     }
-    .draw-pill.show{ animation:revealIn 520ms ease-out forwards; }
-
-    /* =========================
-       4:3 投影專用 (1024x768)
-       只要 has-media (wall/host) 就套用
-    ========================= */
-    body.has-media{
-      padding:12px;
-      padding-bottom:110px;  /* ✅ 底部預留給 LOGO + 控制列 */
-    }
-
-    /* 舞台鎖 1024 寬，避免被拉爆 */
-    body.has-media .stage{
-      max-width:1024px;
-      margin:0 auto;
-      gap:12px;
-      grid-template-columns: 1fr 320px; /* 左留言 右影片 */
-      align-items:start;
-    }
-
-    /* 右側影片區：用固定高度塞進 768 */
-    body.has-media .media-slot{
-      width:320px;
-      height:520px;
-      aspect-ratio:auto;        /* ✅ 避免跟 height 打架 */
-      position:sticky;
-      top:12px;                 /* ✅ 右上不再有控制卡，貼上去即可 */
-      border-radius:18px;
-      display:none;             /* JS 控制顯示 */
-      background:#000;
-    }
-
-    /* ✅ 影片完整顯示：不裁切 */
-    body.has-media .media-slot video{
-      object-fit:contain;
-      background:#000;
-    }
-
-    /* QR：高度 1/5（768/5 ≈ 154） */
-    body.has-media .qr-box{
-      left:10px;
-      top:10px;
-      padding:10px;
-      border-radius:16px;
-    }
-    body.has-media #qr{ width:154px; height:154px; }
-    body.has-media .qr-text{ font-size:16px; margin-top:8px; }
-
-    /* 標題/提示縮小一點，避免擠 */
-    body.has-media h1{ font-size:34px; margin:6px 0 4px; }
-    body.has-media .hint{ font-size:14px; margin-bottom:10px; }
-
-    /* ✅ LOGO 固定在底部置中 */
-    body.has-media .brand{
-      position:fixed;
-      left:50%;
-      bottom:10px;
-      transform:translateX(-50%);
-      margin:0;
-      z-index:998;
-      pointer-events:none; /* 避免擋到點擊 */
-    }
-    body.has-media .brand img{ max-height:70px; }
-
-    /* ✅ 控制列固定在底部右側 */
-    body.has-media .host-card{
-      top:auto;
-      right:10px;
-      bottom:10px;
-      border-radius:16px;
-      padding:10px 12px;
-      max-width: 680px;
-    }
-    body.has-media .btn-draw{ padding:8px 14px; font-size:14px; }
-    body.has-media .btn-ghost{ padding:8px 12px; font-size:13px; }
-
+    .draw-pill.show{ animation: revealIn 520ms ease-out forwards; }
   </style>
 </head>
 
 <body>
-  <div class="brand">
-    <img src="logo.png" alt="SOLIS">
+
+  <!-- QR -->
+  <div class="qr-box" id="qrBox">
+    <canvas id="qr"></canvas>
+    <div class="qr-text">掃描參加抽獎</div>
   </div>
 
-  <!-- 主持人控制列 -->
-  <div class="host-card" id="hostCard">
-    <div class="host-actions" id="hostActions">
-      <button class="btn-draw" id="draw3Btn">🎉 抽 3 名</button>
-
-      <!-- 本機選影片 -->
-      <input id="pickVideo" type="file" accept="video/*" style="display:none;">
-      <button class="btn-ghost" id="pickVideoBtn">📁 選影片</button>
-
-      <button class="btn-ghost" id="vidPlay">▶︎ 播放</button>
-      <button class="btn-ghost" id="vidPause">⏸ 暫停</button>
-      <button class="btn-ghost" id="vidMute">🔇 靜音</button>
-      <button class="btn-ghost" id="vidNext">⏭ 下一支</button>
-    </div>
-    <div class="host-info" id="playerCount">參與者：0 人</div>
+  <!-- 右上：抽獎 + 參與者 -->
+  <div class="host-top" id="hostTop">
+    <div class="pill orange" id="draw3Btn" title="抽 3 名">🎉</div>
+    <div class="count" id="playerCount">參與者：0 人</div>
   </div>
 
+  <!-- 右下：影片控制（icon-only） -->
+  <div class="controls" id="controls">
+    <input id="pickVideo" type="file" accept="video/*" style="display:none;">
+    <button class="icon-btn" id="pickVideoBtn" title="選影片" aria-label="選影片">📁</button>
+    <button class="icon-btn" id="vidPlay" title="播放" aria-label="播放">▶</button>
+    <button class="icon-btn" id="vidPause" title="暫停" aria-label="暫停">⏸</button>
+    <button class="icon-btn" id="vidMute" title="靜音/有聲" aria-label="靜音/有聲">🔇</button>
+    <button class="icon-btn" id="vidNext" title="下一支" aria-label="下一支">⏭</button>
+  </div>
+
+  <!-- Header（置中） -->
+  <div class="header">
+    <h1>SOLIS 許願牆</h1>
+    <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到｜有機會抽精美小禮一份喔</div>
+    <div class="divider"></div>
+  </div>
+
+  <!-- 舞台（標題下方：左留言 / 右影片） -->
   <div class="stage">
-    <!-- 左：互動牆 -->
-    <div class="wrap">
-      <h1>SOLIS 許願牆</h1>
-      <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到｜有機會抽精美小禮一份喔</div>
-
+    <div class="panel">
       <div class="grid input-area">
         <input id="name" placeholder="請輸入你的名字（必填）">
         <input id="message" placeholder="請輸入你想對 SOLIS 說的話～（例如：我要中頭獎）">
         <button id="send">送出</button>
       </div>
-
       <div class="wall" id="wall"></div>
     </div>
 
-    <!-- 右：影片 -->
     <div class="media-slot" id="mediaSlot">
       <video id="bgVideo" playsinline preload="metadata"></video>
       <div class="media-fallback" id="mediaFallback">
@@ -497,10 +460,9 @@
     </div>
   </div>
 
-  <!-- QR -->
-  <div class="qr-box" id="qrBox">
-    <canvas id="qr"></canvas>
-    <div class="qr-text">掃描參加抽獎</div>
+  <!-- 底部置中 LOGO -->
+  <div class="brand">
+    <img src="logo.png" alt="SOLIS">
   </div>
 
   <!-- 抽獎 overlay -->
@@ -637,8 +599,8 @@
       `;
       wall.prepend(div);
 
-      setTimeout(() => div.classList.remove("is-new"), 1800);
-      while (wall.children.length > 50) wall.removeChild(wall.lastChild);
+      setTimeout(() => div.classList.remove("is-new"), 1200);
+      while (wall.children.length > 60) wall.removeChild(wall.lastChild);
     });
 
     // 參與者人數
@@ -692,6 +654,7 @@
         if (e.target === drawOverlay) closeDrawOverlay();
       });
     }
+
     function rollingText(durationMs = 1200){
       if (!drawName || !drawOverlay) return;
       const frames = ["抽獎中", "抽獎中.", "抽獎中..", "抽獎中..."];
@@ -703,6 +666,7 @@
       }, 140);
       setTimeout(() => clearInterval(t), durationMs);
     }
+
     if (isHost && draw3Btn) {
       draw3Btn.addEventListener("click", () => {
         openDrawOverlay();
@@ -710,6 +674,7 @@
         socket.emit("host_draw", { n: 3 });
       });
     }
+
     socket.on("draw_result", (r) => {
       if (!isHost) return;
       if (!drawName || !drawSub || !drawList || !drawBox) return;
@@ -740,12 +705,7 @@
           `;
           drawList.appendChild(pill);
 
-          setTimeout(() => {
-            pill.classList.add("show");
-            drawBox.classList.remove("win");
-            void drawBox.offsetWidth;
-            drawBox.classList.add("win");
-          }, idx * 700);
+          setTimeout(() => pill.classList.add("show"), idx * 650);
         });
 
         drawSub.textContent = "🎉 恭喜得獎！";
@@ -758,47 +718,19 @@
       mediaFallback.style.display = on ? "flex" : "none";
     }
 
-    // ✅ 你 GitHub 不能放 mp4，這裡先留空（避免 404 造成你以為壞掉）
-    const playlist = [];
-    let vidIndex = 0;
-
     function bindEndedHoldLastFrame(){
       if (!bgVideo) return;
       bgVideo.onended = () => {
         bgVideo.pause();
-        // 保險：停在最後一格
         if (isFinite(bgVideo.duration) && bgVideo.duration > 0) {
           bgVideo.currentTime = Math.max(0, bgVideo.duration - 0.05);
         }
       };
     }
 
-    function loadVideo(src, autoplay=true){
-      if (!bgVideo) return;
-      bgVideo.src = src;
-      bgVideo.loop = false;     // ✅ 不輪播
-      bgVideo.muted = true;     // ✅ 自動播放需要靜音
-      bgVideo.playsInline = true;
-
-      bgVideo.onloadeddata = () => {
-        showFallback(false);
-        bindEndedHoldLastFrame();
-        if (autoplay) bgVideo.play().catch(() => {});
-      };
-      bgVideo.onerror = () => {
-        showFallback(true);
-      };
-    }
-
-    // ✅ 只要 wall/host 就顯示影片框（就算沒影片，也會顯示封面）
     if (hasMedia && mediaSlot) {
       mediaSlot.style.display = "block";
       showFallback(true);
-
-      // 如果你未來真的有放影片在 /public/media/ 才把 playlist 填起來
-      if (bgVideo && playlist.length > 0) {
-        loadVideo(playlist[vidIndex], true);
-      }
     }
 
     // host：本機選影片
@@ -812,8 +744,8 @@
         const url = URL.createObjectURL(file);
 
         bgVideo.src = url;
-        bgVideo.loop = false;     // ✅ 不輪播
-        bgVideo.muted = true;
+        bgVideo.loop = false;     // 不輪播
+        bgVideo.muted = true;     // 自動播需要靜音
         bgVideo.playsInline = true;
 
         showFallback(false);
@@ -823,27 +755,17 @@
       });
     }
 
-    // ✅ 下一支：有 playlist 就切；沒有就等同再選一次影片
     function nextVideo(){
-      if (!bgVideo) return;
-
-      if (playlist.length > 0) {
-        vidIndex = (vidIndex + 1) % playlist.length;
-        loadVideo(playlist[vidIndex], true);
-        return;
-      }
-
-      // 沒有 playlist → 打開檔案選擇器
+      // 你目前沒有 playlist（GitHub 不放 mp4）→ 下一支就等同再選一次
       if (isHost && pickVideo) pickVideo.click();
     }
 
-    // 播放控制
     if (isHost && bgVideo) {
       if (vidPlay)  vidPlay.addEventListener("click", () => bgVideo.play().catch(()=>{}));
       if (vidPause) vidPause.addEventListener("click", () => bgVideo.pause());
       if (vidMute)  vidMute.addEventListener("click", () => {
         bgVideo.muted = !bgVideo.muted;
-        vidMute.textContent = bgVideo.muted ? "🔇 靜音" : "🔊 有聲";
+        vidMute.textContent = bgVideo.muted ? "🔇" : "🔊";
       });
       if (vidNext)  vidNext.addEventListener("click", nextVideo);
     }
