@@ -278,6 +278,8 @@
       z-index:999;
       display:none;
     }
+    html.has-media .qr-box{ display:block; }
+
     #qr{ width:154px; height:154px; }
     .qr-text{
       margin-top:8px;
@@ -892,110 +894,112 @@
     });
 
     // ===== 影片 =====
-    function showFallback(on){
-      if (!mediaFallback) return;
-      mediaFallback.style.display = on ? "flex" : "none";
+// ===== 影片 =====
+function showFallback(on){
+  if (!mediaFallback) return;
+  mediaFallback.style.display = on ? "flex" : "none";
+}
+
+function bindEndedHoldLastFrame(){
+  if (!bgVideo) return;
+  bgVideo.onended = () => {
+    bgVideo.pause();
+    if (isFinite(bgVideo.duration) && bgVideo.duration > 0) {
+      bgVideo.currentTime = Math.max(0, bgVideo.duration - 0.05);
     }
-    function bindEndedHoldLastFrame(){
-      if (!bgVideo) return;
-      bgVideo.onended = () => {
-        bgVideo.pause();
-        if (isFinite(bgVideo.duration) && bgVideo.duration > 0) {
-          bgVideo.currentTime = Math.max(0, bgVideo.duration - 0.05);
-        }
-      };
-    }
+  };
+}
 
-    // has-media 顯示影片區
-    if (hasMedia && mediaSlot) {
-      mediaSlot.style.display = "block";
-      showFallback(true);
-    }
+// has-media 顯示影片區（保險）
+if (hasMedia && mediaSlot) {
+  mediaSlot.style.display = "block";
+  showFallback(true);
+}
 
-    // ✅ 播放清單（依檔名排序）＋下一首真正切換
-    let playlist = [];     // [{file, url, name}]
-    let currentIndex = -1;
+// ✅ 播放清單（依檔名排序）＋下一首真正切換
+let playlist = [];     // [{ name, url }]
+let currentIndex = -1;
 
-    function loadVideoByIndex(index) {
-      if (!playlist[index] || !bgVideo) return;
+function cleanupPlaylist() {
+  // 釋放舊的 blob URL（避免記憶體爆）
+  playlist.forEach(v => {
+    try { URL.revokeObjectURL(v.url); } catch(e){}
+  });
+  playlist = [];
+  currentIndex = -1;
+}
 
-      // 釋放上一支（保險）
-      if (bgVideo.dataset.blobUrl) {
-        URL.revokeObjectURL(bgVideo.dataset.blobUrl);
-      }
+function loadVideoByIndex(index) {
+  if (!bgVideo) return;
+  if (!playlist[index]) return;
 
-      const video = playlist[index];
-      bgVideo.dataset.blobUrl = video.url;
+  // ✅ 不要在切換時 revoke 當下要播的 url
+  // 只要把 src 換掉即可（舊的 url 會在重新選檔時 cleanup）
+  const video = playlist[index];
 
-      bgVideo.src = video.url;
-      bgVideo.loop = false;
-      bgVideo.muted = true;
-      bgVideo.playsInline = true;
-      bgVideo.preload = "auto";
+  bgVideo.src = video.url;
+  bgVideo.loop = false;
+  bgVideo.muted = true;
+  bgVideo.playsInline = true;
+  bgVideo.preload = "auto";
 
-      showFallback(false);
-      bindEndedHoldLastFrame();
-      bgVideo.load();
-    }
+  showFallback(false);
+  bindEndedHoldLastFrame();
+
+  bgVideo.load();
+}
 
 function nextVideo() {
   if (!playlist.length) {
-    alert("請先選擇影片（可一次多選）");
+    alert("請先按右下 📁 選擇影片（可一次多選）");
     return;
   }
-
   currentIndex = (currentIndex + 1) % playlist.length;
   loadVideoByIndex(currentIndex);
 }
 
-
-    // host：本機選影片（可多選）
-    if (isHost && pickVideo && pickVideoBtn && bgVideo) {
-      pickVideoBtn.addEventListener("click", () => pickVideo.click());
-
-pickVideo.addEventListener("change", () => {
-  const files = Array.from(pickVideo.files || []);
-  if (!files.length) return;
-
-  // ✅ 依檔名排序（A→Z / 01→99）
-  files.sort((a, b) =>
-    a.name.localeCompare(b.name, undefined, {
-      numeric: true,
-      sensitivity: "base"
-    })
-  );
-
-  // ✅ 清掉舊的 blob URL（避免記憶體爆）
-  playlist.forEach(v => {
-    try { URL.revokeObjectURL(v.url); } catch(e){}
+// host：本機選影片（可多選）
+if (isHost && pickVideo && pickVideoBtn && bgVideo) {
+  pickVideoBtn.addEventListener("click", () => {
+    // ✅ 有些瀏覽器需要按鈕點擊才允許打開檔案視窗
+    pickVideo.click();
   });
 
-  // ✅ 只用「排序後」的結果建立播放清單
-  playlist = files.map(file => ({
-    name: file.name,
-    url: URL.createObjectURL(file)
-  }));
+  pickVideo.addEventListener("change", () => {
+    const files = Array.from(pickVideo.files || []);
+    if (!files.length) return;
 
-  // ✅ 關鍵：每次重新選影片，一定從第 0 支開始
-  currentIndex = 0;
-  loadVideoByIndex(currentIndex);
-});
+    // ✅ 重新選檔：先清掉舊清單（釋放 blob）
+    cleanupPlaylist();
 
+    // ✅ 依檔名排序（A→Z / 01→99）
+    files.sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" })
+    );
 
-        currentIndex = 0;
-        loadVideoByIndex(currentIndex);
-      });
-    }
+    // ✅ 建立播放清單（只用排序後的陣列）
+    playlist = files.map(file => ({
+      name: file.name,
+      url: URL.createObjectURL(file)
+    }));
 
-    if (isHost && bgVideo) {
-      if (vidPlay)  vidPlay.addEventListener("click", () => bgVideo.play().catch(()=>alert("請先選擇影片檔案")));
-      if (vidPause) vidPause.addEventListener("click", () => bgVideo.pause());
-      if (vidMute)  vidMute.addEventListener("click", () => {
-        bgVideo.muted = !bgVideo.muted;
-        vidMute.textContent = bgVideo.muted ? "🔇" : "🔊";
-      });
-      if (vidNext)  vidNext.addEventListener("click", nextVideo);
-    }
+    // ✅ 從第 0 支開始
+    currentIndex = 0;
+    loadVideoByIndex(currentIndex);
+  });
+}
+
+// 主持控制
+if (isHost && bgVideo) {
+  if (vidPlay)  vidPlay.addEventListener("click", () => bgVideo.play().catch(()=>alert("請先按 📁 選影片")));
+  if (vidPause) vidPause.addEventListener("click", () => bgVideo.pause());
+  if (vidMute)  vidMute.addEventListener("click", () => {
+    bgVideo.muted = !bgVideo.muted;
+    vidMute.textContent = bgVideo.muted ? "🔇" : "🔊";
+  });
+  if (vidNext)  vidNext.addEventListener("click", nextVideo);
+}
+
 
     // 清空本機測試綁定
     const resetBtn = document.getElementById("resetLocal");
