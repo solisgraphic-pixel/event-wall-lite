@@ -615,6 +615,8 @@ body:not(.has-media) .header .divider{
     const nameEl = document.getElementById("name");
     const msgEl  = document.getElementById("message");
     const btn    = document.getElementById("send");
+    const tableEl = document.getElementById("tableNo");
+
 
     const playerCountEl = document.getElementById("playerCount");
     const draw3Btn = document.getElementById("draw3Btn");
@@ -662,6 +664,12 @@ body:not(.has-media) .header .divider{
       nameEl.value = lockedName;
       nameEl.disabled = true;
     }
+// ===== 鎖桌號（同裝置）=====
+const lockedTable = localStorage.getItem("event_table");
+if (lockedTable && tableEl) {
+  tableEl.value = lockedTable;
+  tableEl.disabled = true;
+}
 
     let sending = false;
     function sendCheckin(){
@@ -671,16 +679,30 @@ body:not(.has-media) .header .divider{
       sending = true;
       setTimeout(() => (sending = false), 650);
 
-      const name = nameEl.value.trim();
-      const message = msgEl.value.trim() || "我已簽到";
-      if (!name) { alert("請先輸入名字"); return; }
+const tableNo = tableEl ? tableEl.value.trim() : "";
+const name = nameEl.value.trim();
+const message = msgEl.value.trim() || "我已簽到";
+
+if (!tableNo) { alert("請先輸入桌號"); return; }
+if (!name) { alert("請先輸入名字"); return; }
+
+if (tableEl && !localStorage.getItem("event_table")) {
+  localStorage.setItem("event_table", tableNo);
+  tableEl.disabled = true;
+}
+if (!localStorage.getItem("event_name")) {
+  localStorage.setItem("event_name", name);
+  nameEl.disabled = true;
+}
+
 
       if (!localStorage.getItem("event_name")) {
         localStorage.setItem("event_name", name);
         nameEl.disabled = true;
       }
 
-      socket.emit("checkin", { token: myToken, name, message, time: now() });
+socket.emit("checkin", { token: myToken, tableNo, name, message, time: now() });
+
       msgEl.value = "";
       msgEl.focus();
     }
@@ -903,6 +925,28 @@ if (isHost && pickVideo && pickVideoBtn && bgVideo) {
       });
       if (vidNext)  vidNext.addEventListener("click", nextVideo);
     }
+    const resetBtn = document.getElementById("resetLocal");
+if (resetBtn) {
+  resetBtn.addEventListener("click", () => {
+    if (!confirm("確定要清空此手機的測試綁定資料嗎？")) return;
+
+    localStorage.removeItem("event_name");
+    localStorage.removeItem("event_table");
+    localStorage.removeItem("event_token");
+
+    location.reload();
+  });
+}
+/* ✅ 投影版（has-media）LOGO 放大 */
+body.has-media .brand img{
+  max-height: 72px;
+}
+
+/* ✅ 手機/來賓頁 LOGO 放大 */
+body:not(.has-media) .brand img{
+  max-height: 88px;
+}
+
   </script>
 </body>
 </html>
