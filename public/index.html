@@ -420,6 +420,13 @@
       100%{ opacity:1; transform: translateY(0) scale(1); }
     }
     .draw-pill.show{ animation: revealIn 520ms ease-out forwards; }
+    /* ✅ 只保留標題分隔線，不要留言牆那條線 */
+body.has-media .wall{
+  border-top: 0 !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
   </style>
 </head>
 
