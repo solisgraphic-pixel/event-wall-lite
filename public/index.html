@@ -119,21 +119,20 @@
     }
 
     /* 舞台：投影/主持（兩欄 + 避開 QR） */
-html.has-media .stage{
-  margin-top:14px;
-  margin-left:200px;
-  width: calc(100% - 200px);
-  display:grid;
-  grid-template-columns: 1fr 360px;
-  gap:14px;
+    html.has-media .stage{
+      margin-top:14px;
+      margin-left:200px;
+      width: calc(100% - 200px);
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:14px;
 
-  height: 560px;        /* ✅ 舞台固定高度 */
-  align-items: start;   /* ✅ 重要：不要 stretch，避免影片被撐高 */
+      height: 560px;        /* ✅ 舞台固定高度 */
+      align-items: start;   /* ✅ 不要 stretch，避免影片被撐高 */
 
-  max-width: none;
-  padding: 0;
-}
-
+      max-width: none;
+      padding: 0;
+    }
 
     /* 左：留言容器 */
     .panel{
@@ -191,14 +190,13 @@ html.has-media .stage{
     .line .name{ font-size:18px; font-weight:900; }
 
     /* ✅ 桌號/時間同樣式 */
-.line .meta{
-  font-size:12px;              /* 👈 再小一點 */
-  color:#888;
-  font-weight:700;
-  white-space:nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
+    .line .meta{
+      font-size:12px;
+      color:#888;
+      font-weight:700;
+      white-space:nowrap;
+      font-variant-numeric: tabular-nums;
+    }
 
     .line .msg{
       font-size:24px;
@@ -231,25 +229,24 @@ html.has-media .stage{
       background:#000;
       display:block;
     }
-/* ✅ 投影/主持：右側影片區固定直式 9:16，且高度鎖住不被留言撐 */
-html.has-media .media-slot{
-  display:block;        /* 你本來用 JS 控制顯示也行，這行可留著當保險 */
-  height: 560px;        /* ✅ 高度鎖死（跟 stage 一樣） */
-  align-self: start;    /* ✅ 不跟著 grid 被撐高 */
 
-  aspect-ratio: 9 / 16; /* ✅ 固定直式比例 */
-  width: auto;          /* ✅ 讓寬度由比例自動算 */
-  max-width: 360px;     /* ✅ 不超過你右欄寬 */
-}
-
-/* ✅ 影片本體永遠維持比例，不變形 */
-html.has-media .media-slot video{
-  width: 100%;
-  height: 100%;
-  object-fit: contain;  /* ✅ 不裁切、不拉伸 */
-  background:#000;
-  display:block;
-}
+    /* ✅ 投影/主持：右側影片區固定直式 9:16，且高度鎖住不被留言撐 */
+    html.has-media .media-slot{
+      display:block;           /* 保險：就算 JS 還沒跑也會是可見 */
+      height: 560px;           /* 跟 stage 一樣 */
+      align-self: start;       /* 不被 grid 拉伸 */
+      aspect-ratio: 9 / 16;    /* 固定直式比例 */
+      width: auto;             /* 由比例計算寬度 */
+      max-width: 360px;        /* 不超過右欄 */
+      flex: 0 0 auto;
+    }
+    html.has-media .media-slot video{
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background:#000;
+      display:block;
+    }
 
     .media-fallback{
       position:absolute;
@@ -522,7 +519,8 @@ html.has-media .media-slot video{
 
   <!-- 右下：影片控制 -->
   <div class="controls" id="controls">
-    <input id="pickVideo" type="file" accept="video/*" style="display:none;">
+    <!-- ✅ 改成可多選 -->
+    <input id="pickVideo" type="file" accept="video/*" multiple style="display:none;">
     <button class="icon-btn" id="pickVideoBtn" title="選影片" aria-label="選影片">📁</button>
     <button class="icon-btn" id="vidPlay" title="播放" aria-label="播放">▶️</button>
     <button class="icon-btn" id="vidPause" title="暫停" aria-label="暫停">⏸️</button>
@@ -590,13 +588,6 @@ html.has-media .media-slot video{
     const msgEl  = document.getElementById("message");
     const btn    = document.getElementById("send");
     const tableEl = document.getElementById("tableNo");
-// ✅ 使用者輸入桌號時就即時整理（不會跳動太誇張）
-if (tableEl && !tableEl.disabled) {
-  tableEl.addEventListener("blur", () => {
-    const v = normalizeTableNo(tableEl.value);
-    if (v) tableEl.value = v;
-  });
-}
 
     const playerCountEl = document.getElementById("playerCount");
     const draw3Btn = document.getElementById("draw3Btn");
@@ -627,34 +618,40 @@ if (tableEl && !tableEl.disabled) {
         "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
       }[s]));
     }
-   function now() {
-  const d = new Date();
-  const pad = n => String(n).padStart(2,"0");
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-// ✅ 桌號防呆：各種輸入都轉成純數字（例：第一桌、桌1、1 桌、01桌 → 1）
-function normalizeTableNo(input) {
-  const raw = String(input ?? "").trim();
 
-  // 1) 把「第一桌」這種中文數字也處理掉（常用範圍先做 1~20）
-  const zhMap = {
-    "一":1,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9,"十":10,
-    "十一":11,"十二":12,"十三":13,"十四":14,"十五":15,"十六":16,"十七":17,"十八":18,"十九":19,"二十":20,
-    "壹":1,"貳":2,"參":3,"肆":4,"伍":5,"陸":6,"柒":7,"捌":8,"玖":9,"拾":10
-  };
+    function now() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2,"0");
+      return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
 
-  // 抓「第X桌」裡的 X
-  const m = raw.match(/第?\s*([壹貳參肆伍陸柒捌玖拾一二三四五六七八九十]+)\s*桌?/);
-  if (m && zhMap[m[1]] != null) return String(zhMap[m[1]]);
+    // ✅ 桌號防呆：各種輸入都轉成純數字（例：第一桌、桌1、1 桌、01桌 → 1）
+    function normalizeTableNo(input) {
+      const raw = String(input ?? "").trim();
 
-  // 2) 其他情況：只留數字
-  const digits = raw.replace(/[^\d]/g, "");
-  if (!digits) return "";
+      const zhMap = {
+        "一":1,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9,"十":10,
+        "十一":11,"十二":12,"十三":13,"十四":14,"十五":15,"十六":16,"十七":17,"十八":18,"十九":19,"二十":20,
+        "壹":1,"貳":2,"參":3,"肆":4,"伍":5,"陸":6,"柒":7,"捌":8,"玖":9,"拾":10
+      };
 
-  // 3) 去掉前導 0（01 → 1），但全是 0 也不要
-  const n = String(parseInt(digits, 10));
-  return (n === "NaN" || n === "0") ? "" : n;
-}
+      const m = raw.match(/第?\s*([壹貳參肆伍陸柒捌玖拾一二三四五六七八九十]+)\s*桌?/);
+      if (m && zhMap[m[1]] != null) return String(zhMap[m[1]]);
+
+      const digits = raw.replace(/[^\d]/g, "");
+      if (!digits) return "";
+
+      const n = String(parseInt(digits, 10));
+      return (n === "NaN" || n === "0") ? "" : n;
+    }
+
+    // ✅ 使用者輸入桌號時就即時整理
+    if (tableEl && !tableEl.disabled) {
+      tableEl.addEventListener("blur", () => {
+        const v = normalizeTableNo(tableEl.value);
+        if (v) tableEl.value = v;
+      });
+    }
 
     // ===== token：同裝置固定 =====
     let myToken = localStorage.getItem("event_token");
@@ -683,8 +680,7 @@ function normalizeTableNo(input) {
       if (!nameEl || !msgEl) return;
       if (sending) return;
 
-const tableNo = tableEl ? normalizeTableNo(tableEl.value) : "";
-
+      const tableNo = tableEl ? normalizeTableNo(tableEl.value) : "";
       const name = nameEl.value.trim();
       const message = msgEl.value.trim() || "我已簽到";
 
@@ -733,63 +729,52 @@ const tableNo = tableEl ? normalizeTableNo(tableEl.value) : "";
       }
     });
 
-    // ===== 即時牆 =====
-// ✅ 效能版：批次插入 + 節流
-const wallQueue = [];
-let wallFlushTimer = null;
+    // ===== 即時牆（效能版：批次插入 + 節流）=====
+    const wallQueue = [];
+    let wallFlushTimer = null;
 
-function flushWall() {
-  wallFlushTimer = null;
-  if (!wall) return;
-  if (wallQueue.length === 0) return;
+    function flushWall() {
+      wallFlushTimer = null;
+      if (!wall) return;
+      if (wallQueue.length === 0) return;
 
-  const frag = document.createDocumentFragment();
+      const frag = document.createDocumentFragment();
+      const batch = wallQueue.splice(0, 12);
 
-  // 一次最多處理 12 筆，避免一次塞太多造成卡頓
-  const batch = wallQueue.splice(0, 12);
+      for (const p of batch) {
+        const div = document.createElement("div");
+        div.className = "item is-new";
+        div.innerHTML = `
+          <div class="line">
+            <span class="meta">${escapeHtml(p.tableNo ?? "")}桌</span>
+            <span class="name">${escapeHtml(p.name ?? "")}</span>
+            <span class="meta">${escapeHtml(p.time ?? "")}：</span>
+            <span class="msg">${escapeHtml(p.message ?? "")}</span>
+          </div>
+        `;
+        frag.appendChild(div);
+        setTimeout(() => div.classList.remove("is-new"), 900);
+      }
 
-  for (const p of batch) {
-    const div = document.createElement("div");
-    div.className = "item is-new";
-    div.innerHTML = `
-      <div class="line">
-        <span class="meta">${escapeHtml(p.tableNo ?? "")}桌</span>
-        <span class="name">${escapeHtml(p.name ?? "")}</span>
-        <span class="meta">${escapeHtml(p.time ?? "")}：</span>
-        <span class="msg">${escapeHtml(p.message ?? "")}</span>
-      </div>
-    `;
-    frag.appendChild(div);
+      wall.prepend(frag);
+      while (wall.children.length > 80) wall.removeChild(wall.lastChild);
 
-    // 動畫結束移除 is-new（避免一直算樣式）
-    setTimeout(() => div.classList.remove("is-new"), 900);
-  }
+      if (wallQueue.length > 0) scheduleFlush();
+    }
 
-  // ✅ 批次插入：最新在最上面
-  wall.prepend(frag);
+    function scheduleFlush() {
+      if (wallFlushTimer) return;
+      wallFlushTimer = setTimeout(flushWall, 80);
+    }
 
-  // ✅ 保留 80 筆
-  while (wall.children.length > 80) wall.removeChild(wall.lastChild);
-
-  // 如果 queue 還有，繼續排下一次 flush
-  if (wallQueue.length > 0) scheduleFlush();
-}
-
-function scheduleFlush() {
-  if (wallFlushTimer) return;
-  wallFlushTimer = setTimeout(flushWall, 80); // 節流：80ms 一次
-}
-
-socket.on("wall", (p) => {
-  // ✅ 先整理桌號（保險：就算 server 沒轉好也能顯示一致）
-  const normalized = {
-    ...p,
-    tableNo: normalizeTableNo(p?.tableNo ?? "") || String(p?.tableNo ?? "")
-  };
-  wallQueue.push(normalized);
-  scheduleFlush();
-});
-;
+    socket.on("wall", (p) => {
+      const normalized = {
+        ...p,
+        tableNo: normalizeTableNo(p?.tableNo ?? "") || String(p?.tableNo ?? "")
+      };
+      wallQueue.push(normalized);
+      scheduleFlush();
+    });
 
     // ===== 參與者人數 =====
     let lastCount = 0;
@@ -927,37 +912,69 @@ socket.on("wall", (p) => {
       showFallback(true);
     }
 
-    // host：本機選影片
+    // ✅ 播放清單（依檔名排序）＋下一首真正切換
+    let playlist = [];     // [{file, url, name}]
+    let currentIndex = -1;
+
+    function loadVideoByIndex(index) {
+      if (!playlist[index] || !bgVideo) return;
+
+      // 釋放上一支（保險）
+      if (bgVideo.dataset.blobUrl) {
+        URL.revokeObjectURL(bgVideo.dataset.blobUrl);
+      }
+
+      const video = playlist[index];
+      bgVideo.dataset.blobUrl = video.url;
+
+      bgVideo.src = video.url;
+      bgVideo.loop = false;
+      bgVideo.muted = true;
+      bgVideo.playsInline = true;
+      bgVideo.preload = "auto";
+
+      showFallback(false);
+      bindEndedHoldLastFrame();
+      bgVideo.load();
+    }
+
+    function nextVideo() {
+      if (!playlist.length) {
+        alert("請先選擇影片（可一次多選）");
+        return;
+      }
+      currentIndex++;
+      if (currentIndex >= playlist.length) currentIndex = 0; // 循環
+      loadVideoByIndex(currentIndex);
+    }
+
+    // host：本機選影片（可多選）
     if (isHost && pickVideo && pickVideoBtn && bgVideo) {
       pickVideoBtn.addEventListener("click", () => pickVideo.click());
 
-      pickVideo.addEventListener("change", async () => {
-        const file = pickVideo.files?.[0];
-        if (!file) return;
+      pickVideo.addEventListener("change", () => {
+        const files = Array.from(pickVideo.files || []);
+        if (!files.length) return;
 
-        if (bgVideo.dataset.blobUrl) {
-          URL.revokeObjectURL(bgVideo.dataset.blobUrl);
-          bgVideo.dataset.blobUrl = "";
-        }
+        // ✅ 依檔名排序（A→Z / 01→99）
+        files.sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" })
+        );
 
-        const url = URL.createObjectURL(file);
-        bgVideo.dataset.blobUrl = url;
+        // 清掉舊的 blob（避免累積卡頓）
+        playlist.forEach(v => {
+          try { URL.revokeObjectURL(v.url); } catch(e){}
+        });
 
-        bgVideo.src = url;
-        bgVideo.loop = false;
-        bgVideo.muted = true;
-        bgVideo.playsInline = true;
-        bgVideo.preload = "auto";
+        playlist = files.map(file => ({
+          file,
+          name: file.name,
+          url: URL.createObjectURL(file)
+        }));
 
-        showFallback(false);
-        bindEndedHoldLastFrame();
-
-        bgVideo.load();
+        currentIndex = 0;
+        loadVideoByIndex(currentIndex);
       });
-    }
-
-    function nextVideo(){
-      if (isHost && pickVideo) pickVideo.click();
     }
 
     if (isHost && bgVideo) {
