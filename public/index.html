@@ -180,7 +180,7 @@
       padding: 16px 18px;
       box-shadow: var(--shadow);
       display:flex;
-      gap: 10px;
+      gap: 5px;
       align-items: baseline;
       flex-wrap: wrap;
     }
@@ -188,13 +188,14 @@
     .line .name{ font-size:18px; font-weight:900; }
 
     /* ✅ 桌號/時間同樣式 */
-    .line .meta{
-      font-size:14px;
-      color:#777;
-      font-weight:800;
-      white-space:nowrap;
-      font-variant-numeric: tabular-nums;
-    }
+.line .meta{
+  font-size:12px;              /* 👈 再小一點 */
+  color:#888;
+  font-weight:700;
+  white-space:nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 
     .line .msg{
       font-size:24px;
