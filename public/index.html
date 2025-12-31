@@ -420,28 +420,21 @@ body.has-media .stage{
   </div>
 
   <div class="stage">
-    <!-- 右：直式影片（只在 wall/host 顯示） -->
-    <div class="media-slot" id="mediaSlot" style="display:none;">
-      <video id="bgVideo" playsinline preload="metadata"></video>
-      <div class="media-fallback" id="mediaFallback" style="display:none;">
-        SOLIS 活動現場<br/>播放區
-      </div>
-    </div>
 
-    <!-- 左：互動牆內容 -->
-    <div class="wrap">
-      <h1>SOLIS 許願牆</h1>
-      <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到｜有機會抽精美小禮一份喔</div>
+  <!-- ✅ 左：互動牆內容 -->
+  <div class="wrap">
+    ...
+  </div>
 
-      <div class="grid input-area">
-        <input id="name" placeholder="請輸入你的名字（必填）">
-        <input id="message" placeholder="請輸入你想對 SOLIS 說的話～（例如：我要中頭獎）">
-        <button id="send">送出</button>
-      </div>
-
-      <div class="wall" id="wall"></div>
+  <!-- ✅ 右：直式影片（只在 wall/host 顯示） -->
+  <div class="media-slot" id="mediaSlot" style="display:none;">
+    <video id="bgVideo" playsinline preload="metadata"></video>
+    <div class="media-fallback" id="mediaFallback" style="display:none;">
+      SOLIS 活動現場<br/>播放區
     </div>
   </div>
+
+</div>
 
   <!-- QR（wall=1 或 host=1 顯示） -->
   <div class="qr-box" id="qrBox">
