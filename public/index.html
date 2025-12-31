@@ -402,14 +402,18 @@
   <!-- 主持人控制卡（右上角） -->
   <div class="host-card" id="hostCard">
     <div class="host-actions" id="hostActions">
-      <button class="btn-draw" id="draw3Btn">🎉 抽 3 名</button>
+  <button class="btn-draw" id="draw3Btn">🎉 抽 3 名</button>
 
-      <!-- 影片控制（只有 host 才會看到） -->
-      <button class="btn-ghost" id="vidPlay">▶︎ 播放</button>
-      <button class="btn-ghost" id="vidPause">⏸ 暫停</button>
-      <button class="btn-ghost" id="vidMute">🔇 靜音</button>
-      <button class="btn-ghost" id="vidNext">⏭ 下一支</button>
-    </div>
+  <!-- ✅ 新增：選影片 -->
+  <input id="pickVideo" type="file" accept="video/*" style="display:none;">
+  <button class="btn-ghost" id="pickVideoBtn">📁 選影片</button>
+
+  <button class="btn-ghost" id="vidPlay">▶︎ 播放</button>
+  <button class="btn-ghost" id="vidPause">⏸ 暫停</button>
+  <button class="btn-ghost" id="vidMute">🔇 靜音</button>
+  <button class="btn-ghost" id="vidNext">⏭ 下一支</button>
+</div>
+
     <div class="host-info" id="playerCount">參與者：0 人</div>
   </div>
 
@@ -668,6 +672,33 @@
     // ===== 直式影片：只在 wall/host 顯示 =====
     const mediaSlot = document.getElementById("mediaSlot");
     const bgVideo = document.getElementById("bgVideo");
+    // ===== 主持人：本機選影片播放 =====
+const pickVideo = document.getElementById("pickVideo");
+const pickVideoBtn = document.getElementById("pickVideoBtn");
+
+if (isHost && pickVideo && pickVideoBtn && bgVideo) {
+
+  // 點「選影片」→ 打開系統檔案選擇器
+  pickVideoBtn.addEventListener("click", () => {
+    pickVideo.click();
+  });
+
+  // 選到影片後立即播放
+  pickVideo.addEventListener("change", () => {
+    const file = pickVideo.files?.[0];
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+
+    bgVideo.src = url;
+    bgVideo.loop = true;      // 活動最穩：循環播
+    bgVideo.muted = true;    // ✅ 必須靜音才能自動播
+    bgVideo.playsInline = true;
+
+    bgVideo.play().catch(() => {});
+  });
+}
+
     const mediaFallback = document.getElementById("mediaFallback");
 
     // 你把影片放在 public/media/ 底下，這裡填檔名就好
