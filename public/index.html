@@ -36,16 +36,17 @@
       position:relative;
     }
 
-    /* ===== Header（標題區置中）===== */
-/* ===== Header（標題區置中）===== */
-.header{
-  width:100%;
-  text-align:center;
-  padding-top:10px;      /* ✅ 往下 */
-  padding-bottom:6px;
-  margin-left:200px;     /* ✅ 讓整個標題區避開左上 QR */
-  width: calc(100% - 200px);
-}
+    /* ===== Header（固定置中：真正置中，不吃 QR 的 margin-left）===== */
+    .header{
+      position: fixed;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+      width: 760px;            /* 4:3 安全寬度 */
+      text-align: center;
+      z-index: 996;
+      pointer-events: none;    /* 不要擋到點擊 */
+    }
 
     .header h1{
       margin:0;
@@ -53,43 +54,43 @@
       letter-spacing:.5px;
       line-height:1.1;
     }
-   .header .hint{
-  margin-top:6px;
-  font-size:14px;
-  font-weight:700;
-  color:#444;
-  letter-spacing:.4px;
-  white-space:nowrap;      /* ✅ 永遠單行 */
-  overflow:hidden;
-  text-overflow:ellipsis;  /* ✅ 太長就 ... */
-  max-width: 720px;
-  margin-left:auto;
-  margin-right:auto;
-}
 
-.header .divider{
-  margin:8px auto 0;
-  width: 520px;       /* ✅ 分隔線變短（單行） */
-  height:1px;
-  background:#ddd;
-}
+    .header .hint{
+      margin-top:6px;
+      font-size:14px;
+      font-weight:700;
+      color:#444;
+      letter-spacing:.4px;
+      white-space:nowrap;      /* 永遠單行 */
+      overflow:hidden;
+      text-overflow:ellipsis;  /* 太長就 ... */
+    }
 
+    /* ✅ 分隔線只留這一條 */
+    .header .divider{
+      margin:8px auto 0;
+      width: 520px;
+      height:1px;
+      background:#ddd;
+    }
 
-    /* ===== 舞台：標題下方（左留言 + 右影片，同高度）===== */
-   /* ===== 舞台：標題下方（左留言 + 右影片，同高度）===== */
-.stage{
-  margin-top:14px;                       /* ✅ 往下 */
-  margin-left:200px;                     /* ✅ 避開 QR */
-  width: calc(100% - 200px);
-  display:grid;
-  grid-template-columns: 1fr 360px;
-  gap:14px;
-  height: 560px;
-  align-items:stretch;
-}
+    /* ===== 舞台：在 Header 下方（左留言 + 右影片，同高度）===== */
+    .stage{
+      /* ✅ 讓標題區完全不會壓到內容 */
+      margin-top: 120px;
 
+      /* ✅ 舞台避開左上 QR（內容往右縮） */
+      margin-left:200px;
+      width: calc(100% - 200px);
 
-    /* 左：留言容器（做成可捲動） */
+      display:grid;
+      grid-template-columns: 1fr 360px;
+      gap:14px;
+      height: 560px;
+      align-items:stretch;
+    }
+
+    /* 左：留言容器 */
     .panel{
       background:transparent;
       height:100%;
@@ -121,14 +122,15 @@
     /* wall 頁：隱藏輸入 */
     .wall-only .input-area{ display:none; }
 
-    /* 留言牆：固定高度可捲動 */
+    /* 留言牆：固定高度可捲動（✅ 不要上方那條線） */
     .wall{
       flex:1;
       min-height:0;
       overflow:auto;
-      padding-top:10px;
-      border-top:1px solid #ddd;
+      padding-top:0;
+      border-top:0;
     }
+
     .item{ margin-bottom:14px; }
     .line{
       background: var(--card);
@@ -171,13 +173,13 @@
       border-radius:20px;
       overflow:hidden;
       box-shadow: 0 18px 44px rgba(0,0,0,0.18);
-      display:none; /* JS 控制：wall/host 才顯示 */
+      display:none;
       position:relative;
     }
     .media-slot video{
       width:100%;
       height:100%;
-      object-fit: contain;   /* ✅ 要看齊全 */
+      object-fit: contain;
       background:#000;
       display:block;
     }
@@ -211,7 +213,7 @@
       z-index:999;
       display:none;
     }
-    #qr{ width:154px; height:154px; } /* ✅ 768/5 ≈ 154 */
+    #qr{ width:154px; height:154px; }
     .qr-text{
       margin-top:8px;
       font-size:16px;
@@ -302,14 +304,8 @@
       user-select:none;
     }
     .icon-btn:hover{ background:#f3f3f3; }
-    .icon-btn.orange{
-      border:none;
-      background: linear-gradient(135deg, #ff7a00, #ff9a3c);
-      color:#fff;
-      box-shadow: 0 6px 16px rgba(255,122,0,0.35);
-    }
 
-    /* ===== LOGO（底部置中，小小的，不搶版面）===== */
+    /* ===== LOGO（底部置中）===== */
     .brand{
       position:fixed;
       left:50%;
@@ -321,7 +317,7 @@
     }
     .brand img{ max-height:56px; }
 
-    /* ===== 抽獎 overlay ===== */
+    /* ===== 抽獎 overlay（保留原本）===== */
     .draw-overlay{
       position: fixed;
       inset: 0;
@@ -420,69 +416,6 @@
       100%{ opacity:1; transform: translateY(0) scale(1); }
     }
     .draw-pill.show{ animation: revealIn 520ms ease-out forwards; }
-    /* ✅ 只保留標題分隔線，不要留言牆那條線 */
-body.has-media .wall{
-  border-top: 0 !important;
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-/* ===== 標題真正置中（不被 QR 影響）===== */
-body.has-media .wrap h1,
-body.has-media .wrap .hint{
-  width: 100%;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* 標題區整體往下推，避開左上 QR */
-/* =========================
-   ✅ 4:3 投影：標題/副標「固定置中」(不受 QR/欄位影響)
-========================= */
-
-/* 讓內容整體往下，空出標題區高度 */
-body.has-media .stage{
-  margin-top: 120px;   /* 你可微調 110~140 */
-}
-
-/* 把標題/副標做成固定置頂、真正置中 */
-body.has-media .wrap h1{
-  position: fixed;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 640px;              /* 4:3 最穩，避免太長 */
-  text-align: center;
-  margin: 0;
-  z-index: 996;
-}
-
-body.has-media .wrap .hint{
-  position: fixed;
-  top: 64px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 760px;              /* 副標可比標題寬 */
-  text-align: center;
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.2;
-  white-space: nowrap;       /* ✅ 強制單行 */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  z-index: 996;
-}
-
-/* ✅ 把「分隔線」改成只有一條、且固定在副標下方 */
-body.has-media .wrap .hint::after{
-  content:"";
-  display:block;
-  width: 760px;
-  height: 1px;
-  background: #ddd;
-  margin: 10px auto 0;
-}
-
   </style>
 </head>
 
@@ -510,7 +443,7 @@ body.has-media .wrap .hint::after{
     <button class="icon-btn" id="vidNext" title="下一支" aria-label="下一支">⏭️</button>
   </div>
 
-  <!-- Header（置中） -->
+  <!-- Header（固定置中） -->
   <div class="header">
     <h1>SOLIS 許願牆</h1>
     <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到｜有機會抽精美小禮一份喔</div>
@@ -557,7 +490,6 @@ body.has-media .wrap .hint::after{
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 
   <script>
-    // 解析網址參數
     const params = new URLSearchParams(window.location.search);
     const isWall = params.get("wall") === "1";
     const isHost = params.get("host") === "1";
@@ -568,7 +500,6 @@ body.has-media .wrap .hint::after{
     const hasMedia = (isWall || isHost);
     if (hasMedia) document.body.classList.add("has-media");
 
-    // Socket.IO
     const socket = io();
 
     const wall = document.getElementById("wall");
@@ -588,16 +519,13 @@ body.has-media .wrap .hint::after{
 
     const qrBox = document.getElementById("qrBox");
 
-    // 影片元素
     const mediaSlot = document.getElementById("mediaSlot");
     const bgVideo = document.getElementById("bgVideo");
     const mediaFallback = document.getElementById("mediaFallback");
 
-    // 本機選影片
     const pickVideo = document.getElementById("pickVideo");
     const pickVideoBtn = document.getElementById("pickVideoBtn");
 
-    // 播放控制
     const vidPlay = document.getElementById("vidPlay");
     const vidPause = document.getElementById("vidPause");
     const vidMute = document.getElementById("vidMute");
@@ -614,21 +542,18 @@ body.has-media .wrap .hint::after{
       return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
-    // token：同裝置固定
     let myToken = localStorage.getItem("event_token");
     if (!myToken) {
       myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
       localStorage.setItem("event_token", myToken);
     }
 
-    // 鎖名字
     const lockedName = localStorage.getItem("event_name");
     if (lockedName && nameEl) {
       nameEl.value = lockedName;
       nameEl.disabled = true;
     }
 
-    // 防連點送出
     let sending = false;
     function sendCheckin(){
       if (!nameEl || !msgEl) return;
@@ -661,7 +586,6 @@ body.has-media .wrap .hint::after{
       });
     }
 
-    // 即時牆
     socket.on("wall", (p) => {
       if (!wall) return;
       const div = document.createElement("div");
@@ -679,7 +603,6 @@ body.has-media .wrap .hint::after{
       while (wall.children.length > 60) wall.removeChild(wall.lastChild);
     });
 
-    // 參與者人數
     let lastCount = 0;
     socket.on("participants_count", (d) => {
       const c = Number(d?.count ?? 0);
@@ -695,7 +618,6 @@ body.has-media .wrap .hint::after{
       lastCount = c;
     });
 
-    // QR（wall/host 顯示）
     if (isWall || isHost) {
       if (qrBox) qrBox.style.display = "block";
       try{
@@ -709,7 +631,6 @@ body.has-media .wrap .hint::after{
       }
     }
 
-    // 抽獎 overlay
     function openDrawOverlay(){
       if (!drawOverlay || !drawName || !drawSub || !drawList || !drawBox) return;
       drawOverlay.style.display = "flex";
@@ -788,7 +709,6 @@ body.has-media .wrap .hint::after{
       }, 800);
     });
 
-    // ====== 影片 ======
     function showFallback(on){
       if (!mediaFallback) return;
       mediaFallback.style.display = on ? "flex" : "none";
@@ -809,7 +729,6 @@ body.has-media .wrap .hint::after{
       showFallback(true);
     }
 
-    // host：本機選影片
     if (isHost && pickVideo && pickVideoBtn && bgVideo) {
       pickVideoBtn.addEventListener("click", () => pickVideo.click());
 
@@ -820,8 +739,8 @@ body.has-media .wrap .hint::after{
         const url = URL.createObjectURL(file);
 
         bgVideo.src = url;
-        bgVideo.loop = false;     // 不輪播
-        bgVideo.muted = true;     // 自動播需要靜音
+        bgVideo.loop = false;
+        bgVideo.muted = true;
         bgVideo.playsInline = true;
 
         showFallback(false);
@@ -832,7 +751,6 @@ body.has-media .wrap .hint::after{
     }
 
     function nextVideo(){
-      // 你目前沒有 playlist（GitHub 不放 mp4）→ 下一支就等同再選一次
       if (isHost && pickVideo) pickVideo.click();
     }
 
