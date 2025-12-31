@@ -705,22 +705,31 @@
     ];
     let vidIndex = 0;
 
-    function loadVideo(src, autoplay=true){
-      if (!bgVideo) return;
+   function loadVideo(src, autoplay=true){
+  if (!bgVideo) return;
 
-      bgVideo.src = src;
-      bgVideo.loop = true;
-      bgVideo.muted = true;      // 預設靜音（自動播放需要）
-      bgVideo.playsInline = true;
+  bgVideo.src = src;
+  bgVideo.loop = false;      // ✅ 不輪播
+  bgVideo.muted = true;
+  bgVideo.playsInline = true;
 
-      bgVideo.onloadeddata = () => {
-        showFallback(false);
-        if (autoplay) bgVideo.play().catch(() => {});
-      };
-      bgVideo.onerror = () => {
-        showFallback(true);
-      };
-    }
+  bgVideo.onloadeddata = () => {
+    showFallback(false);
+    if (autoplay) bgVideo.play().catch(() => {});
+  };
+
+  bgVideo.onerror = () => {
+    showFallback(true);
+  };
+
+  // ✅ 播完停在最後一格
+  bgVideo.onended = () => {
+    bgVideo.pause();
+    // 一般情況播完會停在最後一格，這行是保險
+    bgVideo.currentTime = Math.max(0, bgVideo.duration - 0.05);
+  };
+}
+
 
     if (hasMedia && mediaSlot) {
       mediaSlot.style.display = "block";
@@ -736,30 +745,32 @@
     }
 
     // ===== host：本機選影片 =====
-    if (isHost && pickVideo && pickVideoBtn && bgVideo) {
-      pickVideoBtn.addEventListener("click", () => pickVideo.click());
+  if (isHost && pickVideo && pickVideoBtn && bgVideo) {
+  pickVideoBtn.addEventListener("click", () => pickVideo.click());
 
-      pickVideo.addEventListener("change", () => {
-        const file = pickVideo.files?.[0];
-        if (!file) return;
+  pickVideo.addEventListener("change", () => {
+    const file = pickVideo.files?.[0];
+    if (!file) return;
 
-        const url = URL.createObjectURL(file);
-        bgVideo.src = url;
-        bgVideo.loop = true;
-        bgVideo.muted = true;
-        bgVideo.playsInline = true;
+    const url = URL.createObjectURL(file);
 
-        showFallback(false);
-        bgVideo.play().catch(() => {});
-      });
-    }
+    bgVideo.src = url;
+    bgVideo.loop = false;     // ✅ 不輪播
+    bgVideo.muted = true;
+    bgVideo.playsInline = true;
 
-    // ===== host：影片控制 =====
-    function nextVideo(){
-      if (!bgVideo || playlist.length === 0) return;
-      vidIndex = (vidIndex + 1) % playlist.length;
-      loadVideo(playlist[vidIndex], true);
-    }
+    showFallback(false);
+
+    // ✅ 播完停在最後一格
+    bgVideo.onended = () => {
+      bgVideo.pause();
+      bgVideo.currentTime = Math.max(0, bgVideo.duration - 0.05);
+    };
+
+    bgVideo.play().catch(() => {});
+  });
+}
+
 
     if (isHost && bgVideo) {
       if (vidPlay)  vidPlay.addEventListener("click", () => bgVideo.play().catch(()=>{}));
