@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SOLIS 許願牆</title>
 
-  <!-- ✅ 先在 head 就把模式 class 加到 <html> -->
   <script>
   (function () {
     const p = new URLSearchParams(location.search);
@@ -13,7 +12,7 @@
     const isHost = p.get("host") === "1";
     const hasMedia = isWall || isHost;
 
-    const root = document.documentElement; // <html>
+    const root = document.documentElement;
     if (isWall) root.classList.add("wall-only");
     if (isHost) root.classList.add("is-host");
     if (hasMedia) root.classList.add("has-media");
@@ -39,9 +38,6 @@
       color:var(--text);
     }
 
-    /* =========================
-       投影（1024x768）主框：只對 has-media 生效
-    ========================= */
     html.has-media body{
       width:1024px;
       height:768px;
@@ -51,9 +47,6 @@
       position:relative;
     }
 
-    /* =========================
-       Header：預設（手機/來賓）
-    ========================= */
     .header{
       width:100%;
       text-align:center;
@@ -85,10 +78,6 @@
       background:#ddd;
     }
 
-    /* =========================
-       Header：投影/主持（has-media）
-       避開左上 QR：內容往右縮
-    ========================= */
     html.has-media .header{
       padding-top:10px;
       padding-bottom:6px;
@@ -105,9 +94,6 @@
       width: 520px;
     }
 
-    /* =========================
-       舞台：預設（手機/來賓）單欄
-    ========================= */
     .stage{
       margin: 12px auto 0;
       width: 100%;
@@ -118,7 +104,6 @@
       gap: 12px;
     }
 
-    /* 舞台：投影/主持（兩欄 + 避開 QR） */
     html.has-media .stage{
       margin-top:14px;
       margin-left:200px;
@@ -126,15 +111,12 @@
       display:grid;
       grid-template-columns: 1fr 360px;
       gap:14px;
-
-      height: 560px;        /* ✅ 舞台固定高度 */
-      align-items: start;   /* ✅ 不要 stretch，避免影片被撐高 */
-
+      height: 560px;
+      align-items: start;
       max-width: none;
       padding: 0;
     }
 
-    /* 左：留言容器 */
     .panel{
       background:transparent;
       height:100%;
@@ -163,10 +145,8 @@
     }
     button:hover{ opacity:.92; }
 
-    /* wall 頁：隱藏輸入（只顯示牆） */
     html.wall-only .input-area{ display:none; }
 
-    /* 留言牆：可捲動 */
     .wall{
       flex:1;
       min-height:0;
@@ -189,7 +169,6 @@
 
     .line .name{ font-size:18px; font-weight:900; }
 
-    /* ✅ 桌號/時間同樣式 */
     .line .meta{
       font-size:12px;
       color:#888;
@@ -212,7 +191,6 @@
     }
     .item.is-new .line{ animation: popIn 420ms ease-out; outline:3px solid rgba(255,106,0,0.18); }
 
-    /* 右：影片 */
     .media-slot{
       height:100%;
       background:#000;
@@ -230,14 +208,13 @@
       display:block;
     }
 
-    /* ✅ 投影/主持：右側影片區固定直式 9:16，且高度鎖住不被留言撐 */
     html.has-media .media-slot{
-      display:block;           /* 保險：就算 JS 還沒跑也會是可見 */
-      height: 560px;           /* 跟 stage 一樣 */
-      align-self: start;       /* 不被 grid 拉伸 */
-      aspect-ratio: 9 / 16;    /* 固定直式比例 */
-      width: auto;             /* 由比例計算寬度 */
-      max-width: 360px;        /* 不超過右欄 */
+      display:block;
+      height: 560px;
+      align-self: start;
+      aspect-ratio: 9 / 16;
+      width: auto;
+      max-width: 360px;
       flex: 0 0 auto;
     }
     html.has-media .media-slot video{
@@ -265,7 +242,6 @@
         #0b0b0b;
     }
 
-    /* QR（左上） */
     .qr-box{
       position:fixed;
       left:10px;
@@ -278,6 +254,7 @@
       z-index:999;
       display:none;
     }
+    /* ✅ 只要 has-media 就一定顯示 */
     html.has-media .qr-box{ display:block; }
 
     #qr{ width:154px; height:154px; }
@@ -289,7 +266,6 @@
       letter-spacing:1px;
     }
 
-    /* 右上：主持工具列（✅ class 在 html，所以要用 html.is-host） */
     .host-top{
       position:fixed;
       right:10px;
@@ -349,7 +325,6 @@
     }
     .count.flash{ animation:countFlash 600ms ease-out; }
 
-    /* 右下：影片控制（✅ class 在 html，所以用 html.is-host） */
     .controls{
       position:fixed;
       right:10px;
@@ -382,7 +357,6 @@
     }
     .icon-btn:hover{ background:#f3f3f3; }
 
-    /* LOGO：投影固定底部置中；手機正常流排版 */
     .brand{
       text-align:center;
       margin: 18px auto 8px;
@@ -401,7 +375,6 @@
     }
     html.has-media .brand img{ max-height:72px; }
 
-    /* 抽獎 overlay */
     .draw-overlay{
       position: fixed;
       inset: 0;
@@ -504,13 +477,11 @@
 </head>
 
 <body>
-  <!-- QR -->
   <div class="qr-box" id="qrBox">
     <canvas id="qr"></canvas>
     <div class="qr-text">掃描參加抽獎</div>
   </div>
 
-  <!-- 右上：主持工具 -->
   <div class="host-top" id="hostTop">
     <div class="host-actions">
       <div class="pill orange" id="draw3Btn" title="抽 3 名">🎉</div>
@@ -519,25 +490,21 @@
     <div class="count" id="playerCount">參與者：0 人</div>
   </div>
 
-  <!-- 右下：影片控制 -->
   <div class="controls" id="controls">
-    <!-- ✅ 改成可多選 -->
     <input id="pickVideo" type="file" accept="video/*" multiple style="display:none;">
     <button class="icon-btn" id="pickVideoBtn" title="選影片" aria-label="選影片">📁</button>
     <button class="icon-btn" id="vidPlay" title="播放" aria-label="播放">▶️</button>
     <button class="icon-btn" id="vidPause" title="暫停" aria-label="暫停">⏸️</button>
-    <button class="icon-btn" id="vidMute" title="靜音/有聲" aria-label="靜音/有聲">🔇</button>
+    <button class="icon-btn" id="vidMute" title="靜音/有聲" aria-label="靜音/有聲">🔊</button>
     <button class="icon-btn" id="vidNext" title="下一支" aria-label="下一支">⏭️</button>
   </div>
 
-  <!-- Header -->
   <div class="header">
     <h1>SOLIS 許願牆</h1>
     <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到｜有機會抽精美小禮一份喔</div>
     <div class="divider"></div>
   </div>
 
-  <!-- 舞台 -->
   <div class="stage">
     <div class="panel">
       <div class="grid input-area">
@@ -557,12 +524,10 @@
     </div>
   </div>
 
-  <!-- LOGO -->
   <div class="brand">
     <img src="logo.png" alt="SOLIS">
   </div>
 
-  <!-- 抽獎 overlay -->
   <div class="draw-overlay" id="drawOverlay">
     <div class="draw-box" id="drawBox">
       <div class="confetti"></div>
@@ -578,7 +543,6 @@
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 
   <script>
-    // ✅ 用 <html> 的 class（已在 head 設好）
     const isWall = document.documentElement.classList.contains("wall-only");
     const isHost = document.documentElement.classList.contains("is-host");
     const hasMedia = document.documentElement.classList.contains("has-media");
@@ -627,27 +591,21 @@
       return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
-    // ✅ 桌號防呆：各種輸入都轉成純數字（例：第一桌、桌1、1 桌、01桌 → 1）
     function normalizeTableNo(input) {
       const raw = String(input ?? "").trim();
-
       const zhMap = {
         "一":1,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9,"十":10,
         "十一":11,"十二":12,"十三":13,"十四":14,"十五":15,"十六":16,"十七":17,"十八":18,"十九":19,"二十":20,
         "壹":1,"貳":2,"參":3,"肆":4,"伍":5,"陸":6,"柒":7,"捌":8,"玖":9,"拾":10
       };
-
       const m = raw.match(/第?\s*([壹貳參肆伍陸柒捌玖拾一二三四五六七八九十]+)\s*桌?/);
       if (m && zhMap[m[1]] != null) return String(zhMap[m[1]]);
-
       const digits = raw.replace(/[^\d]/g, "");
       if (!digits) return "";
-
       const n = String(parseInt(digits, 10));
       return (n === "NaN" || n === "0") ? "" : n;
     }
 
-    // ✅ 使用者輸入桌號時就即時整理
     if (tableEl && !tableEl.disabled) {
       tableEl.addEventListener("blur", () => {
         const v = normalizeTableNo(tableEl.value);
@@ -655,28 +613,24 @@
       });
     }
 
-    // ===== token：同裝置固定 =====
     let myToken = localStorage.getItem("event_token");
     if (!myToken) {
       myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
       localStorage.setItem("event_token", myToken);
     }
 
-    // ===== 鎖名字 =====
     const lockedName = localStorage.getItem("event_name");
     if (lockedName && nameEl) {
       nameEl.value = lockedName;
       nameEl.disabled = true;
     }
 
-    // ===== 鎖桌號 =====
     const lockedTable = localStorage.getItem("event_table");
     if (lockedTable && tableEl) {
       tableEl.value = lockedTable;
       tableEl.disabled = true;
     }
 
-    // ===== 防連點送出 =====
     let sending = false;
     function sendCheckin(){
       if (!nameEl || !msgEl) return;
@@ -692,7 +646,6 @@
       sending = true;
       setTimeout(() => (sending = false), 650);
 
-      // 先鎖（你原本的邏輯）
       if (tableEl && !localStorage.getItem("event_table")) {
         localStorage.setItem("event_table", tableNo);
         tableEl.disabled = true;
@@ -718,7 +671,6 @@
       });
     }
 
-    // ✅ 若 server 回報重複同桌同名：讓他改名
     socket.on("checkin_error", (e) => {
       alert(e?.message || "簽到失敗，請重試");
       if (e?.code === "DUP_NAME_SAME_TABLE") {
@@ -731,7 +683,6 @@
       }
     });
 
-    // ===== 即時牆（效能版：批次插入 + 節流）=====
     const wallQueue = [];
     let wallFlushTimer = null;
 
@@ -778,14 +729,11 @@
       scheduleFlush();
     });
 
-    // ===== 參與者人數 =====
     let lastCount = 0;
     socket.on("participants_count", (d) => {
       const c = Number(d?.count ?? 0);
       if (!playerCountEl) return;
-
       playerCountEl.textContent = `參與者：${c} 人`;
-
       if (c > lastCount) {
         playerCountEl.classList.remove("flash");
         void playerCountEl.offsetWidth;
@@ -794,9 +742,8 @@
       lastCount = c;
     });
 
-    // ===== QR（has-media 才顯示）=====
+    // ✅ QR
     if (hasMedia) {
-      if (qrBox) qrBox.style.display = "block";
       try{
         new QRious({
           element: document.getElementById("qr"),
@@ -808,7 +755,7 @@
       }
     }
 
-    // ===== 抽獎 overlay =====
+    // ===== 抽獎 overlay（保持你原本）=====
     function openDrawOverlay(){
       if (!drawOverlay || !drawName || !drawSub || !drawList || !drawBox) return;
       drawOverlay.style.display = "flex";
@@ -829,7 +776,6 @@
         if (e.target === drawOverlay) closeDrawOverlay();
       });
     }
-
     function rollingText(durationMs = 1200){
       if (!drawName || !drawOverlay) return;
       const frames = ["抽獎中", "抽獎中.", "抽獎中..", "抽獎中..."];
@@ -841,8 +787,6 @@
       }, 140);
       setTimeout(() => clearInterval(t), durationMs);
     }
-
-    // 主持抽獎
     if (isHost && draw3Btn) {
       draw3Btn.addEventListener("click", () => {
         openDrawOverlay();
@@ -850,8 +794,6 @@
         socket.emit("host_draw", { n: 3 });
       });
     }
-
-    // 顯示抽獎結果（支援字串或物件）
     socket.on("draw_result", (r) => {
       if (!isHost) return;
       if (!drawName || !drawSub || !drawList || !drawBox) return;
@@ -893,115 +835,119 @@
       }, 800);
     });
 
-    // ===== 影片 =====
-// ===== 影片 =====
-function showFallback(on){
-  if (!mediaFallback) return;
-  mediaFallback.style.display = on ? "flex" : "none";
-}
-
-function bindEndedHoldLastFrame(){
-  if (!bgVideo) return;
-  bgVideo.onended = () => {
-    bgVideo.pause();
-    if (isFinite(bgVideo.duration) && bgVideo.duration > 0) {
-      bgVideo.currentTime = Math.max(0, bgVideo.duration - 0.05);
+    // ===== 影片（✅ 已修好：下一首、排序、有聲、點影片播放）=====
+    function showFallback(on){
+      if (!mediaFallback) return;
+      mediaFallback.style.display = on ? "flex" : "none";
     }
-  };
-}
 
-// has-media 顯示影片區（保險）
-if (hasMedia && mediaSlot) {
-  mediaSlot.style.display = "block";
-  showFallback(true);
-}
+    // has-media 顯示影片區（保險）
+    if (hasMedia && mediaSlot) {
+      mediaSlot.style.display = "block";
+      showFallback(true);
+    }
 
-// ✅ 播放清單（依檔名排序）＋下一首真正切換
-let playlist = [];     // [{ name, url }]
-let currentIndex = -1;
+    let playlist = [];     // [{ name, url }]
+    let currentIndex = -1;
 
-function cleanupPlaylist() {
-  // 釋放舊的 blob URL（避免記憶體爆）
-  playlist.forEach(v => {
-    try { URL.revokeObjectURL(v.url); } catch(e){}
-  });
-  playlist = [];
-  currentIndex = -1;
-}
+    function cleanupPlaylist() {
+      playlist.forEach(v => {
+        try { URL.revokeObjectURL(v.url); } catch(e){}
+      });
+      playlist = [];
+      currentIndex = -1;
+    }
 
-function loadVideoByIndex(index) {
-  if (!bgVideo) return;
-  if (!playlist[index]) return;
+    function loadVideoByIndex(index, autoplay = true) {
+      if (!bgVideo) return;
+      if (!playlist[index]) return;
 
-  // ✅ 不要在切換時 revoke 當下要播的 url
-  // 只要把 src 換掉即可（舊的 url 會在重新選檔時 cleanup）
-  const video = playlist[index];
+      currentIndex = index;
 
-  bgVideo.src = video.url;
-  bgVideo.loop = false;
-  bgVideo.muted = true;
-  bgVideo.playsInline = true;
-  bgVideo.preload = "auto";
+      bgVideo.src = playlist[index].url;
+      bgVideo.loop = false;
 
-  showFallback(false);
-  bindEndedHoldLastFrame();
+      // ✅ 預設有聲（第一次需要使用者互動，後續就可以）
+      bgVideo.muted = false;
+      if (vidMute) vidMute.textContent = "🔊";
 
-  bgVideo.load();
-}
+      bgVideo.playsInline = true;
+      bgVideo.preload = "auto";
 
-function nextVideo() {
-  if (!playlist.length) {
-    alert("請先按右下 📁 選擇影片（可一次多選）");
-    return;
-  }
-  currentIndex = (currentIndex + 1) % playlist.length;
-  loadVideoByIndex(currentIndex);
-}
+      showFallback(false);
 
-// host：本機選影片（可多選）
-if (isHost && pickVideo && pickVideoBtn && bgVideo) {
-  pickVideoBtn.addEventListener("click", () => {
-    // ✅ 有些瀏覽器需要按鈕點擊才允許打開檔案視窗
-    pickVideo.click();
-  });
+      bgVideo.load();
 
-  pickVideo.addEventListener("change", () => {
-    const files = Array.from(pickVideo.files || []);
-    if (!files.length) return;
+      if (autoplay) {
+        bgVideo.play().catch(()=>{});
+      }
+    }
 
-    // ✅ 重新選檔：先清掉舊清單（釋放 blob）
-    cleanupPlaylist();
+    function nextVideo() {
+      if (!playlist.length) {
+        alert("請先按右下 📁 選擇影片（可一次多選）");
+        return;
+      }
+      if (playlist.length === 1) {
+        alert("目前清單只有 1 支影片，無法切下一首");
+        return;
+      }
+      const next = (currentIndex + 1) % playlist.length;
+      loadVideoByIndex(next, true);
+    }
 
-    // ✅ 依檔名排序（A→Z / 01→99）
-    files.sort((a, b) =>
-      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" })
-    );
+    // ✅ 點影片：解除靜音 + 播放（滿足瀏覽器的 user gesture）
+    if (bgVideo) {
+      bgVideo.addEventListener("click", () => {
+        bgVideo.muted = false;
+        if (vidMute) vidMute.textContent = "🔊";
+        bgVideo.play().catch(()=>{});
+      });
+    }
 
-    // ✅ 建立播放清單（只用排序後的陣列）
-    playlist = files.map(file => ({
-      name: file.name,
-      url: URL.createObjectURL(file)
-    }));
+    if (isHost && pickVideo && pickVideoBtn && bgVideo) {
+      pickVideoBtn.addEventListener("click", () => pickVideo.click());
 
-    // ✅ 從第 0 支開始
-    currentIndex = 0;
-    loadVideoByIndex(currentIndex);
-  });
-}
+      pickVideo.addEventListener("change", () => {
+        const files = Array.from(pickVideo.files || []);
+        if (!files.length) return;
 
-// 主持控制
-if (isHost && bgVideo) {
-  if (vidPlay)  vidPlay.addEventListener("click", () => bgVideo.play().catch(()=>alert("請先按 📁 選影片")));
-  if (vidPause) vidPause.addEventListener("click", () => bgVideo.pause());
-  if (vidMute)  vidMute.addEventListener("click", () => {
-    bgVideo.muted = !bgVideo.muted;
-    vidMute.textContent = bgVideo.muted ? "🔇" : "🔊";
-  });
-  if (vidNext)  vidNext.addEventListener("click", nextVideo);
-}
+        cleanupPlaylist();
 
+        // ✅ 依檔名排序（A→Z / 01→99）
+        files.sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" })
+        );
 
-    // 清空本機測試綁定
+        playlist = files.map(file => ({
+          name: file.name,
+          url: URL.createObjectURL(file)
+        }));
+
+        // ✅ 從第 0 支開始，並嘗試播放（若被擋就點影片一下）
+        loadVideoByIndex(0, true);
+      });
+    }
+
+    if (isHost && bgVideo) {
+      if (vidPlay)  vidPlay.addEventListener("click", () => {
+        bgVideo.muted = false;
+        if (vidMute) vidMute.textContent = "🔊";
+        bgVideo.play().catch(()=>alert("請先按 📁 選影片"));
+      });
+      if (vidPause) vidPause.addEventListener("click", () => bgVideo.pause());
+
+      if (vidMute) {
+        vidMute.textContent = bgVideo.muted ? "🔇" : "🔊";
+        vidMute.addEventListener("click", () => {
+          bgVideo.muted = !bgVideo.muted;
+          vidMute.textContent = bgVideo.muted ? "🔇" : "🔊";
+        });
+      }
+
+      if (vidNext)  vidNext.addEventListener("click", nextVideo);
+    }
+
     const resetBtn = document.getElementById("resetLocal");
     if (resetBtn) {
       resetBtn.addEventListener("click", () => {
