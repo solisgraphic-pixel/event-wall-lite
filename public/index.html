@@ -191,6 +191,14 @@
       white-space:nowrap;
       font-variant-numeric: tabular-nums;
     }
+    .line .meta{
+  font-size:14px;
+  color:#777;
+  font-weight:800;
+  white-space:nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
     .line .msg{
       font-size:24px;
       font-weight:900;
@@ -262,21 +270,34 @@
     }
 
     /* 右上：主持工具列 */
-    .host-top{
-      position:fixed;
-      right:10px;
-      top:10px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(8px);
-      border-radius:16px;
-      padding:10px 12px;
-      box-shadow: var(--shadow2);
-      z-index:998;
-      display:none;
-      gap:10px;
-      align-items:center;
-    }
-    html.is-host .host-top{ display:flex; }
+.host-top{
+  position:fixed;
+  right:10px;
+  top:10px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  border-radius:16px;
+  padding:10px 12px;
+  box-shadow: var(--shadow2);
+  z-index:998;
+  display:none;
+  flex-direction:column;   /* ✅ 上下排 */
+  gap:8px;
+  align-items:flex-end;    /* ✅ 靠右對齊 */
+}
+
+body.is-host .host-top{ display:flex; }
+
+.host-actions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.host-top .count{
+  align-self:flex-end;     /* ✅ 參與者靠右 */
+}
+
 
     .pill{
       display:inline-flex;
@@ -475,11 +496,14 @@
   </div>
 
   <!-- 右上：主持工具 -->
-  <div class="host-top" id="hostTop">
+<div class="host-top" id="hostTop">
+  <div class="host-actions">
     <div class="pill orange" id="draw3Btn" title="抽 3 名">🎉</div>
     <div class="pill" id="resetLocal" title="清空本機測試資料">🧹</div>
-    <div class="count" id="playerCount">參與者：0 人</div>
   </div>
+  <div class="count" id="playerCount">參與者：0 人</div>
+</div>
+
 
   <!-- 右下：影片控制 -->
   <div class="controls" id="controls">
@@ -668,18 +692,15 @@ socket.on("checkin_ok", () => {
     }
 
     // 即時牆：顯示桌號＋名字（更好找人）
-    socket.on("wall", (p) => {
-      if (!wall) return;
-      const tableNo = String(p?.tableNo ?? "").trim();
-      const name = String(p?.name ?? "").trim();
-      const message = String(p?.message ?? "").trim();
-      const time = String(p?.time ?? "").trim();
-
-      const div = document.createElement("div");
-      div.className = "item is-new";
-      div.innerHTML = `
-        <div class="line">
-          <span class="name">${escapeHtml(tableNo ? `桌${tableNo}｜${name}` : name)}</span>
+div.innerHTML = `
+  <div class="line">
+    <span class="meta">桌${escapeHtml(p.tableNo ?? "")}</span>
+    <span class="name">${escapeHtml(p.name)}</span>
+    <span class="meta">${escapeHtml(p.time)}：</span>
+    <span class="msg">${escapeHtml(p.message)}</span>
+  </div>
+`;
+</span>
           <span class="time">${escapeHtml(time)}：</span>
           <span class="msg">${escapeHtml(message)}</span>
         </div>
