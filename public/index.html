@@ -436,6 +436,52 @@ body.has-media .wrap .hint{
 }
 
 /* 標題區整體往下推，避開左上 QR */
+/* =========================
+   ✅ 4:3 投影：標題/副標「固定置中」(不受 QR/欄位影響)
+========================= */
+
+/* 讓內容整體往下，空出標題區高度 */
+body.has-media .stage{
+  margin-top: 120px;   /* 你可微調 110~140 */
+}
+
+/* 把標題/副標做成固定置頂、真正置中 */
+body.has-media .wrap h1{
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 640px;              /* 4:3 最穩，避免太長 */
+  text-align: center;
+  margin: 0;
+  z-index: 996;
+}
+
+body.has-media .wrap .hint{
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 760px;              /* 副標可比標題寬 */
+  text-align: center;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.2;
+  white-space: nowrap;       /* ✅ 強制單行 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 996;
+}
+
+/* ✅ 把「分隔線」改成只有一條、且固定在副標下方 */
+body.has-media .wrap .hint::after{
+  content:"";
+  display:block;
+  width: 760px;
+  height: 1px;
+  background: #ddd;
+  margin: 10px auto 0;
+}
 
   </style>
 </head>
