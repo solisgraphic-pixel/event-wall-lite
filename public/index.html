@@ -119,18 +119,21 @@
     }
 
     /* 舞台：投影/主持（兩欄 + 避開 QR） */
-    html.has-media .stage{
-      margin-top:14px;
-      margin-left:200px;
-      width: calc(100% - 200px);
-      display:grid;
-      grid-template-columns: 1fr 360px;
-      gap:14px;
-      height: 560px;
-      align-items:stretch;
-      max-width: none;
-      padding: 0;
-    }
+html.has-media .stage{
+  margin-top:14px;
+  margin-left:200px;
+  width: calc(100% - 200px);
+  display:grid;
+  grid-template-columns: 1fr 360px;
+  gap:14px;
+
+  height: 560px;        /* ✅ 舞台固定高度 */
+  align-items: start;   /* ✅ 重要：不要 stretch，避免影片被撐高 */
+
+  max-width: none;
+  padding: 0;
+}
+
 
     /* 左：留言容器 */
     .panel{
@@ -228,6 +231,26 @@
       background:#000;
       display:block;
     }
+/* ✅ 投影/主持：右側影片區固定直式 9:16，且高度鎖住不被留言撐 */
+html.has-media .media-slot{
+  display:block;        /* 你本來用 JS 控制顯示也行，這行可留著當保險 */
+  height: 560px;        /* ✅ 高度鎖死（跟 stage 一樣） */
+  align-self: start;    /* ✅ 不跟著 grid 被撐高 */
+
+  aspect-ratio: 9 / 16; /* ✅ 固定直式比例 */
+  width: auto;          /* ✅ 讓寬度由比例自動算 */
+  max-width: 360px;     /* ✅ 不超過你右欄寬 */
+}
+
+/* ✅ 影片本體永遠維持比例，不變形 */
+html.has-media .media-slot video{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;  /* ✅ 不裁切、不拉伸 */
+  background:#000;
+  display:block;
+}
+
     .media-fallback{
       position:absolute;
       inset:0;
