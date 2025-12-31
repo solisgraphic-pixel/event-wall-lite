@@ -15,6 +15,8 @@
       --shadow: 0 10px 24px rgba(0,0,0,0.06);
     }
 
+    *{ box-sizing: border-box; }
+
     body{
       font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif;
       margin: 0;
@@ -22,10 +24,9 @@
       background: var(--bg);
       color: var(--text);
     }
-    .wrap{ max-width: 1100px; margin: 0 auto; }
 
     .brand{ text-align:center; margin-bottom:10px; }
-    .brand img{ max-height: 180px; }
+    .brand img{ max-height: 180px; } /* 你之前說 180px OK */
 
     h1{
       margin: 10px 0 6px;
@@ -33,6 +34,7 @@
       font-size: 44px;
       letter-spacing: .5px;
     }
+
     .hint{
       color: #444;
       font-size: 18px;
@@ -42,7 +44,72 @@
       letter-spacing: 0.6px;
     }
 
-    /* 輸入區 */
+    /* ===== 版面：wall/host 才啟用「影片區 + 互動牆」雙欄 ===== */
+    .stage{
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      gap: 18px;
+    }
+    /* 預設（來賓一般頁）單欄 */
+    .stage{ grid-template-columns: 1fr; }
+
+    /* wall 或 host 才改雙欄（左：直式影片、右：互動牆） */
+    body.has-media .stage{
+      grid-template-columns: 360px 1fr;
+      align-items: start;
+    }
+
+    /* 手機或窄螢幕：改成上下排列，避免太擠 */
+    @media (max-width: 980px){
+      body.has-media .stage{
+        grid-template-columns: 1fr;
+      }
+      .media-slot{ width: min(420px, 92vw); margin: 0 auto; }
+    }
+
+    .wrap{ max-width: 1100px; margin: 0 auto; }
+
+    /* ===== 直式影片區（19.5:9）===== */
+    .media-slot{
+      width: 360px;
+      aspect-ratio: 9 / 19.5;   /* 直式比例 */
+      background:#000;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 18px 44px rgba(0,0,0,0.18);
+      position: sticky;
+      top: 20px;
+    }
+
+    .media-slot video{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+      background:#000;
+    }
+
+    /* 沒有影片時的封面（可放 LOGO / 文字） */
+    .media-fallback{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      color: rgba(255,255,255,0.86);
+      text-align:center;
+      font-weight: 900;
+      letter-spacing: 1px;
+      line-height: 1.35;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,106,0,0.35), transparent 40%),
+        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.08), transparent 45%),
+        #0b0b0b;
+    }
+
+    /* ===== 輸入區 ===== */
     .grid{
       display:grid;
       grid-template-columns: 1fr;
@@ -63,11 +130,15 @@
     }
     button:hover{ opacity:.92; }
 
-    /* 大螢幕牆：隱藏輸入 */
+    /* wall：隱藏輸入 */
     .wall-only .input-area{ display:none; }
 
-    /* 留言牆 */
-    .wall{ margin-top: 24px; padding-top: 10px; border-top: 1px solid #ddd; }
+    /* ===== 留言牆 ===== */
+    .wall{
+      margin-top: 24px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+    }
     .item{ margin-bottom: 18px; }
 
     .line{
@@ -115,7 +186,7 @@
       outline: 3px solid rgba(255,106,0,0.22);
     }
 
-    /* QR（wall=1 或 host=1 顯示） */
+    /* ===== QR（wall=1 或 host=1 顯示）===== */
     .qr-box{
       position: fixed;
       left: 24px;
@@ -128,14 +199,20 @@
       z-index: 999;
       display:none;
     }
-    .qr-box p{
-      margin: 10px 0 0;
-      font-size: 18px;
-      font-weight: 800;
-      color: #111;
+    .qr-text{
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--orange);
+      letter-spacing: 1px;
+      animation: qrBreath 1.6s ease-in-out infinite;
+    }
+    @keyframes qrBreath{
+      0%,100%{ opacity: 1; }
+      50%{ opacity: 0.75; }
     }
 
-    /* 主持人懸浮控制卡 */
+    /* ===== 主持人懸浮控制卡（右上）===== */
     .host-card{
       position: fixed;
       top: 24px;
@@ -152,7 +229,7 @@
       align-items: center;
     }
 
-    /* ✅ 只有 host=1 才顯示按鈕 */
+    /* 只有 host=1 才顯示按鈕 */
     #hostActions{ display:none; }
     body.is-host #hostActions{ display:flex; }
 
@@ -160,13 +237,14 @@
       display:flex;
       gap: 10px;
       justify-content: center;
+      flex-wrap: wrap;
     }
 
     .btn-draw{
       background: linear-gradient(135deg, #ff7a00, #ff9a3c);
       color: #fff;
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 900;
       border: none;
       border-radius: 999px;
       padding: 10px 18px;
@@ -178,14 +256,35 @@
       box-shadow: 0 10px 22px rgba(255,122,0,0.45);
     }
 
+    .btn-ghost{
+      background: #fff;
+      color: #111;
+      font-size: 14px;
+      font-weight: 800;
+      border: 1px solid #ddd;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+    .btn-ghost:hover{ background:#f3f3f3; }
+
     .host-info{
       font-size: 14px;
       color: #555;
       text-align: center;
       width: 100%;
+      transform-origin: center;
     }
 
-    /* 抽獎 overlay */
+    /* 人數增加閃一下 */
+    @keyframes countFlash {
+      0% { color: var(--orange); transform: scale(1); }
+      40%{ color: var(--orange); transform: scale(1.15); }
+      100%{ color: #555; transform: scale(1); }
+    }
+    .host-info.flash{ animation: countFlash 600ms ease-out; }
+
+    /* ===== 抽獎 overlay ===== */
     .draw-overlay{
       position: fixed;
       inset: 0;
@@ -233,7 +332,7 @@
       font-size: 18px;
       color: #666;
       margin-bottom: 12px;
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: 1px;
     }
     .draw-name{
@@ -249,8 +348,8 @@
     }
     @keyframes pulse {
       0% { transform: scale(1); }
-      35% { transform: scale(1.03); }
-      100% { transform: scale(1); }
+      35%{ transform: scale(1.03); }
+      100%{ transform: scale(1); }
     }
     .win{ animation: pulse 900ms ease-out 1; }
 
@@ -276,7 +375,7 @@
     .draw-rank{
       font-weight: 1000;
       font-size: 18px;
-      color: #ff6a00;
+      color: var(--orange);
       letter-spacing: 1px;
       white-space: nowrap;
     }
@@ -291,31 +390,7 @@
       60%{ opacity:1; transform: translateY(0) scale(1.02); }
       100%{ opacity:1; transform: translateY(0) scale(1); }
     }
-    .draw-pill.show{
-      animation: revealIn 520ms ease-out forwards;
-    }
-
-    /* 人數增加閃爍動畫 */
-    @keyframes countFlash {
-      0% { color: #ff6a00; transform: scale(1); }
-      40% { color: #ff6a00; transform: scale(1.15); }
-      100% { color: #555; transform: scale(1); }
-    }
-    .host-info.flash { animation: countFlash 600ms ease-out; }
-
-    /* ✅✅ 這段一定要在 <style> 裡，且放最後：QR 文字強化 */
-    .qr-box .qr-text{
-      margin-top: 10px;
-      font-size: 20px;
-      font-weight: 900;
-      color: #ff6a00;
-      letter-spacing: 1px;
-      animation: qrBreath 1.6s ease-in-out infinite;
-    }
-    @keyframes qrBreath{
-      0%,100%{ opacity: 1; }
-      50%{ opacity: 0.75; }
-    }
+    .draw-pill.show{ animation: revealIn 520ms ease-out forwards; }
   </style>
 </head>
 
@@ -328,27 +403,44 @@
   <div class="host-card" id="hostCard">
     <div class="host-actions" id="hostActions">
       <button class="btn-draw" id="draw3Btn">🎉 抽 3 名</button>
+
+      <!-- 影片控制（只有 host 才會看到） -->
+      <button class="btn-ghost" id="vidPlay">▶︎ 播放</button>
+      <button class="btn-ghost" id="vidPause">⏸ 暫停</button>
+      <button class="btn-ghost" id="vidMute">🔇 靜音</button>
+      <button class="btn-ghost" id="vidNext">⏭ 下一支</button>
     </div>
     <div class="host-info" id="playerCount">參與者：0 人</div>
   </div>
 
-  <div class="wrap">
-    <h1>SOLIS 許願牆</h1>
-    <div class="hint">歡迎來大家到 SOLIS 尾牙現場｜掃描 QR Code 留言互動｜有機會抽中精美小禮喔</div>
-
-    <div class="grid input-area">
-      <input id="name" placeholder="請輸入你的名字（必填）">
-      <input id="message" placeholder="請輸入你想對 SOLIS 說的話～（例如：我要中頭獎）">
-      <button id="send">送出</button>
+  <div class="stage">
+    <!-- 左：直式影片（只在 wall/host 顯示） -->
+    <div class="media-slot" id="mediaSlot" style="display:none;">
+      <video id="bgVideo" playsinline preload="metadata"></video>
+      <div class="media-fallback" id="mediaFallback" style="display:none;">
+        SOLIS 活動現場<br/>播放區
+      </div>
     </div>
 
-    <div class="wall" id="wall"></div>
+    <!-- 右：互動牆內容 -->
+    <div class="wrap">
+      <h1>SOLIS 許願牆</h1>
+      <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到｜有機會抽精美小禮一份喔</div>
+
+      <div class="grid input-area">
+        <input id="name" placeholder="請輸入你的名字（必填）">
+        <input id="message" placeholder="請輸入你想對 SOLIS 說的話～（例如：我要中頭獎）">
+        <button id="send">送出</button>
+      </div>
+
+      <div class="wall" id="wall"></div>
+    </div>
   </div>
 
   <!-- QR（wall=1 或 host=1 顯示） -->
   <div class="qr-box" id="qrBox">
     <canvas id="qr"></canvas>
-    <p class="qr-text">掃描參加抽獎</p>
+    <div class="qr-text">掃描參加抽獎</div>
   </div>
 
   <!-- 抽獎 overlay（主持人觸發） -->
@@ -367,6 +459,7 @@
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 
   <script>
+    // ===== 解析網址參數 =====
     const params = new URLSearchParams(window.location.search);
     const isWall = params.get("wall") === "1";
     const isHost = params.get("host") === "1";
@@ -374,6 +467,11 @@
     if (isWall) document.body.classList.add("wall-only");
     if (isHost) document.body.classList.add("is-host");
 
+    // wall 或 host 才顯示影片區
+    const hasMedia = (isWall || isHost);
+    if (hasMedia) document.body.classList.add("has-media");
+
+    // ===== Socket.IO =====
     const socket = io();
 
     const wall = document.getElementById("wall");
@@ -403,18 +501,21 @@
       return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
+    // ===== token：同裝置固定 =====
     let myToken = localStorage.getItem("event_token");
     if (!myToken) {
       myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
       localStorage.setItem("event_token", myToken);
     }
 
+    // ===== 鎖名字（同裝置）=====
     const lockedName = localStorage.getItem("event_name");
     if (lockedName) {
       nameEl.value = lockedName;
       nameEl.disabled = true;
     }
 
+    // ===== 防連點送出 =====
     let sending = false;
     function sendCheckin(){
       if (sending) return;
@@ -434,7 +535,6 @@
       msgEl.value = "";
       msgEl.focus();
     }
-
     btn.addEventListener("click", sendCheckin);
     msgEl.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
@@ -443,6 +543,7 @@
       }
     });
 
+    // ===== 即時牆 =====
     socket.on("wall", (p) => {
       const div = document.createElement("div");
       div.className = "item is-new";
@@ -459,6 +560,7 @@
       while (wall.children.length > 50) wall.removeChild(wall.lastChild);
     });
 
+    // ===== 參與者人數（人數變多才閃）=====
     let lastCount = 0;
     socket.on("participants_count", (d) => {
       const c = Number(d?.count ?? 0);
@@ -474,6 +576,7 @@
       lastCount = c;
     });
 
+    // ===== QR：wall 或 host 顯示（掃到首頁，不帶 host）=====
     if (isWall || isHost) {
       const qrBox = document.getElementById("qrBox");
       if (qrBox) qrBox.style.display = "block";
@@ -484,6 +587,7 @@
       });
     }
 
+    // ===== 抽獎 Overlay 控制 =====
     function openDrawOverlay(){
       drawOverlay.style.display = "flex";
       drawName.style.display = "block";
@@ -510,6 +614,7 @@
       setTimeout(() => clearInterval(t), durationMs);
     }
 
+    // 主持人：抽 3 名（呼叫 server）
     if (isHost && draw3Btn) {
       draw3Btn.addEventListener("click", () => {
         openDrawOverlay();
@@ -518,13 +623,11 @@
       });
     }
 
+    // 抽獎結果：逐一揭曉 3 位
     socket.on("draw_result", (r) => {
       if (!isHost) return;
 
-      const winners = Array.isArray(r?.winners)
-        ? r.winners
-        : (r?.winner ? [r.winner] : []);
-
+      const winners = Array.isArray(r?.winners) ? r.winners : (r?.winner ? [r.winner] : []);
       openDrawOverlay();
 
       if (!r?.ok || winners.length === 0) {
@@ -561,6 +664,74 @@
         drawSub.textContent = "🎉 恭喜得獎！";
       }, 800);
     });
+
+    // ===== 直式影片：只在 wall/host 顯示 =====
+    const mediaSlot = document.getElementById("mediaSlot");
+    const bgVideo = document.getElementById("bgVideo");
+    const mediaFallback = document.getElementById("mediaFallback");
+
+    // 你把影片放在 public/media/ 底下，這裡填檔名就好
+    const playlist = [
+      "/media/demo.mp4",
+      "/media/demo2.mp4"
+    ];
+    let vidIndex = 0;
+
+    function showFallback(on){
+      if (!mediaFallback) return;
+      mediaFallback.style.display = on ? "flex" : "none";
+    }
+
+    function loadVideo(src, autoplay=true){
+      if (!bgVideo) return;
+      bgVideo.src = src;
+      bgVideo.loop = true;         // 活動最穩：循環播放（你也可改 false）
+      bgVideo.muted = true;        // 預設靜音，避免現場爆音
+      bgVideo.playsInline = true;
+
+      bgVideo.onloadeddata = () => {
+        showFallback(false);
+        if (autoplay) bgVideo.play().catch(() => {});
+      };
+      bgVideo.onerror = () => {
+        // 找不到影片或格式不支援 → 顯示封面
+        showFallback(true);
+      };
+    }
+
+    if (hasMedia && mediaSlot) {
+      mediaSlot.style.display = "block";
+
+      // 若你還沒放影片檔，會顯示封面
+      showFallback(true);
+      loadVideo(playlist[vidIndex], true);
+
+      // 影片播完（若你把 loop 改成 false）→ 顯示封面（選項 B）
+      bgVideo.addEventListener("ended", () => {
+        showFallback(true);
+      });
+    }
+
+    // ===== 主持人影片控制（只綁 host）=====
+    const vidPlay = document.getElementById("vidPlay");
+    const vidPause = document.getElementById("vidPause");
+    const vidMute = document.getElementById("vidMute");
+    const vidNext = document.getElementById("vidNext");
+
+    function nextVideo(){
+      vidIndex = (vidIndex + 1) % playlist.length;
+      loadVideo(playlist[vidIndex], true);
+    }
+
+    if (isHost && bgVideo) {
+      if (vidPlay)  vidPlay.addEventListener("click", () => bgVideo.play().catch(()=>{}));
+      if (vidPause) vidPause.addEventListener("click", () => bgVideo.pause());
+      if (vidMute)  vidMute.addEventListener("click", () => {
+        bgVideo.muted = !bgVideo.muted;
+        vidMute.textContent = bgVideo.muted ? "🔇 靜音" : "🔊 有聲";
+      });
+      if (vidNext)  vidNext.addEventListener("click", nextVideo);
+    }
   </script>
 </body>
 </html>
