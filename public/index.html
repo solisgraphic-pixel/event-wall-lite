@@ -14,110 +14,108 @@
       --orange:#ff6a00;
       --shadow: 0 10px 24px rgba(0,0,0,0.06);
     }
-    *{ box-sizing: border-box; }
+    *{ box-sizing:border-box; }
 
     body{
       font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: var(--bg);
-      color: var(--text);
+      margin:0;
+      padding:20px;
+      background:var(--bg);
+      color:var(--text);
     }
 
+    /* LOGO（一般模式） */
     .brand{ text-align:center; margin-bottom:10px; }
-    .brand img{ max-height: 180px; }
+    .brand img{ max-height:180px; display:inline-block; }
 
     h1{
-      margin: 10px 0 6px;
+      margin:10px 0 6px;
       text-align:center;
-      font-size: 44px;
-      letter-spacing: .5px;
+      font-size:44px;
+      letter-spacing:.5px;
     }
     .hint{
-      color: #444;
-      font-size: 18px;
-      font-weight: 600;
-      text-align: center;
-      margin-bottom: 22px;
-      letter-spacing: 0.6px;
+      color:#444;
+      font-size:18px;
+      font-weight:600;
+      text-align:center;
+      margin-bottom:22px;
+      letter-spacing:.6px;
     }
 
-    /* ===== 版面：預設單欄；wall/host 才雙欄（左留言 / 右影片）===== */
+    /* 舞台：預設單欄；wall/host 才雙欄 */
     .stage{
-      max-width: 1280px;
-      margin: 0 auto;
-      display: grid;
-      gap: 18px;
-      grid-template-columns: 1fr; /* 預設單欄 */
-      align-items: start;
+      max-width:1280px;
+      margin:0 auto;
+      display:grid;
+      gap:18px;
+      grid-template-columns:1fr;
+      align-items:start;
     }
     body.has-media .stage{
-      grid-template-columns: 1fr 360px; /* ✅ 左留言 右影片 */
+      grid-template-columns:1fr 360px; /* 左留言 / 右影片 */
     }
 
     @media (max-width: 980px){
-      body.has-media .stage{
-        grid-template-columns: 1fr;  /* 窄螢幕上下排列 */
-      }
+      body.has-media .stage{ grid-template-columns:1fr; }
       .media-slot{
-        width: min(420px, 92vw);
-        margin: 0 auto;
-        position: relative;
-        top: 0;
+        width:min(420px, 92vw);
+        margin:0 auto;
+        position:relative;
+        top:0;
       }
     }
 
-    .wrap{ max-width: 1100px; margin: 0 auto; }
+    .wrap{ max-width:1100px; margin:0 auto; }
 
-    /* ===== 右：直式影片區（9:16）===== */
+    /* 影片區（一般模式） */
     .media-slot{
-      width: 360px;
-      aspect-ratio: 9 / 16;   /* ✅ 9:16 */
+      width:360px;
+      aspect-ratio:9/16;
       background:#000;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 18px 44px rgba(0,0,0,0.18);
-      position: sticky;
-      top: 20px;
-      display:none; /* JS 會在 wall/host 才顯示 */
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow:0 18px 44px rgba(0,0,0,0.18);
+      position:sticky;
+      top:20px;
+      display:none; /* JS 在 wall/host 才打開 */
     }
     .media-slot video{
       width:100%;
       height:100%;
-      object-fit: cover;
+      object-fit:cover;
       display:block;
       background:#000;
     }
     .media-fallback{
       width:100%;
       height:100%;
-      display:flex;
+      display:none;
       align-items:center;
       justify-content:center;
-      padding: 18px;
-      color: rgba(255,255,255,0.86);
+      padding:18px;
+      color:rgba(255,255,255,0.86);
       text-align:center;
-      font-weight: 900;
-      letter-spacing: 1px;
-      line-height: 1.35;
+      font-weight:900;
+      letter-spacing:1px;
+      line-height:1.35;
       background:
         radial-gradient(circle at 30% 20%, rgba(255,106,0,0.35), transparent 40%),
         radial-gradient(circle at 70% 80%, rgba(255,255,255,0.08), transparent 45%),
         #0b0b0b;
-      display:none;
     }
 
-    /* ===== 輸入區 ===== */
+    /* 輸入區 */
     .grid{
       display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-bottom: 18px;
+      grid-template-columns:1fr;
+      gap:12px;
+      margin-bottom:18px;
     }
     input, button{
-      font-size: 18px;
-      padding: 14px 16px;
-      border-radius: 12px;
+      font-size:18px;
+      padding:14px 16px;
+      border-radius:12px;
     }
     input{ border:1px solid #ccc; }
     button{
@@ -127,174 +125,168 @@
       cursor:pointer;
     }
     button:hover{ opacity:.92; }
-
-    /* wall：隱藏輸入 */
     .wall-only .input-area{ display:none; }
 
-    /* ===== 留言牆 ===== */
+    /* 留言牆 */
     .wall{
-      margin-top: 24px;
-      padding-top: 10px;
-      border-top: 1px solid #ddd;
+      margin-top:24px;
+      padding-top:10px;
+      border-top:1px solid #ddd;
     }
-    .item{ margin-bottom: 18px; }
+    .item{ margin-bottom:18px; }
     .line{
-      background: var(--card);
-      border-radius: 18px;
-      padding: 18px 22px;
-      box-shadow: var(--shadow);
+      background:var(--card);
+      border-radius:18px;
+      padding:18px 22px;
+      box-shadow:var(--shadow);
       display:flex;
-      gap: 12px;
-      align-items: baseline;
-      flex-wrap: wrap;
+      gap:12px;
+      align-items:baseline;
+      flex-wrap:wrap;
     }
     .line .name{
-      font-size: 22px;
-      font-weight: 900;
-      color: var(--text);
+      font-size:22px;
+      font-weight:900;
+      color:var(--text);
     }
     .line .time{
-      font-size: 16px;
-      color: #777;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
+      font-size:16px;
+      color:#777;
+      font-variant-numeric:tabular-nums;
+      white-space:nowrap;
     }
     .line .msg{
-      font-size: 30px;
-      font-weight: 800;
-      line-height: 1.25;
-      color: var(--text);
-      word-break: break-word;
+      font-size:30px;
+      font-weight:800;
+      line-height:1.25;
+      color:var(--text);
+      word-break:break-word;
     }
 
     @keyframes popIn{
-      0%{ transform: translateY(12px) scale(.96); opacity:0; }
-      60%{ transform: translateY(0) scale(1.03); opacity:1; }
-      100%{ transform: translateY(0) scale(1); opacity:1; }
+      0%{ transform:translateY(12px) scale(.96); opacity:0; }
+      60%{ transform:translateY(0) scale(1.03); opacity:1; }
+      100%{ transform:translateY(0) scale(1); opacity:1; }
     }
     @keyframes glow{
-      0%{ box-shadow: var(--shadow); }
-      40%{ box-shadow: 0 18px 42px rgba(255,106,0,0.25); }
-      100%{ box-shadow: var(--shadow); }
+      0%{ box-shadow:var(--shadow); }
+      40%{ box-shadow:0 18px 42px rgba(255,106,0,0.25); }
+      100%{ box-shadow:var(--shadow); }
     }
     .item.is-new .line{
-      animation: popIn 420ms ease-out, glow 1200ms ease-out;
-      outline: 3px solid rgba(255,106,0,0.22);
+      animation:popIn 420ms ease-out, glow 1200ms ease-out;
+      outline:3px solid rgba(255,106,0,0.22);
     }
 
-    /* ===== QR（wall/host 顯示）===== */
+    /* QR */
     .qr-box{
-      position: fixed;
-      left: 24px;
-      top: 24px;
+      position:fixed;
+      left:24px;
+      top:24px;
       background:#fff;
-      padding: 14px;
-      border-radius: 18px;
-      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+      padding:14px;
+      border-radius:18px;
+      box-shadow:0 8px 28px rgba(0,0,0,0.18);
       text-align:center;
-      z-index: 999;
+      z-index:999;
       display:none;
     }
     .qr-text{
-      margin-top: 10px;
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--orange);
-      letter-spacing: 1px;
-      animation: qrBreath 1.6s ease-in-out infinite;
+      margin-top:10px;
+      font-size:20px;
+      font-weight:900;
+      color:var(--orange);
+      letter-spacing:1px;
+      animation:qrBreath 1.6s ease-in-out infinite;
     }
     @keyframes qrBreath{
-      0%,100%{ opacity: 1; }
-      50%{ opacity: 0.75; }
+      0%,100%{ opacity:1; }
+      50%{ opacity:.75; }
     }
 
-    /* ===== 主持人卡（右上）===== */
+    /* 主持人控制列（一般模式：右上） */
     .host-card{
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(8px);
-      border-radius: 18px;
-      padding: 12px 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-      display: inline-flex;
-      flex-direction: column;
-      gap: 8px;
-      z-index: 998;
-      align-items: center;
+      position:fixed;
+      top:24px;
+      right:24px;
+      background:rgba(255,255,255,0.92);
+      backdrop-filter:blur(8px);
+      border-radius:18px;
+      padding:12px 14px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.15);
+      display:inline-flex;
+      flex-direction:column;
+      gap:8px;
+      z-index:998;
+      align-items:center;
     }
     #hostActions{ display:none; }
     body.is-host #hostActions{ display:flex; }
 
     .host-actions{
       display:flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      align-items:center;
     }
     .btn-draw{
-      background: linear-gradient(135deg, #ff7a00, #ff9a3c);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 900;
-      border: none;
-      border-radius: 999px;
-      padding: 10px 18px;
-      cursor: pointer;
-      box-shadow: 0 6px 16px rgba(255,122,0,0.35);
-    }
-    .btn-draw:hover{
-      transform: translateY(-1px);
-      box-shadow: 0 10px 22px rgba(255,122,0,0.45);
+      background:linear-gradient(135deg, #ff7a00, #ff9a3c);
+      color:#fff;
+      font-size:16px;
+      font-weight:900;
+      border:none;
+      border-radius:999px;
+      padding:10px 18px;
+      cursor:pointer;
+      box-shadow:0 6px 16px rgba(255,122,0,0.35);
     }
     .btn-ghost{
-      background: #fff;
-      color: #111;
-      font-size: 14px;
-      font-weight: 800;
-      border: 1px solid #ddd;
-      border-radius: 999px;
-      padding: 10px 14px;
-      cursor: pointer;
+      background:#fff;
+      color:#111;
+      font-size:14px;
+      font-weight:800;
+      border:1px solid #ddd;
+      border-radius:999px;
+      padding:10px 14px;
+      cursor:pointer;
     }
     .btn-ghost:hover{ background:#f3f3f3; }
 
     .host-info{
-      font-size: 14px;
-      color: #555;
-      text-align: center;
-      width: 100%;
-      transform-origin: center;
+      font-size:14px;
+      color:#555;
+      text-align:center;
+      width:100%;
+      transform-origin:center;
     }
-
     @keyframes countFlash {
-      0% { color: var(--orange); transform: scale(1); }
-      40%{ color: var(--orange); transform: scale(1.15); }
-      100%{ color: #555; transform: scale(1); }
+      0% { color:var(--orange); transform:scale(1); }
+      40%{ color:var(--orange); transform:scale(1.15); }
+      100%{ color:#555; transform:scale(1); }
     }
-    .host-info.flash{ animation: countFlash 600ms ease-out; }
+    .host-info.flash{ animation:countFlash 600ms ease-out; }
 
-    /* ===== 抽獎 overlay ===== */
+    /* 抽獎 overlay */
     .draw-overlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      display: none;
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.55);
+      display:none;
+      z-index:2000;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
     }
     .draw-box{
-      width: min(920px, 94vw);
-      background: #fff;
-      border-radius: 24px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.35);
-      padding: 26px 26px 22px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+      width:min(920px, 94vw);
+      background:#fff;
+      border-radius:24px;
+      box-shadow:0 24px 80px rgba(0,0,0,0.35);
+      padding:26px 26px 22px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
     }
     .confetti{
       position:absolute;
@@ -306,192 +298,155 @@
         radial-gradient(circle at 80% 10%, rgba(0,0,0,.15), transparent 25%),
         radial-gradient(circle at 90% 70%, rgba(255,106,0,.35), transparent 28%),
         radial-gradient(circle at 30% 80%, rgba(0,0,0,.08), transparent 25%);
-      mix-blend-mode: multiply;
-      transform: scale(1.1);
+      mix-blend-mode:multiply;
+      transform:scale(1.1);
     }
     .draw-close{
       position:absolute;
-      right: 18px;
-      top: 14px;
+      right:18px;
+      top:14px;
       border:none;
-      background: transparent;
-      font-size: 22px;
-      cursor: pointer;
-      color: #666;
+      background:transparent;
+      font-size:22px;
+      cursor:pointer;
+      color:#666;
     }
     .draw-title{
-      font-size: 18px;
-      color: #666;
-      margin-bottom: 12px;
-      font-weight: 900;
-      letter-spacing: 1px;
+      font-size:18px;
+      color:#666;
+      margin-bottom:12px;
+      font-weight:900;
+      letter-spacing:1px;
     }
     .draw-name{
-      font-size: clamp(42px, 6vw, 86px);
-      font-weight: 1000;
-      margin: 6px 0 8px;
-      color: #111;
+      font-size:clamp(42px, 6vw, 86px);
+      font-weight:1000;
+      margin:6px 0 8px;
+      color:#111;
     }
     .draw-sub{
-      font-size: 16px;
-      color: #777;
-      margin-top: 10px;
+      font-size:16px;
+      color:#777;
+      margin-top:10px;
     }
     @keyframes pulse {
-      0% { transform: scale(1); }
-      35%{ transform: scale(1.03); }
-      100%{ transform: scale(1); }
+      0% { transform:scale(1); }
+      35%{ transform:scale(1.03); }
+      100%{ transform:scale(1); }
     }
-    .win{ animation: pulse 900ms ease-out 1; }
+    .win{ animation:pulse 900ms ease-out 1; }
 
     .draw-list{
-      margin-top: 10px;
-      display: none;
-      gap: 14px;
-      justify-items: center;
+      margin-top:10px;
+      display:none;
+      gap:14px;
+      justify-items:center;
     }
     .draw-pill{
-      width: min(640px, 92%);
-      background: #fff;
-      border-radius: 18px;
-      padding: 16px 18px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+      width:min(640px, 92%);
+      background:#fff;
+      border-radius:18px;
+      padding:16px 18px;
+      box-shadow:0 12px 30px rgba(0,0,0,0.12);
       display:flex;
-      align-items: baseline;
-      gap: 14px;
-      opacity: 0;
-      transform: translateY(10px) scale(.98);
+      align-items:baseline;
+      gap:14px;
+      opacity:0;
+      transform:translateY(10px) scale(.98);
     }
     .draw-rank{
-      font-weight: 1000;
-      font-size: 18px;
-      color: var(--orange);
-      letter-spacing: 1px;
-      white-space: nowrap;
+      font-weight:1000;
+      font-size:18px;
+      color:var(--orange);
+      letter-spacing:1px;
+      white-space:nowrap;
     }
     .draw-winner{
-      font-weight: 1000;
-      font-size: clamp(28px, 3.6vw, 44px);
+      font-weight:1000;
+      font-size:clamp(28px, 3.6vw, 44px);
       color:#111;
-      word-break: break-word;
+      word-break:break-word;
     }
     @keyframes revealIn{
-      0% { opacity:0; transform: translateY(14px) scale(.97); }
-      60%{ opacity:1; transform: translateY(0) scale(1.02); }
-      100%{ opacity:1; transform: translateY(0) scale(1); }
+      0% { opacity:0; transform:translateY(14px) scale(.97); }
+      60%{ opacity:1; transform:translateY(0) scale(1.02); }
+      100%{ opacity:1; transform:translateY(0) scale(1); }
     }
-    .draw-pill.show{ animation: revealIn 520ms ease-out forwards; }
+    .draw-pill.show{ animation:revealIn 520ms ease-out forwards; }
+
     /* =========================
-   4:3 投影專用 (1024x768)
-   只要有 has-media (wall/host) 就套用
-========================= */
+       4:3 投影專用 (1024x768)
+       只要 has-media (wall/host) 就套用
+    ========================= */
     body.has-media{
-  padding-bottom: 140px;  /* ✅ 讓內容不會被底部 LOGO/按鈕壓到 */
-}
+      padding:12px;
+      padding-bottom:110px;  /* ✅ 底部預留給 LOGO + 控制列 */
+    }
 
-    /* 下方置中的 LOGO */
-body.has-media .brand{
-  position: fixed;
-  left: 50%;
-  bottom: 10px;
-  transform: translateX(-50%);
-  margin: 0;
-  z-index: 997;
-}
-body.has-media .brand img{
-  max-height: 90px; /* 下方建議小一點才不會擋 */
-}
+    /* 舞台鎖 1024 寬，避免被拉爆 */
+    body.has-media .stage{
+      max-width:1024px;
+      margin:0 auto;
+      gap:12px;
+      grid-template-columns: 1fr 320px; /* 左留言 右影片 */
+      align-items:start;
+    }
 
-    /* 右下控制卡 */
-    
-body.has-media .host-card{
-  top: auto;
-  bottom: 10px;
-  right: 10px;
-}
+    /* 右側影片區：用固定高度塞進 768 */
+    body.has-media .media-slot{
+      width:320px;
+      height:520px;
+      aspect-ratio:auto;        /* ✅ 避免跟 height 打架 */
+      position:sticky;
+      top:12px;                 /* ✅ 右上不再有控制卡，貼上去即可 */
+      border-radius:18px;
+      display:none;             /* JS 控制顯示 */
+      background:#000;
+    }
 
+    /* ✅ 影片完整顯示：不裁切 */
+    body.has-media .media-slot video{
+      object-fit:contain;
+      background:#000;
+    }
+
+    /* QR：高度 1/5（768/5 ≈ 154） */
     body.has-media .qr-box{
-  padding: 10px;
-}
-body.has-media #qr{
-  width: 154px;
-  height: 154px;
-}
-body.has-media .qr-text{
-  font-size: 16px;
-  margin-top: 8px;
-}
+      left:10px;
+      top:10px;
+      padding:10px;
+      border-radius:16px;
+    }
+    body.has-media #qr{ width:154px; height:154px; }
+    body.has-media .qr-text{ font-size:16px; margin-top:8px; }
 
-body.has-media{
-  padding: 12px;                 /* 原本 20 太大，4:3 會擠 */
-}
+    /* 標題/提示縮小一點，避免擠 */
+    body.has-media h1{ font-size:34px; margin:6px 0 4px; }
+    body.has-media .hint{ font-size:14px; margin-bottom:10px; }
 
-/* 整個舞台鎖 1024 寬，避免被拉爆 */
-body.has-media .stage{
-  max-width: 1024px;
-  margin: 0 auto;
-  gap: 12px;
-  grid-template-columns: 1fr 320px;   /* ✅ 左留言、右影片（右欄固定） */
-  align-items: start;
-}
+    /* ✅ LOGO 固定在底部置中 */
+    body.has-media .brand{
+      position:fixed;
+      left:50%;
+      bottom:10px;
+      transform:translateX(-50%);
+      margin:0;
+      z-index:998;
+      pointer-events:none; /* 避免擋到點擊 */
+    }
+    body.has-media .brand img{ max-height:70px; }
 
-/* 右側影片區：改用「固定高度」去塞進 768 */
-body.has-media .media-slot{
-  width: 320px;                     /* 右欄寬度 */
-  height: 520px;                    /* ✅ 4:3 內比較舒服的高度 */
-  aspect-ratio: auto;               /* 取消 aspect-ratio，避免互相打架 */
-  position: sticky;
-  top: 96px;                        /* ✅ 避開右上控制卡 */
-  border-radius: 18px;
-}
-
-/* ✅ 影片完整顯示：不裁切 */
-body.has-media .media-slot video{
-  object-fit: contain;              /* 你要「看齊全」就用 contain */
-  background: #000;
-}
-
-/* 右上控制卡縮小，避免壓到內容 */
-body.has-media .host-card{
-  top: 10px;
-  right: 10px;
-  padding: 10px 12px;
-  border-radius: 16px;
-}
-
-body.has-media .btn-draw{
-  padding: 8px 14px;
-  font-size: 14px;
-}
-body.has-media .btn-ghost{
-  padding: 8px 12px;
-  font-size: 13px;
-}
-
-/* 左上 QR 縮小一點，避免擠到標題 */
-body.has-media .qr-box{
-  left: 10px;
-  top: 10px;
-  padding: 10px;
-  border-radius: 16px;
-}
-
-/* 你的 LOGO、標題、提示字在 4:3 要縮，不然會跟 QR/控制卡打架 */
-body.has-media .brand img{ max-height: 120px; }
-body.has-media h1{ font-size: 36px; margin: 6px 0 4px; }
-body.has-media .hint{ font-size: 14px; margin-bottom: 10px; }
-
-/* 留言牆不要太胖，不然左邊會爆 */
-body.has-media .wrap{
-  max-width: 100%;
-}
-
-/* 留言區上方留一點空間，避免被 QR 擋住 */
-body.has-media .wrap{
-  padding-left: 210px;   /* ✅ 讓左上 QR 不會蓋到標題區 */
-}
-
-/* 如果你覺得標題還是被壓到：可以把 padding-left 改 230 */
+    /* ✅ 控制列固定在底部右側 */
+    body.has-media .host-card{
+      top:auto;
+      right:10px;
+      bottom:10px;
+      border-radius:16px;
+      padding:10px 12px;
+      max-width: 680px;
+    }
+    body.has-media .btn-draw{ padding:8px 14px; font-size:14px; }
+    body.has-media .btn-ghost{ padding:8px 12px; font-size:13px; }
 
   </style>
 </head>
@@ -501,12 +456,12 @@ body.has-media .wrap{
     <img src="logo.png" alt="SOLIS">
   </div>
 
-  <!-- 主持人控制卡（右上角） -->
+  <!-- 主持人控制列 -->
   <div class="host-card" id="hostCard">
     <div class="host-actions" id="hostActions">
       <button class="btn-draw" id="draw3Btn">🎉 抽 3 名</button>
 
-      <!-- ✅ 本機選影片 -->
+      <!-- 本機選影片 -->
       <input id="pickVideo" type="file" accept="video/*" style="display:none;">
       <button class="btn-ghost" id="pickVideoBtn">📁 選影片</button>
 
@@ -519,8 +474,7 @@ body.has-media .wrap{
   </div>
 
   <div class="stage">
-
-    <!-- ✅ 左：互動牆內容（一定要是完整內容，不要用 ...） -->
+    <!-- 左：互動牆 -->
     <div class="wrap">
       <h1>SOLIS 許願牆</h1>
       <div class="hint">歡迎來到 SOLIS 活動現場｜請掃描 QR Code 完成簽到｜有機會抽精美小禮一份喔</div>
@@ -534,17 +488,16 @@ body.has-media .wrap{
       <div class="wall" id="wall"></div>
     </div>
 
-    <!-- ✅ 右：直式影片 -->
+    <!-- 右：影片 -->
     <div class="media-slot" id="mediaSlot">
       <video id="bgVideo" playsinline preload="metadata"></video>
       <div class="media-fallback" id="mediaFallback">
         SOLIS 活動現場<br/>播放區
       </div>
     </div>
-
   </div>
 
-  <!-- QR（wall=1 或 host=1 顯示） -->
+  <!-- QR -->
   <div class="qr-box" id="qrBox">
     <canvas id="qr"></canvas>
     <div class="qr-text">掃描參加抽獎</div>
@@ -566,7 +519,7 @@ body.has-media .wrap{
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 
   <script>
-    // ===== 解析網址參數 =====
+    // 解析網址參數
     const params = new URLSearchParams(window.location.search);
     const isWall = params.get("wall") === "1";
     const isHost = params.get("host") === "1";
@@ -577,13 +530,13 @@ body.has-media .wrap{
     const hasMedia = (isWall || isHost);
     if (hasMedia) document.body.classList.add("has-media");
 
-    // ===== Socket.IO =====
+    // Socket.IO
     const socket = io();
 
     const wall = document.getElementById("wall");
     const nameEl = document.getElementById("name");
-    const msgEl = document.getElementById("message");
-    const btn = document.getElementById("send");
+    const msgEl  = document.getElementById("message");
+    const btn    = document.getElementById("send");
 
     const playerCountEl = document.getElementById("playerCount");
     const draw3Btn = document.getElementById("draw3Btn");
@@ -597,16 +550,16 @@ body.has-media .wrap{
 
     const qrBox = document.getElementById("qrBox");
 
-    // ===== 影片 =====
+    // 影片元素
     const mediaSlot = document.getElementById("mediaSlot");
     const bgVideo = document.getElementById("bgVideo");
     const mediaFallback = document.getElementById("mediaFallback");
 
-    // ===== 本機選影片 =====
+    // 本機選影片
     const pickVideo = document.getElementById("pickVideo");
     const pickVideoBtn = document.getElementById("pickVideoBtn");
 
-    // ===== 播放控制 =====
+    // 播放控制
     const vidPlay = document.getElementById("vidPlay");
     const vidPause = document.getElementById("vidPause");
     const vidMute = document.getElementById("vidMute");
@@ -623,23 +576,22 @@ body.has-media .wrap{
       return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     }
 
-    // ===== token：同裝置固定 =====
+    // token：同裝置固定
     let myToken = localStorage.getItem("event_token");
     if (!myToken) {
       myToken = (crypto?.randomUUID?.() || (Date.now() + "-" + Math.random())).toString();
       localStorage.setItem("event_token", myToken);
     }
 
-    // ===== 鎖名字 =====
+    // 鎖名字
     const lockedName = localStorage.getItem("event_name");
     if (lockedName && nameEl) {
       nameEl.value = lockedName;
       nameEl.disabled = true;
     }
 
-    // ===== 防連點送出 =====
+    // 防連點送出
     let sending = false;
-
     function sendCheckin(){
       if (!nameEl || !msgEl) return;
       if (sending) return;
@@ -671,7 +623,7 @@ body.has-media .wrap{
       });
     }
 
-    // ===== 即時牆 =====
+    // 即時牆
     socket.on("wall", (p) => {
       if (!wall) return;
       const div = document.createElement("div");
@@ -689,7 +641,7 @@ body.has-media .wrap{
       while (wall.children.length > 50) wall.removeChild(wall.lastChild);
     });
 
-    // ===== 參與者人數（人數變多才閃）=====
+    // 參與者人數
     let lastCount = 0;
     socket.on("participants_count", (d) => {
       const c = Number(d?.count ?? 0);
@@ -705,22 +657,21 @@ body.has-media .wrap{
       lastCount = c;
     });
 
-    // ===== QR：wall 或 host 顯示 =====
+    // QR（wall/host 顯示）
     if (isWall || isHost) {
       if (qrBox) qrBox.style.display = "block";
       try{
-new QRious({
-  element: document.getElementById("qr"),
-  value: window.location.origin,
-  size: 154
-});
+        new QRious({
+          element: document.getElementById("qr"),
+          value: window.location.origin,
+          size: 154
+        });
       }catch(e){
-        // QR lib 沒載到也不要讓整支 JS 掛掉
         console.warn("QR init failed", e);
       }
     }
 
-    // ===== 抽獎 Overlay =====
+    // 抽獎 overlay
     function openDrawOverlay(){
       if (!drawOverlay || !drawName || !drawSub || !drawList || !drawBox) return;
       drawOverlay.style.display = "flex";
@@ -735,14 +686,12 @@ new QRious({
       if (!drawOverlay) return;
       drawOverlay.style.display = "none";
     }
-
     if (drawClose) drawClose.addEventListener("click", closeDrawOverlay);
     if (drawOverlay) {
       drawOverlay.addEventListener("click", (e) => {
         if (e.target === drawOverlay) closeDrawOverlay();
       });
     }
-
     function rollingText(durationMs = 1200){
       if (!drawName || !drawOverlay) return;
       const frames = ["抽獎中", "抽獎中.", "抽獎中..", "抽獎中..."];
@@ -754,7 +703,6 @@ new QRious({
       }, 140);
       setTimeout(() => clearInterval(t), durationMs);
     }
-
     if (isHost && draw3Btn) {
       draw3Btn.addEventListener("click", () => {
         openDrawOverlay();
@@ -762,7 +710,6 @@ new QRious({
         socket.emit("host_draw", { n: 3 });
       });
     }
-
     socket.on("draw_result", (r) => {
       if (!isHost) return;
       if (!drawName || !drawSub || !drawList || !drawBox) return;
@@ -805,85 +752,92 @@ new QRious({
       }, 800);
     });
 
-    // ===== 影片區：只在 wall/host 顯示 =====
+    // ====== 影片 ======
     function showFallback(on){
       if (!mediaFallback) return;
       mediaFallback.style.display = on ? "flex" : "none";
     }
 
-    const playlist = [
-      "/media/demo.mp4",
-      "/media/demo2.mp4"
-    ];
+    // ✅ 你 GitHub 不能放 mp4，這裡先留空（避免 404 造成你以為壞掉）
+    const playlist = [];
     let vidIndex = 0;
 
-   function loadVideo(src, autoplay=true){
-  if (!bgVideo) return;
+    function bindEndedHoldLastFrame(){
+      if (!bgVideo) return;
+      bgVideo.onended = () => {
+        bgVideo.pause();
+        // 保險：停在最後一格
+        if (isFinite(bgVideo.duration) && bgVideo.duration > 0) {
+          bgVideo.currentTime = Math.max(0, bgVideo.duration - 0.05);
+        }
+      };
+    }
 
-  bgVideo.src = src;
-  bgVideo.loop = false;      // ✅ 不輪播
-  bgVideo.muted = true;
-  bgVideo.playsInline = true;
+    function loadVideo(src, autoplay=true){
+      if (!bgVideo) return;
+      bgVideo.src = src;
+      bgVideo.loop = false;     // ✅ 不輪播
+      bgVideo.muted = true;     // ✅ 自動播放需要靜音
+      bgVideo.playsInline = true;
 
-  bgVideo.onloadeddata = () => {
-    showFallback(false);
-    if (autoplay) bgVideo.play().catch(() => {});
-  };
+      bgVideo.onloadeddata = () => {
+        showFallback(false);
+        bindEndedHoldLastFrame();
+        if (autoplay) bgVideo.play().catch(() => {});
+      };
+      bgVideo.onerror = () => {
+        showFallback(true);
+      };
+    }
 
-  bgVideo.onerror = () => {
-    showFallback(true);
-  };
-
-  // ✅ 播完停在最後一格
-  bgVideo.onended = () => {
-    bgVideo.pause();
-    // 一般情況播完會停在最後一格，這行是保險
-    bgVideo.currentTime = Math.max(0, bgVideo.duration - 0.05);
-  };
-}
-
-
+    // ✅ 只要 wall/host 就顯示影片框（就算沒影片，也會顯示封面）
     if (hasMedia && mediaSlot) {
       mediaSlot.style.display = "block";
       showFallback(true);
 
-      // 有影片檔就播，沒有也不會炸
+      // 如果你未來真的有放影片在 /public/media/ 才把 playlist 填起來
       if (bgVideo && playlist.length > 0) {
         loadVideo(playlist[vidIndex], true);
       }
-    } else {
-      // 來賓一般頁：不顯示影片區
-      if (mediaSlot) mediaSlot.style.display = "none";
     }
 
-    // ===== host：本機選影片 =====
-  if (isHost && pickVideo && pickVideoBtn && bgVideo) {
-  pickVideoBtn.addEventListener("click", () => pickVideo.click());
+    // host：本機選影片
+    if (isHost && pickVideo && pickVideoBtn && bgVideo) {
+      pickVideoBtn.addEventListener("click", () => pickVideo.click());
 
-  pickVideo.addEventListener("change", () => {
-    const file = pickVideo.files?.[0];
-    if (!file) return;
+      pickVideo.addEventListener("change", () => {
+        const file = pickVideo.files?.[0];
+        if (!file) return;
 
-    const url = URL.createObjectURL(file);
+        const url = URL.createObjectURL(file);
 
-    bgVideo.src = url;
-    bgVideo.loop = false;     // ✅ 不輪播
-    bgVideo.muted = true;
-    bgVideo.playsInline = true;
+        bgVideo.src = url;
+        bgVideo.loop = false;     // ✅ 不輪播
+        bgVideo.muted = true;
+        bgVideo.playsInline = true;
 
-    showFallback(false);
+        showFallback(false);
+        bindEndedHoldLastFrame();
 
-    // ✅ 播完停在最後一格
-    bgVideo.onended = () => {
-      bgVideo.pause();
-      bgVideo.currentTime = Math.max(0, bgVideo.duration - 0.05);
-    };
+        bgVideo.play().catch(() => {});
+      });
+    }
 
-    bgVideo.play().catch(() => {});
-  });
-}
+    // ✅ 下一支：有 playlist 就切；沒有就等同再選一次影片
+    function nextVideo(){
+      if (!bgVideo) return;
 
+      if (playlist.length > 0) {
+        vidIndex = (vidIndex + 1) % playlist.length;
+        loadVideo(playlist[vidIndex], true);
+        return;
+      }
 
+      // 沒有 playlist → 打開檔案選擇器
+      if (isHost && pickVideo) pickVideo.click();
+    }
+
+    // 播放控制
     if (isHost && bgVideo) {
       if (vidPlay)  vidPlay.addEventListener("click", () => bgVideo.play().catch(()=>{}));
       if (vidPause) vidPause.addEventListener("click", () => bgVideo.pause());
