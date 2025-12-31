@@ -385,6 +385,43 @@
    4:3 投影專用 (1024x768)
    只要有 has-media (wall/host) 就套用
 ========================= */
+    body.has-media{
+  padding-bottom: 140px;  /* ✅ 讓內容不會被底部 LOGO/按鈕壓到 */
+}
+
+    /* 下方置中的 LOGO */
+body.has-media .brand{
+  position: fixed;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  margin: 0;
+  z-index: 997;
+}
+body.has-media .brand img{
+  max-height: 90px; /* 下方建議小一點才不會擋 */
+}
+
+    /* 右下控制卡 */
+    
+body.has-media .host-card{
+  top: auto;
+  bottom: 10px;
+  right: 10px;
+}
+
+    body.has-media .qr-box{
+  padding: 10px;
+}
+body.has-media #qr{
+  width: 154px;
+  height: 154px;
+}
+body.has-media .qr-text{
+  font-size: 16px;
+  margin-top: 8px;
+}
+
 body.has-media{
   padding: 12px;                 /* 原本 20 太大，4:3 會擠 */
 }
@@ -672,11 +709,11 @@ body.has-media .wrap{
     if (isWall || isHost) {
       if (qrBox) qrBox.style.display = "block";
       try{
-        new QRious({
-          element: document.getElementById("qr"),
-          value: window.location.origin,
-          size: 180
-        });
+new QRious({
+  element: document.getElementById("qr"),
+  value: window.location.origin,
+  size: 154
+});
       }catch(e){
         // QR lib 沒載到也不要讓整支 JS 掛掉
         console.warn("QR init failed", e);
