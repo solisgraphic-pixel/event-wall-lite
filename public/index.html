@@ -583,6 +583,20 @@ function playWinSound(){
     const draw3Btn = document.getElementById("draw3Btn");
 
     const drawOverlay = document.getElementById("drawOverlay");
+// ===== 抽獎音效（只播一次）=====
+const winAudio = new Audio("win.mp3");
+winAudio.preload = "auto";
+winAudio.volume = 0.9;
+
+function playWinSoundOnce(){
+  try {
+    winAudio.currentTime = 0;
+    winAudio.play();
+  } catch(e){
+    console.warn("音效播放失敗", e);
+  }
+}
+
     const drawBox = document.getElementById("drawBox");
     const drawName = document.getElementById("drawName");
     const drawSub = document.getElementById("drawSub");
@@ -850,20 +864,25 @@ draw3Btn.addEventListener("click", () => {
   drawList.style.display = "grid";
   drawList.innerHTML = "";
 
-  winners.slice(0, 3).forEach((w, idx) => {
-    const pill = document.createElement("div");
-    pill.className = "draw-pill";
-    pill.innerHTML = `
-      <div class="draw-rank">第 ${idx + 1} 位</div>
-      <div class="draw-winner">桌 ${escapeHtml(w.tableNo)}｜${escapeHtml(w.name)}</div>
-    `;
-    drawList.appendChild(pill);
+winners.slice(0, 3).forEach((w, idx) => {
+  const pill = document.createElement("div");
+  pill.className = "draw-pill";
+  pill.innerHTML = `
+    <div class="draw-rank">第 ${idx + 1} 位</div>
+    <div class="draw-winner">桌 ${escapeHtml(w.tableNo)}｜${escapeHtml(w.name)}</div>
+  `;
+  drawList.appendChild(pill);
 
-    setTimeout(() => {
-      pill.classList.add("show");
-      playWinSound(); // 🔔 每位得獎播放
-    }, idx * 650);
-  });
+  setTimeout(() => {
+    pill.classList.add("show");
+
+    // ✅ 只在第一名播音效
+    if (idx === 0) {
+      playWinSoundOnce();
+    }
+  }, idx * 650);
+});
+
 
   drawSub.textContent = "🎉 恭喜得獎！";
 }, 800);
