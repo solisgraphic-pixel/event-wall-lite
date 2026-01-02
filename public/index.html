@@ -6,6 +6,30 @@
   <title>SOLIS 許願牆</title>
 
   <script>
+    // ===== 抽獎音效 =====
+const drawSound = new Audio("/sound/draw-loop.mp3");
+drawSound.loop = true;
+drawSound.volume = 0.7;
+
+const winSound = new Audio("/sound/win.mp3");
+winSound.loop = false;
+winSound.volume = 0.9;
+
+function playDrawSound(){
+  drawSound.currentTime = 0;
+  drawSound.play().catch(()=>{});
+}
+
+function stopDrawSound(){
+  drawSound.pause();
+  drawSound.currentTime = 0;
+}
+
+function playWinSound(){
+  winSound.currentTime = 0;
+  winSound.play().catch(()=>{});
+}
+
   (function () {
     const p = new URLSearchParams(location.search);
     const isWall = p.get("wall") === "1";
@@ -788,11 +812,15 @@
       setTimeout(() => clearInterval(t), durationMs);
     }
     if (isHost && draw3Btn) {
-      draw3Btn.addEventListener("click", () => {
-        openDrawOverlay();
-        rollingText(1200);
-        socket.emit("host_draw", { n: 3 });
-      });
+draw3Btn.addEventListener("click", () => {
+  openDrawOverlay();
+  rollingText(1200);
+
+  playDrawSound(); // 🔊 抽獎中音效
+
+  socket.emit("host_draw", { n: 3 });
+});
+
     }
     socket.on("draw_result", (r) => {
       if (!isHost) return;
@@ -815,24 +843,31 @@
       drawSub.textContent = `參與者共 ${Number(r.total ?? winners.length)} 人`;
       drawName.textContent = "準備揭曉…";
 
-      setTimeout(() => {
-        drawName.style.display = "none";
-        drawList.style.display = "grid";
-        drawList.innerHTML = "";
+   setTimeout(() => {
+  stopDrawSound();
 
-        winners.slice(0, 3).forEach((w, idx) => {
-          const pill = document.createElement("div");
-          pill.className = "draw-pill";
-          pill.innerHTML = `
-            <div class="draw-rank">第 ${idx + 1} 位</div>
-            <div class="draw-winner">桌 ${escapeHtml(w.tableNo)}｜${escapeHtml(w.name)}</div>
-          `;
-          drawList.appendChild(pill);
-          setTimeout(() => pill.classList.add("show"), idx * 650);
-        });
+  drawName.style.display = "none";
+  drawList.style.display = "grid";
+  drawList.innerHTML = "";
 
-        drawSub.textContent = "🎉 恭喜得獎！";
-      }, 800);
+  winners.slice(0, 3).forEach((w, idx) => {
+    const pill = document.createElement("div");
+    pill.className = "draw-pill";
+    pill.innerHTML = `
+      <div class="draw-rank">第 ${idx + 1} 位</div>
+      <div class="draw-winner">桌 ${escapeHtml(w.tableNo)}｜${escapeHtml(w.name)}</div>
+    `;
+    drawList.appendChild(pill);
+
+    setTimeout(() => {
+      pill.classList.add("show");
+      playWinSound(); // 🔔 每位得獎播放
+    }, idx * 650);
+  });
+
+  drawSub.textContent = "🎉 恭喜得獎！";
+}, 800);
+
     });
 
     // ===== 影片（✅ 已修好：下一首、排序、有聲、點影片播放）=====
