@@ -127,12 +127,21 @@
       background:#ddd;
     }
 
-    html.has-media .header{
-      padding-top:10px;
-      padding-bottom:6px;
-      margin-left:200px;
-      width: calc(100% - 200px);
-    }
+/* ✅ Header 真正畫面置中（不受 QR 影響） */
+html.has-media .header{
+  position: relative;
+  margin-left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* Header 內容本體 */
+html.has-media .header > *{
+  max-width: 720px;        /* 視覺中心寬度，可調 680~760 */
+  text-align: center;
+}
+
     html.has-media .header .hint{
       white-space:nowrap;
       overflow:hidden;
