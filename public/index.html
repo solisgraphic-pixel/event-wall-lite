@@ -128,29 +128,30 @@
     }
 
 /* ✅ Header 真正畫面置中（不受 QR 影響） */
+/* ✅ 投影/主持：Header 視覺置中（左右各預留 200px 抵銷 QR） */
 html.has-media .header{
-  position: relative;
-  margin-left: 0;
+  padding: 10px 200px 6px;   /* 上 10、左右 200、下 6 */
+  margin: 0;
   width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-/* Header 內容本體 */
-html.has-media .header > *{
-  max-width: 720px;        /* 視覺中心寬度，可調 680~760 */
   text-align: center;
+  box-sizing: border-box;
 }
 
-    html.has-media .header .hint{
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width: 760px;
-    }
-    html.has-media .header .divider{
-      width: 520px;
-    }
+/* ✅ 副標：不要跑出螢幕，太長就省略 */
+html.has-media .header .hint{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ✅ 分隔線置中 */
+html.has-media .header .divider{
+  width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 
     .stage{
       margin: 12px auto 0;
