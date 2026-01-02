@@ -5,30 +5,55 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SOLIS 許願牆</title>
 
-  <script>
-    // ===== 抽獎音效 =====
-const drawSound = new Audio("/sound/draw-loop.mp3");
-drawSound.loop = true;
-drawSound.volume = 0.7;
+<script>
+  // ===== 抽獎音效 =====
+  const drawSound = new Audio("/sound/draw-loop.mp3");
+  drawSound.loop = true;
+  drawSound.volume = 0.7;
 
-const winSound = new Audio("/sound/win.mp3");
-winSound.loop = false;
-winSound.volume = 0.9;
+  const winSound = new Audio("/sound/win.mp3");
+  winSound.loop = false;
+  winSound.volume = 0.9;
 
-function playDrawSound(){
-  drawSound.currentTime = 0;
-  drawSound.play().catch(()=>{});
-}
+  function playDrawSound(){
+    drawSound.currentTime = 0;
+    drawSound.play().catch(()=>{});
+  }
 
-function stopDrawSound(){
-  drawSound.pause();
-  drawSound.currentTime = 0;
-}
+  function stopDrawSound(){
+    drawSound.pause();
+    drawSound.currentTime = 0;
+  }
 
-function playWinSound(){
-  winSound.currentTime = 0;
-  winSound.play().catch(()=>{});
-}
+  function playWinSound(){
+    winSound.currentTime = 0;
+    winSound.play().catch(()=>{});
+  }
+
+  // ✅ 解鎖音效（重要：避免瀏覽器擋播放）
+  let audioUnlocked = false;
+  async function unlockAudioOnce(){
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+
+    try{
+      // 用極小音量播放 1ms 來解鎖
+      const v1 = drawSound.volume, v2 = winSound.volume;
+      drawSound.volume = 0.001;
+      winSound.volume  = 0.001;
+
+      await drawSound.play().catch(()=>{});
+      drawSound.pause(); drawSound.currentTime = 0;
+
+      await winSound.play().catch(()=>{});
+      winSound.pause(); winSound.currentTime = 0;
+
+      drawSound.volume = v1;
+      winSound.volume  = v2;
+    }catch(e){
+      console.warn("unlockAudio failed", e);
+    }
+  }
 
   (function () {
     const p = new URLSearchParams(location.search);
@@ -41,7 +66,7 @@ function playWinSound(){
     if (isHost) root.classList.add("is-host");
     if (hasMedia) root.classList.add("has-media");
   })();
-  </script>
+</script>
 
   <style>
     :root{
@@ -583,19 +608,7 @@ function playWinSound(){
     const draw3Btn = document.getElementById("draw3Btn");
 
     const drawOverlay = document.getElementById("drawOverlay");
-// ===== 抽獎音效（只播一次）=====
-const winAudio = new Audio("win.mp3");
-winAudio.preload = "auto";
-winAudio.volume = 0.9;
 
-function playWinSoundOnce(){
-  try {
-    winAudio.currentTime = 0;
-    winAudio.play();
-  } catch(e){
-    console.warn("音效播放失敗", e);
-  }
-}
 
     const drawBox = document.getElementById("drawBox");
     const drawName = document.getElementById("drawName");
@@ -826,14 +839,17 @@ function playWinSoundOnce(){
       setTimeout(() => clearInterval(t), durationMs);
     }
     if (isHost && draw3Btn) {
-draw3Btn.addEventListener("click", () => {
+draw3Btn.addEventListener("click", async () => {
+  // ✅ 先解鎖（保證後面中獎音效不會被擋）
+  await unlockAudioOnce();
+
   openDrawOverlay();
   rollingText(1200);
 
   playDrawSound(); // 🔊 抽獎中音效
-
   socket.emit("host_draw", { n: 3 });
 });
+
 
     }
     socket.on("draw_result", (r) => {
@@ -877,9 +893,10 @@ winners.slice(0, 3).forEach((w, idx) => {
     pill.classList.add("show");
 
     // ✅ 只在第一名播音效
-    if (idx === 0) {
-      playWinSoundOnce();
-    }
+if (idx === 0) {
+  playWinSound();
+}
+
   }, idx * 650);
 });
 
