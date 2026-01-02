@@ -532,6 +532,36 @@ html.has-media .header .divider{
       100%{ opacity:1; transform: translateY(0) scale(1); }
     }
     .draw-pill.show{ animation: revealIn 520ms ease-out forwards; }
+    /* 左下：全螢幕按鈕（主持頁限定） */
+.fs-left{
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+  user-select: none;
+  z-index: 998;
+}
+
+/* 只在主持頁顯示 */
+html.is-host .fs-left{
+  display: flex;
+}
+
+.fs-left:hover{
+  background:#f3f3f3;
+}
+
   </style>
 </head>
 
@@ -540,6 +570,11 @@ html.has-media .header .divider{
     <canvas id="qr"></canvas>
     <div class="qr-text">掃描參加抽獎</div>
   </div>
+  
+<!-- 左下：全螢幕切換 -->
+<div class="fs-left" id="fsBtn" title="全螢幕 / 解除全螢幕">
+  ⛶
+</div>
 
   <div class="host-top" id="hostTop">
     <div class="host-actions">
@@ -1039,6 +1074,49 @@ if (idx === 0) {
         location.reload();
       });
     }
+    // ================================
+// 全螢幕切換（主持頁｜左下）
+// ================================
+const fsBtn = document.getElementById("fsBtn");
+
+function isFullscreen() {
+  return !!document.fullscreenElement;
+}
+
+async function enterFullscreen() {
+  await document.documentElement.requestFullscreen();
+}
+
+async function exitFullscreen() {
+  await document.exitFullscreen();
+}
+
+function syncFsIcon() {
+  if (!fsBtn) return;
+  const on = isFullscreen();
+  fsBtn.textContent = on ? "⤢" : "⛶";
+  fsBtn.title = on ? "解除全螢幕" : "全螢幕";
+}
+
+if (isHost && fsBtn) {
+  fsBtn.addEventListener("click", async () => {
+    try {
+      if (!isFullscreen()) {
+        await enterFullscreen();
+      } else {
+        await exitFullscreen();
+      }
+    } catch (e) {
+      alert("全螢幕被瀏覽器阻擋，請確認是由點擊觸發");
+    } finally {
+      syncFsIcon();
+    }
+  });
+
+  document.addEventListener("fullscreenchange", syncFsIcon);
+  syncFsIcon();
+}
+
   </script>
 </body>
 </html>
