@@ -539,6 +539,24 @@
     html.is-host .host-system-controls{
       display: flex;
     }
+    /* =========================
+   主持 / 投影頁背景圖
+   圖片位置：public/my-cover.jpg
+========================= */
+html.has-media body{
+  background: url("/my-cover.jpg") center center / cover no-repeat fixed !important;
+}
+
+/* 白霧遮罩（讓文字清楚，不吃畫面） */
+html.has-media body::before{
+  content:"";
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.78);
+  pointer-events: none;
+  z-index: -1;
+}
+
   </style>
 </head>
 
