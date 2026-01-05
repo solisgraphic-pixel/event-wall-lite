@@ -561,6 +561,42 @@ html.is-host .fs-left{
 .fs-left:hover{
   background:#f3f3f3;
 }
+/* =========================
+   主持頁｜左下快速跳轉
+========================= */
+.host-left-bottom{
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  z-index: 998;
+  display: none;
+}
+
+/* 只在主持頁顯示 */
+html.is-host .host-left-bottom{
+  display: block;
+}
+
+.quick-link{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+  font-weight: 900;
+  font-size: 14px;
+  color: #111;
+  text-decoration: none;
+  user-select: none;
+}
+
+.quick-link:hover{
+  background: #fff;
+  transform: translateY(-1px);
+}
 
   </style>
 </head>
@@ -1118,5 +1154,18 @@ if (isHost && fsBtn) {
 }
 
   </script>
+
+  <!-- 左下：主持快速工具 -->
+<div class="host-left-bottom" id="hostLeftBottom">
+  <a
+    href="http://localhost:6719/log-lottery/home" 
+    target="_blank"
+    class="quick-link"
+    title="開啟抽獎工具 log-lottery"
+  >
+    🎰 抽獎工具
+  </a>
+</div>
+
 </body>
 </html>
