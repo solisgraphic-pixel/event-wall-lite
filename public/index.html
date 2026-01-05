@@ -5,68 +5,67 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SOLIS 許願牆</title>
 
-<script>
-  // ===== 抽獎音效 =====
-  const drawSound = new Audio("/sound/draw-loop.mp3");
-  drawSound.loop = true;
-  drawSound.volume = 0.7;
+  <script>
+    // ===== 抽獎音效 =====
+    const drawSound = new Audio("/sound/draw-loop.mp3");
+    drawSound.loop = true;
+    drawSound.volume = 0.7;
 
-  const winSound = new Audio("/sound/win.mp3");
-  winSound.loop = false;
-  winSound.volume = 0.9;
+    const winSound = new Audio("/sound/win.mp3");
+    winSound.loop = false;
+    winSound.volume = 0.9;
 
-  function playDrawSound(){
-    drawSound.currentTime = 0;
-    drawSound.play().catch(()=>{});
-  }
-
-  function stopDrawSound(){
-    drawSound.pause();
-    drawSound.currentTime = 0;
-  }
-
-  function playWinSound(){
-    winSound.currentTime = 0;
-    winSound.play().catch(()=>{});
-  }
-
-  // ✅ 解鎖音效（重要：避免瀏覽器擋播放）
-  let audioUnlocked = false;
-  async function unlockAudioOnce(){
-    if (audioUnlocked) return;
-    audioUnlocked = true;
-
-    try{
-      // 用極小音量播放 1ms 來解鎖
-      const v1 = drawSound.volume, v2 = winSound.volume;
-      drawSound.volume = 0.001;
-      winSound.volume  = 0.001;
-
-      await drawSound.play().catch(()=>{});
-      drawSound.pause(); drawSound.currentTime = 0;
-
-      await winSound.play().catch(()=>{});
-      winSound.pause(); winSound.currentTime = 0;
-
-      drawSound.volume = v1;
-      winSound.volume  = v2;
-    }catch(e){
-      console.warn("unlockAudio failed", e);
+    function playDrawSound(){
+      drawSound.currentTime = 0;
+      drawSound.play().catch(()=>{});
     }
-  }
 
-  (function () {
-    const p = new URLSearchParams(location.search);
-    const isWall = p.get("wall") === "1";
-    const isHost = p.get("host") === "1";
-    const hasMedia = isWall || isHost;
+    function stopDrawSound(){
+      drawSound.pause();
+      drawSound.currentTime = 0;
+    }
 
-    const root = document.documentElement;
-    if (isWall) root.classList.add("wall-only");
-    if (isHost) root.classList.add("is-host");
-    if (hasMedia) root.classList.add("has-media");
-  })();
-</script>
+    function playWinSound(){
+      winSound.currentTime = 0;
+      winSound.play().catch(()=>{});
+    }
+
+    // ✅ 解鎖音效（重要：避免瀏覽器擋播放）
+    let audioUnlocked = false;
+    async function unlockAudioOnce(){
+      if (audioUnlocked) return;
+      audioUnlocked = true;
+
+      try{
+        const v1 = drawSound.volume, v2 = winSound.volume;
+        drawSound.volume = 0.001;
+        winSound.volume  = 0.001;
+
+        await drawSound.play().catch(()=>{});
+        drawSound.pause(); drawSound.currentTime = 0;
+
+        await winSound.play().catch(()=>{});
+        winSound.pause(); winSound.currentTime = 0;
+
+        drawSound.volume = v1;
+        winSound.volume  = v2;
+      }catch(e){
+        console.warn("unlockAudio failed", e);
+      }
+    }
+
+    (function () {
+      const p = new URLSearchParams(location.search);
+      const isWall = p.get("wall") === "1";
+      const isHost = p.get("host") === "1";
+      const hasMedia = isWall || isHost;
+
+      const root = document.documentElement;
+      if (isWall) root.classList.add("wall-only");
+      if (isHost) root.classList.add("is-host");
+      if (hasMedia) root.classList.add("has-media");
+    })();
+  </script>
 
   <style>
     :root{
@@ -127,31 +126,25 @@
       background:#ddd;
     }
 
-/* ✅ Header 真正畫面置中（不受 QR 影響） */
-/* ✅ 投影/主持：Header 視覺置中（左右各預留 200px 抵銷 QR） */
-html.has-media .header{
-  padding: 10px 200px 6px;   /* 上 10、左右 200、下 6 */
-  margin: 0;
-  width: 100%;
-  text-align: center;
-  box-sizing: border-box;
-}
-
-/* ✅ 副標：不要跑出螢幕，太長就省略 */
-html.has-media .header .hint{
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-/* ✅ 分隔線置中 */
-html.has-media .header .divider{
-  width: 520px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
+    /* ✅ 投影/主持：Header 視覺置中（左右各預留 200px 抵銷 QR） */
+    html.has-media .header{
+      padding: 10px 200px 6px;
+      margin: 0;
+      width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    html.has-media .header .hint{
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+    html.has-media .header .divider{
+      width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
     .stage{
       margin: 12px auto 0;
@@ -313,7 +306,6 @@ html.has-media .header .divider{
       z-index:999;
       display:none;
     }
-    /* ✅ 只要 has-media 就一定顯示 */
     html.has-media .qr-box{ display:block; }
 
     #qr{ width:154px; height:154px; }
@@ -413,6 +405,8 @@ html.has-media .header .divider{
       font-size:18px;
       font-weight:900;
       user-select:none;
+      color:#111;
+      text-decoration:none;
     }
     .icon-btn:hover{ background:#f3f3f3; }
 
@@ -532,89 +526,19 @@ html.has-media .header .divider{
       100%{ opacity:1; transform: translateY(0) scale(1); }
     }
     .draw-pill.show{ animation: revealIn 520ms ease-out forwards; }
-    /* 左下：全螢幕按鈕（主持頁限定） */
-.fs-left{
-  position: fixed;
-  left: 12px;
-  bottom: 12px;
-  width: 52px;
-  height: 52px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 900;
-  cursor: pointer;
-  user-select: none;
-  z-index: 998;
-}
 
-/* 只在主持頁顯示 */
-html.is-host .fs-left{
-  display: flex;
-}
-
-.fs-left:hover{
-  background:#f3f3f3;
-}
-/* =========================
-   主持頁｜左下快速跳轉
-========================= */
-.host-left-bottom{
-  position: fixed;
-  left: 10px;
-  bottom: 10px;
-  z-index: 998;
-  display: none;
-}
-
-/* 只在主持頁顯示 */
-html.is-host .host-left-bottom{
-  display: block;
-}
-
-.quick-link{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
-  font-weight: 900;
-  font-size: 14px;
-  color: #111;
-  text-decoration: none;
-  user-select: none;
-}
-
-.quick-link:hover{
-  background: #fff;
-  transform: translateY(-1px);
-}
-/* =========================
-   主持頁｜系統控制區（左下）
-   全螢幕 + 抽獎工具
-========================= */
-.host-system-controls{
-  position: fixed;
-  left: 10px;
-  bottom: 10px;
-  display: none;
-  gap: 10px;
-  z-index: 999;
-}
-
-/* 只在主持頁顯示 */
-html.is-host .host-system-controls{
-  display: flex;
-}
-
+    /* ✅ 主持頁｜左下系統控制（全螢幕 + 抽獎工具） */
+    .host-system-controls{
+      position: fixed;
+      left: 10px;
+      bottom: 10px;
+      display: none;
+      gap: 10px;
+      z-index: 999;
+    }
+    html.is-host .host-system-controls{
+      display: flex;
+    }
   </style>
 </head>
 
@@ -623,11 +547,6 @@ html.is-host .host-system-controls{
     <canvas id="qr"></canvas>
     <div class="qr-text">掃描參加抽獎</div>
   </div>
-  
-<!-- 左下：全螢幕切換 -->
-<div class="fs-left" id="fsBtn" title="全螢幕 / 解除全螢幕">
-  ⛶
-</div>
 
   <div class="host-top" id="hostTop">
     <div class="host-actions">
@@ -686,6 +605,17 @@ html.is-host .host-system-controls{
     </div>
   </div>
 
+  <!-- ✅ 左下：主持快速工具（唯一的 fsBtn，不會再變 2 個） -->
+  <div class="host-system-controls">
+    <button class="icon-btn" id="fsBtn" title="全螢幕">⛶</button>
+    <a
+      href="http://localhost:6719/log-lottery/home"
+      target="_blank"
+      class="icon-btn"
+      title="開啟加碼 log-lottery"
+    >🎰</a>
+  </div>
+
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 
@@ -706,15 +636,11 @@ html.is-host .host-system-controls{
     const draw3Btn = document.getElementById("draw3Btn");
 
     const drawOverlay = document.getElementById("drawOverlay");
-
-
     const drawBox = document.getElementById("drawBox");
     const drawName = document.getElementById("drawName");
     const drawSub = document.getElementById("drawSub");
     const drawClose = document.getElementById("drawClose");
     const drawList = document.getElementById("drawList");
-
-    const qrBox = document.getElementById("qrBox");
 
     const mediaSlot = document.getElementById("mediaSlot");
     const bgVideo = document.getElementById("bgVideo");
@@ -904,7 +830,7 @@ html.is-host .host-system-controls{
       }
     }
 
-    // ===== 抽獎 overlay（保持你原本）=====
+    // ===== 抽獎 overlay =====
     function openDrawOverlay(){
       if (!drawOverlay || !drawName || !drawSub || !drawList || !drawBox) return;
       drawOverlay.style.display = "flex";
@@ -918,6 +844,7 @@ html.is-host .host-system-controls{
     function closeDrawOverlay(){
       if (!drawOverlay) return;
       drawOverlay.style.display = "none";
+      stopDrawSound();
     }
     if (drawClose) drawClose.addEventListener("click", closeDrawOverlay);
     if (drawOverlay) {
@@ -936,20 +863,17 @@ html.is-host .host-system-controls{
       }, 140);
       setTimeout(() => clearInterval(t), durationMs);
     }
+
     if (isHost && draw3Btn) {
-draw3Btn.addEventListener("click", async () => {
-  // ✅ 先解鎖（保證後面中獎音效不會被擋）
-  await unlockAudioOnce();
-
-  openDrawOverlay();
-  rollingText(1200);
-
-  playDrawSound(); // 🔊 抽獎中音效
-  socket.emit("host_draw", { n: 3 });
-});
-
-
+      draw3Btn.addEventListener("click", async () => {
+        await unlockAudioOnce();
+        openDrawOverlay();
+        rollingText(1200);
+        playDrawSound();
+        socket.emit("host_draw", { n: 3 });
+      });
     }
+
     socket.on("draw_result", (r) => {
       if (!isHost) return;
       if (!drawName || !drawSub || !drawList || !drawBox) return;
@@ -963,6 +887,7 @@ draw3Btn.addEventListener("click", async () => {
       openDrawOverlay();
 
       if (!r?.ok || winners.length === 0) {
+        stopDrawSound();
         drawName.textContent = r?.reason || "抽獎失敗";
         drawSub.textContent = "";
         return;
@@ -971,58 +896,48 @@ draw3Btn.addEventListener("click", async () => {
       drawSub.textContent = `參與者共 ${Number(r.total ?? winners.length)} 人`;
       drawName.textContent = "準備揭曉…";
 
-   setTimeout(() => {
-  stopDrawSound();
+      setTimeout(() => {
+        stopDrawSound();
 
-  drawName.style.display = "none";
-  drawList.style.display = "grid";
-  drawList.innerHTML = "";
+        drawName.style.display = "none";
+        drawList.style.display = "grid";
+        drawList.innerHTML = "";
 
-winners.slice(0, 3).forEach((w, idx) => {
-  const pill = document.createElement("div");
-  pill.className = "draw-pill";
-  pill.innerHTML = `
-    <div class="draw-rank">第 ${idx + 1} 位</div>
-    <div class="draw-winner">桌 ${escapeHtml(w.tableNo)}｜${escapeHtml(w.name)}</div>
-  `;
-  drawList.appendChild(pill);
+        winners.slice(0, 3).forEach((w, idx) => {
+          const pill = document.createElement("div");
+          pill.className = "draw-pill";
+          pill.innerHTML = `
+            <div class="draw-rank">第 ${idx + 1} 位</div>
+            <div class="draw-winner">桌 ${escapeHtml(w.tableNo)}｜${escapeHtml(w.name)}</div>
+          `;
+          drawList.appendChild(pill);
 
-  setTimeout(() => {
-    pill.classList.add("show");
+          setTimeout(() => {
+            pill.classList.add("show");
+            if (idx === 0) playWinSound(); // ✅ 只播一次（第一名）
+          }, idx * 650);
+        });
 
-    // ✅ 只在第一名播音效
-if (idx === 0) {
-  playWinSound();
-}
-
-  }, idx * 650);
-});
-
-
-  drawSub.textContent = "🎉 恭喜得獎！";
-}, 800);
-
+        drawSub.textContent = "🎉 恭喜得獎！";
+      }, 800);
     });
 
-    // ===== 影片（✅ 已修好：下一首、排序、有聲、點影片播放）=====
+    // ===== 影片 =====
     function showFallback(on){
       if (!mediaFallback) return;
       mediaFallback.style.display = on ? "flex" : "none";
     }
 
-    // has-media 顯示影片區（保險）
     if (hasMedia && mediaSlot) {
       mediaSlot.style.display = "block";
       showFallback(true);
     }
 
-    let playlist = [];     // [{ name, url }]
+    let playlist = [];
     let currentIndex = -1;
 
     function cleanupPlaylist() {
-      playlist.forEach(v => {
-        try { URL.revokeObjectURL(v.url); } catch(e){}
-      });
+      playlist.forEach(v => { try { URL.revokeObjectURL(v.url); } catch(e){} });
       playlist = [];
       currentIndex = -1;
     }
@@ -1032,11 +947,9 @@ if (idx === 0) {
       if (!playlist[index]) return;
 
       currentIndex = index;
-
       bgVideo.src = playlist[index].url;
       bgVideo.loop = false;
 
-      // ✅ 預設有聲（第一次需要使用者互動，後續就可以）
       bgVideo.muted = false;
       if (vidMute) vidMute.textContent = "🔊";
 
@@ -1044,28 +957,18 @@ if (idx === 0) {
       bgVideo.preload = "auto";
 
       showFallback(false);
-
       bgVideo.load();
 
-      if (autoplay) {
-        bgVideo.play().catch(()=>{});
-      }
+      if (autoplay) bgVideo.play().catch(()=>{});
     }
 
     function nextVideo() {
-      if (!playlist.length) {
-        alert("請先按右下 📁 選擇影片（可一次多選）");
-        return;
-      }
-      if (playlist.length === 1) {
-        alert("目前清單只有 1 支影片，無法切下一首");
-        return;
-      }
+      if (!playlist.length) return alert("請先按右下 📁 選擇影片（可一次多選）");
+      if (playlist.length === 1) return alert("目前清單只有 1 支影片，無法切下一首");
       const next = (currentIndex + 1) % playlist.length;
       loadVideoByIndex(next, true);
     }
 
-    // ✅ 點影片：解除靜音 + 播放（滿足瀏覽器的 user gesture）
     if (bgVideo) {
       bgVideo.addEventListener("click", () => {
         bgVideo.muted = false;
@@ -1082,18 +985,9 @@ if (idx === 0) {
         if (!files.length) return;
 
         cleanupPlaylist();
+        files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" }));
 
-        // ✅ 依檔名排序（A→Z / 01→99）
-        files.sort((a, b) =>
-          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" })
-        );
-
-        playlist = files.map(file => ({
-          name: file.name,
-          url: URL.createObjectURL(file)
-        }));
-
-        // ✅ 從第 0 支開始，並嘗試播放（若被擋就點影片一下）
+        playlist = files.map(file => ({ name: file.name, url: URL.createObjectURL(file) }));
         loadVideoByIndex(0, true);
       });
     }
@@ -1127,65 +1021,46 @@ if (idx === 0) {
         location.reload();
       });
     }
+
     // ================================
-// 全螢幕切換（主持頁｜左下）
-// ================================
-const fsBtn = document.getElementById("fsBtn");
+    // ✅ 全螢幕切換（主持頁｜左下唯一按鈕）
+    // ================================
+    const fsBtn = document.getElementById("fsBtn");
 
-function isFullscreen() {
-  return !!document.fullscreenElement;
-}
+    function isFullscreen() {
+      return !!document.fullscreenElement;
+    }
 
-async function enterFullscreen() {
-  await document.documentElement.requestFullscreen();
-}
+    async function enterFullscreen() {
+      await document.documentElement.requestFullscreen();
+    }
 
-async function exitFullscreen() {
-  await document.exitFullscreen();
-}
+    async function exitFullscreen() {
+      await document.exitFullscreen();
+    }
 
-function syncFsIcon() {
-  if (!fsBtn) return;
-  const on = isFullscreen();
-  fsBtn.textContent = on ? "⤢" : "⛶";
-  fsBtn.title = on ? "解除全螢幕" : "全螢幕";
-}
+    function syncFsIcon() {
+      if (!fsBtn) return;
+      const on = isFullscreen();
+      fsBtn.textContent = on ? "⤢" : "⛶";
+      fsBtn.title = on ? "解除全螢幕" : "全螢幕";
+    }
 
-if (isHost && fsBtn) {
-  fsBtn.addEventListener("click", async () => {
-    try {
-      if (!isFullscreen()) {
-        await enterFullscreen();
-      } else {
-        await exitFullscreen();
-      }
-    } catch (e) {
-      alert("全螢幕被瀏覽器阻擋，請確認是由點擊觸發");
-    } finally {
+    if (isHost && fsBtn) {
+      fsBtn.addEventListener("click", async () => {
+        try {
+          if (!isFullscreen()) await enterFullscreen();
+          else await exitFullscreen();
+        } catch (e) {
+          alert("全螢幕被瀏覽器阻擋，請確認是由點擊觸發");
+        } finally {
+          syncFsIcon();
+        }
+      });
+
+      document.addEventListener("fullscreenchange", syncFsIcon);
       syncFsIcon();
     }
-  });
-
-  document.addEventListener("fullscreenchange", syncFsIcon);
-  syncFsIcon();
-}
-
   </script>
-
-  <!-- 左下：主持快速工具 -->
-<div class="host-system-controls">
-  <button class="icon-btn" id="fsBtn" title="全螢幕">⛶</button>
-
-  <a
-    href="http://localhost:6719/log-lottery/home"
-    target="_blank"
-    class="icon-btn"
-    title="開啟加碼 log-lottery"
-  >
-    🎰
-  </a>
-</div>
-
-
 </body>
 </html>
