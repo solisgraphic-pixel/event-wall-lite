@@ -597,6 +597,23 @@ html.is-host .host-left-bottom{
   background: #fff;
   transform: translateY(-1px);
 }
+/* =========================
+   主持頁｜系統控制區（左下）
+   全螢幕 + 抽獎工具
+========================= */
+.host-system-controls{
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  display: none;
+  gap: 10px;
+  z-index: 999;
+}
+
+/* 只在主持頁顯示 */
+html.is-host .host-system-controls{
+  display: flex;
+}
 
   </style>
 </head>
@@ -1156,16 +1173,19 @@ if (isHost && fsBtn) {
   </script>
 
   <!-- 左下：主持快速工具 -->
-<div class="host-left-bottom" id="hostLeftBottom">
+<div class="host-system-controls">
+  <button class="icon-btn" id="fsBtn" title="全螢幕">⛶</button>
+
   <a
-    href="http://localhost:6719/log-lottery/home" 
+    href="http://localhost:6719/log-lottery/home"
     target="_blank"
-    class="quick-link"
-    title="開啟抽獎工具 log-lottery"
+    class="icon-btn"
+    title="開啟加碼 log-lottery"
   >
-    🎰 抽獎工具
+    🎰
   </a>
 </div>
+
 
 </body>
 </html>
