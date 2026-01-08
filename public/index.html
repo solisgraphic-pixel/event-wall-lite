@@ -134,12 +134,18 @@
       text-align: center;
       box-sizing: border-box;
     }
-    html.has-media .header .hint{
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-    }
+html.has-media .header .hint{
+  font-size: 18px;      /* ✅ 只改主持/投影頁副標字體大小：你要多大改這裡 */
+  font-weight: 800;     /* 可選：更有存在感 */
+  line-height: 1.4;     /* 可選：更好讀 */
+  letter-spacing: .6px; /* 可選：更有質感 */
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
     html.has-media .header .divider{
       width: 520px;
       margin-left: auto;
