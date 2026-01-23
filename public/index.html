@@ -693,11 +693,20 @@ html.has-media body::before{
       return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
-function normalizeTableNo(input) {
-   return String(input ?? "").trim(); // 直接返回輸入的桌號，不做數字轉換
-}
-
-<input id="tableNo" type="text" placeholder="請輸入桌號（如：一桌、2桌）">    
+    function normalizeTableNo(input) {
+      const raw = String(input ?? "").trim();
+      const zhMap = {
+        "一":1,"二":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9,"十":10,
+        "十一":11,"十二":12,"十三":13,"十四":14,"十五":15,"十六":16,"十七":17,"十八":18,"十九":19,"二十":20,
+        "壹":1,"貳":2,"參":3,"肆":4,"伍":5,"陸":6,"柒":7,"捌":8,"玖":9,"拾":10
+      };
+      const m = raw.match(/第?\s*([壹貳參肆伍陸柒捌玖拾一二三四五六七八九十]+)\s*桌?/);
+      if (m && zhMap[m[1]] != null) return String(zhMap[m[1]]);
+      const digits = raw.replace(/[^\d]/g, "");
+      if (!digits) return "";
+      const n = String(parseInt(digits, 10));
+      return (n === "NaN" || n === "0") ? "" : n;
+    }
 
     if (tableEl && !tableEl.disabled) {
       tableEl.addEventListener("blur", () => {
