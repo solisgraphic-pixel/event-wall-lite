@@ -342,13 +342,27 @@
   </div>
 
   <div class="controls" id="controls">
-    <!-- 控制按鈕這裡 -->
+    <input id="pickVideo" type="file" accept="video/*" multiple style="display:none;">
+    <button class="icon-btn" id="pickVideoBtn" title="選影片" aria-label="選影片">📁</button>
+    <button class="icon-btn" id="vidPlay" title="播放" aria-label="播放">▶️</button>
+    <button class="icon-btn" id="vidPause" title="暫停" aria-label="暫停">⏸️</button>
+    <button class="icon-btn" id="vidMute" title="靜音/有聲" aria-label="靜音/有聲">🔊</button>
+    <button class="icon-btn" id="vidNext" title="下一支" aria-label="下一支">⏭️</button>
+  </div>
+
+  <div class="header">
+    <h1>SOLIS 神馬都好</h1>
+    <div class="hint">歡迎蒞臨 SOLIS 活動現場｜掃描 QR Code 留言互動｜精美小禮等你來抽</div>
+    <div class="divider"></div>
   </div>
 
   <div class="stage">
     <div class="panel">
       <div class="grid input-area">
-        <!-- 輸入框區域 -->
+        <input id="tableNo" placeholder="請輸入桌號（必填，如：2）">
+        <input id="name" placeholder="請輸入稱呼（必填）">
+        <input id="message" placeholder="請輸入你想對 SOLIS 說的話～（例如：我要中頭獎）">
+        <button id="send">送出</button>
       </div>
       <div class="wall" id="wall"></div>
     </div>
@@ -365,6 +379,26 @@
     <img src="logo.png" alt="SOLIS">
   </div>
 
-  <!-- 其他內容 -->
+  <div class="draw-overlay" id="drawOverlay">
+    <div class="draw-box" id="drawBox">
+      <div class="confetti"></div>
+      <button class="draw-close" id="drawClose" aria-label="Close">✕</button>
+      <div class="draw-title">WINNERS</div>
+      <div class="draw-name" id="drawName">準備抽獎…</div>
+      <div class="draw-list" id="drawList"></div>
+      <div class="draw-sub" id="drawSub"></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <script>
+    const isWall = document.documentElement.classList.contains("wall-only");
+    const isHost = document.documentElement.classList.contains("is-host");
+    const hasMedia = document.documentElement.classList.contains("has-media");
+
+    const socket = io();
+    // 其他功能不變...
+  </script>
 </body>
 </html>
