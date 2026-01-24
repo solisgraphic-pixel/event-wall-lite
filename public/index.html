@@ -608,6 +608,56 @@ html.has-media body::before{
 
     <div class="media-slot" id="mediaSlot">
       <video id="bgVideo" playsinline preload="metadata"></video>
+      // ================================
+// ✅ 滑鼠移到影片上：顯示原生進度條（只在支援 hover 的裝置）
+// ================================
+(function enableHoverControls(){
+  if (!bgVideo) return;
+
+  // 手機/平板多數沒有 hover，就不要啟用（避免怪怪的）
+  const canHover = window.matchMedia && window.matchMedia("(hover: hover)").matches;
+  if (!canHover) return;
+
+  let hideTimer = null;
+
+  function showControls(){
+    bgVideo.controls = true; // 顯示底部控制列(含進度條)
+    // 一些瀏覽器需要重新聚焦才會立刻顯示
+    bgVideo.focus?.();
+  }
+
+  function hideControls(){
+    bgVideo.controls = false;
+  }
+
+  function scheduleHide(ms = 1600){
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      // 若滑鼠還在影片上就不關
+      if (!bgVideo.matches(":hover")) return;
+      hideControls();
+    }, ms);
+  }
+
+  bgVideo.addEventListener("mouseenter", () => {
+    showControls();
+    scheduleHide(2000);
+  });
+
+  bgVideo.addEventListener("mousemove", () => {
+    showControls();
+    scheduleHide(1600);
+  });
+
+  bgVideo.addEventListener("mouseleave", () => {
+    clearTimeout(hideTimer);
+    hideControls();
+  });
+
+  // 初始先關掉，避免一開始就出現
+  hideControls();
+})();
+
       <div class="media-fallback" id="mediaFallback">
         SOLIS 活動現場<br/>播放區
       </div>
