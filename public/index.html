@@ -134,23 +134,6 @@
       text-align: center;
       box-sizing: border-box;
     }
-html.has-media .header .hint{
-  font-size: 18px;      /* ✅ 只改主持/投影頁副標字體大小：你要多大改這裡 */
-  font-weight: 800;     /* 可選：更有存在感 */
-  line-height: 1.4;     /* 可選：更好讀 */
-  letter-spacing: .6px; /* 可選：更有質感 */
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-
-    html.has-media .header .divider{
-      width: 520px;
-      margin-left: auto;
-      margin-right: auto;
-    }
 
     .stage{
       margin: 12px auto 0;
@@ -242,13 +225,7 @@ html.has-media .header .hint{
       word-break:break-word;
     }
 
-    @keyframes popIn{
-      0%{ transform: translateY(10px) scale(.98); opacity:0; }
-      60%{ transform: translateY(0) scale(1.02); opacity:1; }
-      100%{ transform: translateY(0) scale(1); opacity:1; }
-    }
-    .item.is-new .line{ animation: popIn 420ms ease-out; outline:3px solid rgba(255,106,0,0.18); }
-
+    /* 新增影片顯示進度條的功能 */
     .media-slot{
       height:100%;
       background:#000;
@@ -258,6 +235,7 @@ html.has-media .header .hint{
       display:none;
       position:relative;
     }
+
     .media-slot video{
       width:100%;
       height:100%;
@@ -275,6 +253,7 @@ html.has-media .header .hint{
       max-width: 360px;
       flex: 0 0 auto;
     }
+
     html.has-media .media-slot video{
       width: 100%;
       height: 100%;
@@ -300,269 +279,51 @@ html.has-media .header .hint{
         #0b0b0b;
     }
 
-    .qr-box{
-      position:fixed;
-      left:10px;
-      top:10px;
-      background:#fff;
-      padding:10px;
-      border-radius:16px;
-      box-shadow: var(--shadow2);
-      text-align:center;
-      z-index:999;
-      display:none;
-    }
-    html.has-media .qr-box{ display:block; }
+    /* 影片控制 */
+    function enableHoverControls(){
+      const bgVideo = document.getElementById("bgVideo");
+      if (!bgVideo) return;
 
-    #qr{ width:154px; height:154px; }
-    .qr-text{
-      margin-top:8px;
-      font-size:16px;
-      font-weight:900;
-      color:var(--orange);
-      letter-spacing:1px;
-    }
+      const canHover = window.matchMedia && window.matchMedia("(hover: hover)").matches;
+      if (!canHover) return;
 
-    .host-top{
-      position:fixed;
-      right:10px;
-      top:10px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(8px);
-      border-radius:16px;
-      padding:10px 12px;
-      box-shadow: var(--shadow2);
-      z-index:998;
-      display:none;
-      flex-direction:column;
-      gap:8px;
-      align-items:flex-end;
-    }
-    html.is-host .host-top{ display:flex; }
+      let hideTimer = null;
 
-    .host-actions{
-      display:flex;
-      gap:10px;
-      align-items:center;
+      function showControls(){
+        bgVideo.controls = true;
+      }
+
+      function hideControls(){
+        bgVideo.controls = false;
+      }
+
+      function scheduleHide(ms = 1600){
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => {
+          if (!bgVideo.matches(":hover")) return;
+          hideControls();
+        }, ms);
+      }
+
+      bgVideo.addEventListener("mouseenter", () => {
+        showControls();
+        scheduleHide(2000);
+      });
+
+      bgVideo.addEventListener("mousemove", () => {
+        showControls();
+        scheduleHide(1600);
+      });
+
+      bgVideo.addEventListener("mouseleave", () => {
+        clearTimeout(hideTimer);
+        hideControls();
+      });
+
+      hideControls();
     }
 
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      padding:10px 14px;
-      border-radius:999px;
-      border:1px solid #ddd;
-      background:#fff;
-      font-weight:900;
-      cursor:pointer;
-      user-select:none;
-      white-space:nowrap;
-      min-height: 42px;
-    }
-    .pill.orange{
-      border:none;
-      background: linear-gradient(135deg, #ff7a00, #ff9a3c);
-      color:#fff;
-      box-shadow: 0 6px 16px rgba(255,122,0,0.35);
-    }
-
-    .count{
-      font-size:14px;
-      color:#555;
-      font-weight:800;
-      padding:0 4px;
-      white-space:nowrap;
-    }
-    @keyframes countFlash {
-      0% { color:var(--orange); transform:scale(1); }
-      40%{ color:var(--orange); transform:scale(1.12); }
-      100%{ color:#555; transform:scale(1); }
-    }
-    .count.flash{ animation:countFlash 600ms ease-out; }
-
-    .controls{
-      position:fixed;
-      right:10px;
-      bottom:10px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(8px);
-      border-radius:16px;
-      padding:10px 10px;
-      box-shadow: var(--shadow2);
-      z-index:998;
-      display:none;
-      gap:10px;
-      align-items:center;
-    }
-    html.is-host .controls{ display:flex; }
-
-    .icon-btn{
-      width:46px;
-      height:46px;
-      border-radius:999px;
-      border:1px solid #ddd;
-      background:#fff;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size:18px;
-      font-weight:900;
-      user-select:none;
-      color:#111;
-      text-decoration:none;
-    }
-    .icon-btn:hover{ background:#f3f3f3; }
-
-    .brand{
-      text-align:center;
-      margin: 18px auto 8px;
-      opacity:.95;
-      pointer-events:none;
-    }
-    .brand img{ max-height:88px; }
-
-    html.has-media .brand{
-      position:fixed;
-      left:50%;
-      bottom:12px;
-      transform:translateX(-50%);
-      z-index:997;
-      margin:0;
-    }
-    html.has-media .brand img{ max-height:96px; }
-
-    .draw-overlay{
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.55);
-      display: none;
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .draw-box{
-      width: min(920px, 94vw);
-      background: #fff;
-      border-radius: 24px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.35);
-      padding: 26px 26px 22px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .confetti{
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      opacity:.85;
-      background:
-        radial-gradient(circle at 10% 20%, rgba(255,106,0,.55), transparent 30%),
-        radial-gradient(circle at 80% 10%, rgba(0,0,0,.15), transparent 25%),
-        radial-gradient(circle at 90% 70%, rgba(255,106,0,.35), transparent 28%),
-        radial-gradient(circle at 30% 80%, rgba(0,0,0,.08), transparent 25%);
-      mix-blend-mode: multiply;
-      transform: scale(1.1);
-    }
-    .draw-close{
-      position:absolute;
-      right: 18px;
-      top: 14px;
-      border:none;
-      background: transparent;
-      font-size: 22px;
-      cursor: pointer;
-      color: #666;
-    }
-    .draw-title{
-      font-size: 18px;
-      color: #666;
-      margin-bottom: 12px;
-      font-weight: 900;
-      letter-spacing: 1px;
-    }
-    .draw-name{
-      font-size: clamp(42px, 6vw, 86px);
-      font-weight: 1000;
-      margin: 6px 0 8px;
-      color: #111;
-    }
-    .draw-sub{
-      font-size: 16px;
-      color: #777;
-      margin-top: 10px;
-    }
-    .draw-list{
-      margin-top: 10px;
-      display: none;
-      gap: 14px;
-      justify-items: center;
-    }
-    .draw-pill{
-      width: min(720px, 92%);
-      background: #fff;
-      border-radius: 18px;
-      padding: 16px 18px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-      display:flex;
-      align-items: baseline;
-      gap: 14px;
-      opacity: 0;
-      transform: translateY(10px) scale(.98);
-    }
-    .draw-rank{
-      font-weight: 1000;
-      font-size: 18px;
-      color: var(--orange);
-      letter-spacing: 1px;
-      white-space: nowrap;
-    }
-    .draw-winner{
-      font-weight: 1000;
-      font-size: clamp(24px, 3.2vw, 40px);
-      color:#111;
-      word-break: break-word;
-    }
-    @keyframes revealIn{
-      0% { opacity:0; transform: translateY(14px) scale(.97); }
-      60%{ opacity:1; transform: translateY(0) scale(1.02); }
-      100%{ opacity:1; transform: translateY(0) scale(1); }
-    }
-    .draw-pill.show{ animation: revealIn 520ms ease-out forwards; }
-
-    /* ✅ 主持頁｜左下系統控制（全螢幕 + 抽獎工具） */
-    .host-system-controls{
-      position: fixed;
-      left: 10px;
-      bottom: 10px;
-      display: none;
-      gap: 10px;
-      z-index: 999;
-    }
-    html.is-host .host-system-controls{
-      display: flex;
-    }
-    /* =========================
-   主持 / 投影頁背景圖
-   圖片位置：public/my-cover-2.jpg
-========================= */
-html.has-media body{
-  background: url("/my-cover-2.jpg") center center / cover no-repeat fixed !important;
-}
-
-/* 白霧遮罩（讓文字清楚，不吃畫面） */
-html.has-media body::before{
-  content:"";
-  position: fixed;
-  inset: 0;
-  background: rgba(255,255,255,0.78);
-  pointer-events: none;
-  z-index: -1;
-}
-
+    window.addEventListener("load", enableHoverControls); // 載入時啟用控制
   </style>
 </head>
 
@@ -580,4 +341,30 @@ html.has-media body::before{
     <div class="count" id="playerCount">參與者：0 人</div>
   </div>
 
-  <div class="controls
+  <div class="controls" id="controls">
+    <!-- 控制按鈕這裡 -->
+  </div>
+
+  <div class="stage">
+    <div class="panel">
+      <div class="grid input-area">
+        <!-- 輸入框區域 -->
+      </div>
+      <div class="wall" id="wall"></div>
+    </div>
+
+    <div class="media-slot" id="mediaSlot">
+      <video id="bgVideo" playsinline preload="metadata"></video>
+      <div class="media-fallback" id="mediaFallback">
+        SOLIS 活動現場<br/>播放區
+      </div>
+    </div>
+  </div>
+
+  <div class="brand">
+    <img src="logo.png" alt="SOLIS">
+  </div>
+
+  <!-- 其他內容 -->
+</body>
+</html>
